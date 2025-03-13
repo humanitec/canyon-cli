@@ -1,0 +1,26 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: setup-go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: test
+        run: go run gotest.tools/gotestsum@latest --format github-actions
+      - name: lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+      - name: tidy
+        run: go mod tidy
+      - name: diff
+        run: git diff --exit-code
