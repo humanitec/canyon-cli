@@ -3,7 +3,7 @@ package echo
 import (
 	"log/slog"
 
-	"github.com/humanitec/canyon-cli/internal/mpc"
+	"github.com/humanitec/canyon-cli/internal/mcp"
 	"github.com/humanitec/canyon-cli/internal/ref"
 	"github.com/humanitec/canyon-cli/internal/rpc"
 )
@@ -13,7 +13,7 @@ func NewEchoServer() rpc.Server {
 		Handler: rpc.HandlerFunc(func(req rpc.JsonRpcRequest, notifications chan<- rpc.JsonRpcNotification) (*rpc.JsonRpcResponse, error) {
 			slog.Debug("Echoing request", slog.Any("req", req.LogValue()))
 
-			notifications <- mpc.ServerNotification{LoggingMessageNotification: &mpc.LoggingMessageNotification{
+			notifications <- mcp.ServerNotification{LoggingMessageNotification: &mcp.LoggingMessageNotification{
 				Level: "info",
 				Data:  "this is a log message",
 			}}

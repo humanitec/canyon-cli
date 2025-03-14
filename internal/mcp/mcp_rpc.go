@@ -1,9 +1,13 @@
-package mpc
+package mcp
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
+	"strings"
 
+	"github.com/humanitec/canyon-cli/internal/ref"
 	"github.com/humanitec/canyon-cli/internal/rpc"
 )
 
@@ -313,4 +317,83 @@ type LoggingMessageNotification struct {
 }
 
 type ToolListChangedNotification struct {
+}
+
+type McpIo interface {
+	Initialize(context.Context, InitializeRequest, chan<- ServerNotification) (*InitializeResponse, error)
+	ListTools(context.Context, ListToolsRequest, chan<- ServerNotification) (*ListToolsResponse, error)
+	CallTool(context.Context, CallToolRequest, chan<- ServerNotification) (*CallToolResponse, error)
+	ListPrompts(context.Context, ListPromptsRequest, chan<- ServerNotification) (*ListPromptsResponse, error)
+	GetPrompt(context.Context, GetPromptRequest, chan<- ServerNotification) (*GetPromptResponse, error)
+	ListResources(context.Context, ListResourcesRequest, chan<- ServerNotification) (*ListResourcesResponse, error)
+	ReadResource(context.Context, ReadResourceRequest, chan<- ServerNotification) (*ReadResourceResponse, error)
+	ListResourcesTemplates(context.Context, ListResourceTemplatesRequest, chan<- ServerNotification) (*ListResourceTemplatesResponse, error)
+	SetLevel(context.Context, SetLevelRequest, chan<- ServerNotification) (*SetLevelResponse, error)
+}
+
+func wrap[x any, y any](request rpc.JsonRpcRequest, notifications chan<- ServerNotification, f func(context.Context, x, chan<- ServerNotification) (*y, error)) (*rpc.JsonRpcResponse, error) {
+	var ir x
+	if len(request.Params) > 0 {
+		if err := json.Unmarshal(request.Params, &ir); err != nil {
+			slog.Error("failed to unmarshal request", slog.Any("err", err), slog.String("request", string(request.Params)))
+			return nil, rpc.JsonRpcError{Code: rpc.JsonRpcInvalidParamsError, Message: err.Error(), Data: map[string]interface{}{"raw": string(request.Params)}}
+		}
+	}
+	if irr, err := f(request.Context(), ir, notifications); err != nil {
+		slog.Error("returning json rpc error", slog.Any("err", err))
+		return nil, rpc.NewJsonRpcErrorFromErr(err)
+	} else if raw, err := json.Marshal(irr); err != nil {
+		slog.Error("failed to marshal response", slog.Any("err", err))
+		return nil, rpc.NewJsonRpcErrorFromErr(err)
+	} else {
+		return &rpc.JsonRpcResponse{JsonRpcResponseInner: &rpc.JsonRpcResponseInner{
+			Id: ref.Deref(request.Id, -1), Result: raw,
+		}}, nil
+	}
+}
+
+func AsHandler(inner McpIo) rpc.Handler {
+	return rpc.HandlerFunc(func(req rpc.JsonRpcRequest, notifications chan<- rpc.JsonRpcNotification) (*rpc.JsonRpcResponse, error) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		snc := make(chan ServerNotification)
+		go func() {
+			for {
+				select {
+				case n := <-snc:
+					notifications <- n
+				case <-ctx.Done():
+					return
+				}
+			}
+		}()
+		switch req.Method {
+		case "initialize":
+			return wrap[InitializeRequest, InitializeResponse](req, snc, inner.Initialize)
+		case "tools/list":
+			return wrap[ListToolsRequest, ListToolsResponse](req, snc, inner.ListTools)
+		case "tools/call":
+			return wrap[CallToolRequest, CallToolResponse](req, snc, inner.CallTool)
+		case "prompts/list":
+			return wrap[ListPromptsRequest, ListPromptsResponse](req, snc, inner.ListPrompts)
+		case "prompts/get":
+			return wrap[GetPromptRequest, GetPromptResponse](req, snc, inner.GetPrompt)
+		case "resources/list":
+			return wrap[ListResourcesRequest, ListResourcesResponse](req, snc, inner.ListResources)
+		case "resources/templates/list":
+			return wrap[ListResourceTemplatesRequest, ListResourceTemplatesResponse](req, snc, inner.ListResourcesTemplates)
+		case "resources/read":
+			return wrap[ReadResourceRequest, ReadResourceResponse](req, snc, inner.ReadResource)
+		case "logging/setLevel":
+			return wrap[SetLevelRequest, SetLevelResponse](req, snc, inner.SetLevel)
+		default:
+			if strings.HasPrefix(req.Method, "notifications/") {
+				slog.Debug("dropping unsupported notification", slog.Any("method", req.Method))
+				return nil, nil
+			}
+			slog.Warn("ignoring unknown method", slog.Any("method", req.Method))
+			return nil, rpc.JsonRpcError{Code: rpc.JsonRpcMethodNotFoundError, Message: fmt.Sprintf("method not found: %s", req.Method)}
+		}
+
+	})
 }

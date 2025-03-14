@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 
-	"github.com/humanitec/canyon-cli/internal/echo"
+	"github.com/humanitec/canyon-cli/internal/mcp"
 	"github.com/humanitec/canyon-cli/internal/ref"
 	"github.com/humanitec/canyon-cli/internal/rpc"
 )
@@ -44,7 +44,10 @@ var rpcCmd = &cobra.Command{
 		}
 		rawRawParams, _ := json.Marshal(intermediate)
 
-		server := echo.NewEchoServer()
+		h := mcp.AsHandler(&mcp.Impl{})
+		h = rpc.RecoveryMiddleware(h)
+		h = rpc.LoggingMiddleware(h)
+		server := &rpc.Generic{Handler: h}
 		in := server.In()
 		defer close(in)
 

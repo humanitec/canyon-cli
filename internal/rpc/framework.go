@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"context"
+	"errors"
 	"sync"
 
 	"github.com/humanitec/canyon-cli/internal/ref"
@@ -20,6 +21,16 @@ type HandlerFunc func(req JsonRpcRequest, notifications chan<- JsonRpcNotificati
 
 func (f HandlerFunc) Handle(req JsonRpcRequest, notifications chan<- JsonRpcNotification) (*JsonRpcResponse, error) {
 	return f(req, notifications)
+}
+
+type Middleware interface {
+	Wrap(next Handler) Handler
+}
+
+type MiddlewareFunc func(next Handler) Handler
+
+func (f MiddlewareFunc) Wrap(next Handler) Handler {
+	return f(next)
 }
 
 type Generic struct {
@@ -65,20 +76,26 @@ func (e *Generic) setup() {
 			for req := range e.in {
 				r, err := e.Handler.Handle(req, notifications)
 				if err != nil {
+					var rpcErr JsonRpcError
+					if !errors.As(err, &rpcErr) {
+						rpcErr = JsonRpcError{
+							Code:    JsonRpcInternalError,
+							Message: "internal error",
+							Data: map[string]interface{}{
+								"message": err.Error(),
+							},
+						}
+					}
 					r = ref.Ref(JsonRpcResponse{
 						JsonRpcResponseInner: &JsonRpcResponseInner{
-							Id: ref.Deref(req.Id, -1),
-							Error: &JsonRpcError{
-								Code:    JsonRpcInternalError,
-								Message: "internal error",
-								Data: map[string]interface{}{
-									"message": err.Error(),
-								},
-							},
+							Id:    ref.Deref(req.Id, -1),
+							Error: &rpcErr,
 						},
-					}.WithContext(r.Context()))
+					}.WithContext(req.Context()))
 				}
-				e.out <- *r
+				if r != nil {
+					e.out <- *r
+				}
 			}
 		}()
 	})

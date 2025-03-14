@@ -5,12 +5,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"math/rand/v2"
 	"time"
 
 	"github.com/spf13/cobra"
 
-	"github.com/humanitec/canyon-cli/internal/echo"
+	"github.com/humanitec/canyon-cli/internal/mcp"
 	"github.com/humanitec/canyon-cli/internal/ref"
 	"github.com/humanitec/canyon-cli/internal/rpc"
 )
@@ -22,13 +23,19 @@ var mcpCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cmd.SilenceUsage = true
 
-		server := echo.NewEchoServer()
+		h := mcp.AsHandler(&mcp.Impl{})
+		h = rpc.RecoveryMiddleware(h)
+		h = rpc.LoggingMiddleware(h)
+		server := &rpc.Generic{Handler: h}
 		in := server.In()
-		defer close(in)
 
 		scanner := bufio.NewScanner(cmd.InOrStdin())
 		errChan := make(chan error)
 		go func() {
+			defer func() {
+				slog.Info("Closing input session")
+				close(in)
+			}()
 			for {
 				select {
 				case <-cmd.Context().Done():
@@ -49,11 +56,7 @@ var mcpCmd = &cobra.Command{
 					if msg.Id == nil {
 						msg.Id = ref.Ref(int(rand.Int64()))
 					}
-					select {
-					case server.In() <- msg.WithContext(cmd.Context()):
-					default:
-						return
-					}
+					server.In() <- msg.WithContext(cmd.Context())
 				}
 			}
 		}()

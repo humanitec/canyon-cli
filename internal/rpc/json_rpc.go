@@ -57,7 +57,7 @@ type JsonRpcResponse struct {
 }
 
 type JsonRpcResponseInner struct {
-	Id     int             `json:"id,omitempty"`
+	Id     int             `json:"id"`
 	Result json.RawMessage `json:"result,omitempty"`
 	Error  *JsonRpcError   `json:"error,omitempty"`
 }
@@ -100,7 +100,10 @@ type JsonRpcError struct {
 }
 
 func (err JsonRpcError) Error() string {
-	return fmt.Sprintf("json rpc error: %d: %s (%#v)", err.Code, err.Message, err.Data)
+	if len(err.Data) > 0 {
+		return fmt.Sprintf("json rpc error: %d: %s (%#v)", err.Code, err.Message, err.Data)
+	}
+	return fmt.Sprintf("json rpc error: %d: %s", err.Code, err.Message)
 }
 
 func NewJsonRpcErrorFromErr(err error) JsonRpcError {
