@@ -2,12 +2,17 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"log/slog"
+	"math/rand/v2"
 	"time"
 
 	"github.com/spf13/cobra"
 
+	"github.com/humanitec/canyon-cli/internal/mcp"
+	"github.com/humanitec/canyon-cli/internal/ref"
 	"github.com/humanitec/canyon-cli/internal/rpc"
 )
 
@@ -18,13 +23,19 @@ var mcpCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cmd.SilenceUsage = true
 
-		server := rpc.NewEchoServer()
+		h := mcp.AsHandler(&mcp.Impl{})
+		h = rpc.RecoveryMiddleware(h)
+		h = rpc.LoggingMiddleware(h)
+		server := &rpc.Generic{Handler: h}
 		in := server.In()
-		defer close(in)
 
 		scanner := bufio.NewScanner(cmd.InOrStdin())
 		errChan := make(chan error)
 		go func() {
+			defer func() {
+				slog.Info("Closing input session")
+				close(in)
+			}()
 			for {
 				select {
 				case <-cmd.Context().Done():
@@ -36,15 +47,16 @@ var mcpCmd = &cobra.Command{
 						break
 					}
 					var msg rpc.JsonRpcRequest
-					if err := json.Unmarshal(scanner.Bytes(), &msg); err != nil {
+					dec := json.NewDecoder(bytes.NewReader(scanner.Bytes()))
+					dec.DisallowUnknownFields()
+					if err := dec.Decode(&msg); err != nil {
 						errChan <- fmt.Errorf("failed to read json formatted line '%q' as a request: %w", scanner.Text(), err)
 						return
 					}
-					select {
-					case server.In() <- msg:
-					default:
-						return
+					if msg.Id == nil {
+						msg.Id = ref.Ref(int(rand.Int64()))
 					}
+					server.In() <- msg.WithContext(cmd.Context())
 				}
 			}
 		}()

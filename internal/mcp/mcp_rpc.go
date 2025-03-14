@@ -1,8 +1,14 @@
-package rpc
+package mcp
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
+	"strings"
+
+	"github.com/humanitec/canyon-cli/internal/ref"
+	"github.com/humanitec/canyon-cli/internal/rpc"
 )
 
 type InitializeRequest struct {
@@ -286,42 +292,96 @@ type ServerNotification struct {
 	*ToolListChangedNotification
 }
 
-func (c ServerNotification) MarshalJSON() ([]byte, error) {
-	if c.LoggingMessageNotification != nil {
-		return json.Marshal(c.LoggingMessageNotification)
-	} else if c.ToolListChangedNotification != nil {
-		return json.Marshal(c.ToolListChangedNotification)
+func (sn ServerNotification) ToJsonRpcNotificationInner() rpc.JsonRpcNotificationInner {
+	if sn.LoggingMessageNotification != nil {
+		raw, _ := json.Marshal(sn.LoggingMessageNotification)
+		return rpc.JsonRpcNotificationInner{
+			Method: "notifications/message",
+			Params: raw,
+		}
+	} else if sn.ToolListChangedNotification != nil {
+		raw, _ := json.Marshal(sn.ToolListChangedNotification)
+		return rpc.JsonRpcNotificationInner{
+			Method: "notifications/tools/list_changed",
+			Params: raw,
+		}
 	} else {
-		return []byte("{}"), nil
+		return rpc.JsonRpcNotificationInner{}
 	}
 }
 
-type LoggingMessageNotificationMethod struct {
-}
-
-func (t LoggingMessageNotificationMethod) MarshalJSON() ([]byte, error) {
-	return json.Marshal("notification/message")
-}
-
 type LoggingMessageNotification struct {
-	Method LoggingMessageNotificationMethod `json:"method"`
-	Params LoggingMessageParams             `json:"params"`
-}
-
-type LoggingMessageParams struct {
 	Level  string `json:"level"`
 	Data   string `json:"data"`
 	Logger string `json:"logger,omitempty"`
 }
 
-type ToolListChangedNotificationMethod struct {
-}
-
-func (t ToolListChangedNotificationMethod) MarshalJSON() ([]byte, error) {
-	return json.Marshal("notification/tools/list_changed")
-}
-
 type ToolListChangedNotification struct {
-	Method ToolListChangedNotificationMethod `json:"method"`
-	Params map[string]interface{}            `json:"params"`
+}
+
+type McpIo interface {
+	SetNotifications(notifications chan<- ServerNotification)
+	Initialize(context.Context, InitializeRequest) (*InitializeResponse, error)
+	ListTools(context.Context, ListToolsRequest) (*ListToolsResponse, error)
+	CallTool(context.Context, CallToolRequest) (*CallToolResponse, error)
+	ListPrompts(context.Context, ListPromptsRequest) (*ListPromptsResponse, error)
+	GetPrompt(context.Context, GetPromptRequest) (*GetPromptResponse, error)
+	ListResources(context.Context, ListResourcesRequest) (*ListResourcesResponse, error)
+	ReadResource(context.Context, ReadResourceRequest) (*ReadResourceResponse, error)
+	ListResourcesTemplates(context.Context, ListResourceTemplatesRequest) (*ListResourceTemplatesResponse, error)
+	SetLevel(context.Context, SetLevelRequest) (*SetLevelResponse, error)
+}
+
+func wrap[x any, y any](request rpc.JsonRpcRequest, f func(context.Context, x) (*y, error)) (*rpc.JsonRpcResponse, error) {
+	var ir x
+	if len(request.Params) > 0 {
+		if err := json.Unmarshal(request.Params, &ir); err != nil {
+			slog.Error("failed to unmarshal request", slog.Any("err", err), slog.String("request", string(request.Params)))
+			return nil, rpc.JsonRpcError{Code: rpc.JsonRpcInvalidParamsError, Message: err.Error(), Data: map[string]interface{}{"raw": string(request.Params)}}
+		}
+	}
+	if irr, err := f(request.Context(), ir); err != nil {
+		slog.Error("returning json rpc error", slog.Any("err", err))
+		return nil, rpc.NewJsonRpcErrorFromErr(err)
+	} else if raw, err := json.Marshal(irr); err != nil {
+		slog.Error("failed to marshal response", slog.Any("err", err))
+		return nil, rpc.NewJsonRpcErrorFromErr(err)
+	} else {
+		return &rpc.JsonRpcResponse{JsonRpcResponseInner: &rpc.JsonRpcResponseInner{
+			Id: ref.Deref(request.Id, -1), Result: raw,
+		}}, nil
+	}
+}
+
+func AsHandler(inner McpIo) rpc.Handler {
+	return rpc.HandlerFunc(func(req rpc.JsonRpcRequest) (*rpc.JsonRpcResponse, error) {
+		switch req.Method {
+		case "initialize":
+			return wrap[InitializeRequest, InitializeResponse](req, inner.Initialize)
+		case "tools/list":
+			return wrap[ListToolsRequest, ListToolsResponse](req, inner.ListTools)
+		case "tools/call":
+			return wrap[CallToolRequest, CallToolResponse](req, inner.CallTool)
+		case "prompts/list":
+			return wrap[ListPromptsRequest, ListPromptsResponse](req, inner.ListPrompts)
+		case "prompts/get":
+			return wrap[GetPromptRequest, GetPromptResponse](req, inner.GetPrompt)
+		case "resources/list":
+			return wrap[ListResourcesRequest, ListResourcesResponse](req, inner.ListResources)
+		case "resources/templates/list":
+			return wrap[ListResourceTemplatesRequest, ListResourceTemplatesResponse](req, inner.ListResourcesTemplates)
+		case "resources/read":
+			return wrap[ReadResourceRequest, ReadResourceResponse](req, inner.ReadResource)
+		case "logging/setLevel":
+			return wrap[SetLevelRequest, SetLevelResponse](req, inner.SetLevel)
+		default:
+			if strings.HasPrefix(req.Method, "notifications/") {
+				slog.Debug("dropping unsupported notification", slog.Any("method", req.Method))
+				return nil, nil
+			}
+			slog.Warn("ignoring unknown method", slog.Any("method", req.Method))
+			return nil, rpc.JsonRpcError{Code: rpc.JsonRpcMethodNotFoundError, Message: fmt.Sprintf("method not found: %s", req.Method)}
+		}
+
+	})
 }
