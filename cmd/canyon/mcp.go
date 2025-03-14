@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -36,12 +37,14 @@ var mcpCmd = &cobra.Command{
 						break
 					}
 					var msg rpc.JsonRpcRequest
-					if err := json.Unmarshal(scanner.Bytes(), &msg); err != nil {
+					dec := json.NewDecoder(bytes.NewReader(scanner.Bytes()))
+					dec.DisallowUnknownFields()
+					if err := dec.Decode(&msg); err != nil {
 						errChan <- fmt.Errorf("failed to read json formatted line '%q' as a request: %w", scanner.Text(), err)
 						return
 					}
 					select {
-					case server.In() <- msg:
+					case server.In() <- msg.WithContext(cmd.Context()):
 					default:
 						return
 					}

@@ -52,7 +52,7 @@ var rpcCmd = &cobra.Command{
 				Method: args[0],
 				Id:     requestId,
 				Params: rawRawParams,
-			}
+			}.WithContext(cmd.Context())
 		}()
 
 		out := server.Out()

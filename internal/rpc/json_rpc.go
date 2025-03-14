@@ -1,6 +1,7 @@
 package rpc
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -19,13 +20,26 @@ const (
 )
 
 type JsonRpcRequest struct {
+	ctx     context.Context
 	JsonRpc JsonRpcVersion  `json:"jsonrpc"`
 	Id      int             `json:"id"`
 	Method  string          `json:"method"`
 	Params  json.RawMessage `json:"params,omitempty"`
 }
 
-func (j *JsonRpcRequest) LogValue() slog.Value {
+func (j JsonRpcRequest) Context() context.Context {
+	if j.ctx == nil {
+		return context.TODO()
+	}
+	return j.ctx
+}
+
+func (j JsonRpcRequest) WithContext(ctx context.Context) JsonRpcRequest {
+	j.ctx = ctx
+	return j
+}
+
+func (j JsonRpcRequest) LogValue() slog.Value {
 	if raw, err := json.Marshal(j); err != nil {
 		return slog.StringValue(fmt.Sprintf("%+v", err))
 	} else {
@@ -33,16 +47,29 @@ func (j *JsonRpcRequest) LogValue() slog.Value {
 	}
 }
 
-var _ slog.LogValuer = (*JsonRpcRequest)(nil)
+var _ slog.LogValuer = JsonRpcRequest{}
 
 type JsonRpcResponse struct {
+	ctx     context.Context
 	JsonRpc JsonRpcVersion  `json:"jsonrpc"`
 	Id      *int            `json:"id,omitempty"`
 	Result  json.RawMessage `json:"result,omitempty"`
 	Error   *JsonRpcError   `json:"error,omitempty"`
 }
 
-func (j *JsonRpcResponse) LogValue() slog.Value {
+func (j JsonRpcResponse) Context() context.Context {
+	if j.ctx == nil {
+		return context.TODO()
+	}
+	return j.ctx
+}
+
+func (j JsonRpcResponse) WithContext(ctx context.Context) JsonRpcResponse {
+	j.ctx = ctx
+	return j
+}
+
+func (j JsonRpcResponse) LogValue() slog.Value {
 	if raw, err := json.Marshal(j); err != nil {
 		return slog.StringValue(fmt.Sprintf("%+v", err))
 	} else {
@@ -50,7 +77,7 @@ func (j *JsonRpcResponse) LogValue() slog.Value {
 	}
 }
 
-var _ slog.LogValuer = (*JsonRpcResponse)(nil)
+var _ slog.LogValuer = JsonRpcResponse{}
 
 type JsonRpcError struct {
 	Code    JsonRpcErrorCode       `json:"code"`
