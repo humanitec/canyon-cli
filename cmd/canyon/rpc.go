@@ -8,6 +8,8 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 
+	"github.com/humanitec/canyon-cli/internal/echo"
+	"github.com/humanitec/canyon-cli/internal/ref"
 	"github.com/humanitec/canyon-cli/internal/rpc"
 )
 
@@ -42,7 +44,7 @@ var rpcCmd = &cobra.Command{
 		}
 		rawRawParams, _ := json.Marshal(intermediate)
 
-		server := rpc.NewEchoServer()
+		server := echo.NewEchoServer()
 		in := server.In()
 		defer close(in)
 
@@ -50,7 +52,7 @@ var rpcCmd = &cobra.Command{
 		go func() {
 			in <- rpc.JsonRpcRequest{
 				Method: args[0],
-				Id:     requestId,
+				Id:     ref.Ref(requestId),
 				Params: rawRawParams,
 			}.WithContext(cmd.Context())
 		}()
@@ -64,7 +66,7 @@ var rpcCmd = &cobra.Command{
 				if err := enc.Encode(result); err != nil {
 					return err
 				}
-				if result.Id != nil && *result.Id == requestId {
+				if result.JsonRpcResponseInner != nil && result.JsonRpcResponseInner.Id == requestId {
 					return nil
 				}
 			case <-cmd.Context().Done():

@@ -1,4 +1,4 @@
-package rpc
+package mpc
 
 import (
 	"encoding/json"

@@ -5,10 +5,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"math/rand/v2"
 	"time"
 
 	"github.com/spf13/cobra"
 
+	"github.com/humanitec/canyon-cli/internal/echo"
+	"github.com/humanitec/canyon-cli/internal/ref"
 	"github.com/humanitec/canyon-cli/internal/rpc"
 )
 
@@ -19,7 +22,7 @@ var mcpCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cmd.SilenceUsage = true
 
-		server := rpc.NewEchoServer()
+		server := echo.NewEchoServer()
 		in := server.In()
 		defer close(in)
 
@@ -42,6 +45,9 @@ var mcpCmd = &cobra.Command{
 					if err := dec.Decode(&msg); err != nil {
 						errChan <- fmt.Errorf("failed to read json formatted line '%q' as a request: %w", scanner.Text(), err)
 						return
+					}
+					if msg.Id == nil {
+						msg.Id = ref.Ref(int(rand.Int64()))
 					}
 					select {
 					case server.In() <- msg.WithContext(cmd.Context()):

@@ -22,7 +22,7 @@ const (
 type JsonRpcRequest struct {
 	ctx     context.Context
 	JsonRpc JsonRpcVersion  `json:"jsonrpc"`
-	Id      int             `json:"id"`
+	Id      *int            `json:"id"`
 	Method  string          `json:"method"`
 	Params  json.RawMessage `json:"params,omitempty"`
 }
@@ -51,10 +51,24 @@ var _ slog.LogValuer = JsonRpcRequest{}
 
 type JsonRpcResponse struct {
 	ctx     context.Context
-	JsonRpc JsonRpcVersion  `json:"jsonrpc"`
-	Id      *int            `json:"id,omitempty"`
-	Result  json.RawMessage `json:"result,omitempty"`
-	Error   *JsonRpcError   `json:"error,omitempty"`
+	JsonRpc JsonRpcVersion `json:"jsonrpc"`
+	*JsonRpcResponseInner
+	*JsonRpcNotificationInner
+}
+
+type JsonRpcResponseInner struct {
+	Id     int             `json:"id,omitempty"`
+	Result json.RawMessage `json:"result,omitempty"`
+	Error  *JsonRpcError   `json:"error,omitempty"`
+}
+
+type JsonRpcNotification interface {
+	ToJsonRpcNotificationInner() JsonRpcNotificationInner
+}
+
+type JsonRpcNotificationInner struct {
+	Method string          `json:"method"`
+	Params json.RawMessage `json:"params,omitempty"`
 }
 
 func (j JsonRpcResponse) Context() context.Context {

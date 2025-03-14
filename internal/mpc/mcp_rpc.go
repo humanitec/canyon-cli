@@ -1,8 +1,10 @@
-package rpc
+package mpc
 
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/humanitec/canyon-cli/internal/rpc"
 )
 
 type InitializeRequest struct {
@@ -286,42 +288,29 @@ type ServerNotification struct {
 	*ToolListChangedNotification
 }
 
-func (c ServerNotification) MarshalJSON() ([]byte, error) {
-	if c.LoggingMessageNotification != nil {
-		return json.Marshal(c.LoggingMessageNotification)
-	} else if c.ToolListChangedNotification != nil {
-		return json.Marshal(c.ToolListChangedNotification)
+func (sn ServerNotification) ToJsonRpcNotificationInner() rpc.JsonRpcNotificationInner {
+	if sn.LoggingMessageNotification != nil {
+		raw, _ := json.Marshal(sn.LoggingMessageNotification)
+		return rpc.JsonRpcNotificationInner{
+			Method: "notifications/message",
+			Params: raw,
+		}
+	} else if sn.ToolListChangedNotification != nil {
+		raw, _ := json.Marshal(sn.ToolListChangedNotification)
+		return rpc.JsonRpcNotificationInner{
+			Method: "notifications/tools/list_changed",
+			Params: raw,
+		}
 	} else {
-		return []byte("{}"), nil
+		return rpc.JsonRpcNotificationInner{}
 	}
 }
 
-type LoggingMessageNotificationMethod struct {
-}
-
-func (t LoggingMessageNotificationMethod) MarshalJSON() ([]byte, error) {
-	return json.Marshal("notification/message")
-}
-
 type LoggingMessageNotification struct {
-	Method LoggingMessageNotificationMethod `json:"method"`
-	Params LoggingMessageParams             `json:"params"`
-}
-
-type LoggingMessageParams struct {
 	Level  string `json:"level"`
 	Data   string `json:"data"`
 	Logger string `json:"logger,omitempty"`
 }
 
-type ToolListChangedNotificationMethod struct {
-}
-
-func (t ToolListChangedNotificationMethod) MarshalJSON() ([]byte, error) {
-	return json.Marshal("notification/tools/list_changed")
-}
-
 type ToolListChangedNotification struct {
-	Method ToolListChangedNotificationMethod `json:"method"`
-	Params map[string]interface{}            `json:"params"`
 }
