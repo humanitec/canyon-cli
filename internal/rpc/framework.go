@@ -3,6 +3,7 @@ package rpc
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"sync"
 
 	"github.com/humanitec/canyon-cli/internal/ref"
@@ -64,17 +65,20 @@ func (e *Generic) setup() {
 				case <-notificationCtx.Done():
 					return
 				case n := <-notifications:
-					e.out <- JsonRpcResponse{
+					jn := JsonRpcResponse{
 						JsonRpcNotificationInner: ref.Ref(n.ToJsonRpcNotificationInner()),
 					}
+					e.out <- jn
+					slog.Debug("forwarded notification", slog.Any("res", jn.LogValue()))
 				}
 			}
 		}()
+		var sendOnlyNotifications chan<- JsonRpcNotification = notifications
 
 		go func() {
 			defer notificationsCancel()
 			for req := range e.in {
-				req = req.WithContext(context.WithValue(req.Context(), NotificationChannelKey, notifications))
+				req = req.WithContext(context.WithValue(req.Context(), NotificationChannelKey, sendOnlyNotifications))
 				r, err := e.Handler.Handle(req)
 				if err != nil {
 					var rpcErr JsonRpcError

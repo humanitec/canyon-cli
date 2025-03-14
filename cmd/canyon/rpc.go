@@ -44,7 +44,7 @@ var rpcCmd = &cobra.Command{
 		}
 		rawRawParams, _ := json.Marshal(intermediate)
 
-		h := mcp.AsHandler(&mcp.Impl{})
+		h := mcp.AsHandler(mcp.New())
 		h = rpc.RecoveryMiddleware(h)
 		h = rpc.LoggingMiddleware(h)
 		server := &rpc.Generic{Handler: h}
