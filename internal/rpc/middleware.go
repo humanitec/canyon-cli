@@ -10,10 +10,10 @@ import (
 )
 
 func LoggingMiddleware(next Handler) Handler {
-	return HandlerFunc(func(req JsonRpcRequest, notifications chan<- JsonRpcNotification) (*JsonRpcResponse, error) {
+	return HandlerFunc(func(req JsonRpcRequest) (*JsonRpcResponse, error) {
 		logger := slog.Default().With(slog.Int("id", ref.Deref(req.Id, -1)))
 		logger.Debug("received", slog.Any("req", req.LogValue()))
-		res, err := next.Handle(req, notifications)
+		res, err := next.Handle(req)
 		if err != nil {
 			var e JsonRpcError
 			if !errors.As(err, &e) || e.Code == JsonRpcInternalError {
@@ -31,14 +31,14 @@ func LoggingMiddleware(next Handler) Handler {
 var _ MiddlewareFunc = LoggingMiddleware
 
 func RecoveryMiddleware(next Handler) Handler {
-	return HandlerFunc(func(req JsonRpcRequest, notifications chan<- JsonRpcNotification) (res *JsonRpcResponse, err error) {
+	return HandlerFunc(func(req JsonRpcRequest) (res *JsonRpcResponse, err error) {
 		defer func() {
 			if e := recover(); e != nil {
 				res = nil
 				err = fmt.Errorf("caught panic: %v at:\n%s", e, string(debug.Stack()))
 			}
 		}()
-		res, err = next.Handle(req, notifications)
+		res, err = next.Handle(req)
 		return
 	})
 }

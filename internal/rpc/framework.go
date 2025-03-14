@@ -14,13 +14,13 @@ type Server interface {
 }
 
 type Handler interface {
-	Handle(req JsonRpcRequest, notifications chan<- JsonRpcNotification) (*JsonRpcResponse, error)
+	Handle(req JsonRpcRequest) (*JsonRpcResponse, error)
 }
 
-type HandlerFunc func(req JsonRpcRequest, notifications chan<- JsonRpcNotification) (*JsonRpcResponse, error)
+type HandlerFunc func(req JsonRpcRequest) (*JsonRpcResponse, error)
 
-func (f HandlerFunc) Handle(req JsonRpcRequest, notifications chan<- JsonRpcNotification) (*JsonRpcResponse, error) {
-	return f(req, notifications)
+func (f HandlerFunc) Handle(req JsonRpcRequest) (*JsonRpcResponse, error) {
+	return f(req)
 }
 
 type Middleware interface {
@@ -74,7 +74,8 @@ func (e *Generic) setup() {
 		go func() {
 			defer notificationsCancel()
 			for req := range e.in {
-				r, err := e.Handler.Handle(req, notifications)
+				req = req.WithContext(context.WithValue(req.Context(), NotificationChannelKey, notifications))
+				r, err := e.Handler.Handle(req)
 				if err != nil {
 					var rpcErr JsonRpcError
 					if !errors.As(err, &rpcErr) {

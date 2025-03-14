@@ -10,13 +10,15 @@ import (
 
 func NewEchoServer() rpc.Server {
 	return &rpc.Generic{
-		Handler: rpc.HandlerFunc(func(req rpc.JsonRpcRequest, notifications chan<- rpc.JsonRpcNotification) (*rpc.JsonRpcResponse, error) {
+		Handler: rpc.HandlerFunc(func(req rpc.JsonRpcRequest) (*rpc.JsonRpcResponse, error) {
 			slog.Debug("Echoing request", slog.Any("req", req.LogValue()))
 
-			notifications <- mcp.ServerNotification{LoggingMessageNotification: &mcp.LoggingMessageNotification{
-				Level: "info",
-				Data:  "this is a log message",
-			}}
+			if c := rpc.GetNotificationChannel(req.Context()); c != nil {
+				c <- mcp.ServerNotification{LoggingMessageNotification: &mcp.LoggingMessageNotification{
+					Level: "info",
+					Data:  "this is a log message",
+				}}
+			}
 
 			return ref.Ref(rpc.JsonRpcResponse{
 				JsonRpcResponseInner: &rpc.JsonRpcResponseInner{
