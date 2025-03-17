@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/humanitec/canyon-cli/internal/mcp"
+	"github.com/humanitec/canyon-cli/internal/mcp/tools"
 	"github.com/humanitec/canyon-cli/internal/rpc"
 )
 
@@ -21,7 +22,7 @@ var mcpCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cmd.SilenceUsage = true
 
-		h := mcp.AsHandler(mcp.New())
+		h := mcp.AsHandler(tools.New())
 		h = rpc.RecoveryMiddleware(h)
 		h = rpc.LoggingMiddleware(h)
 		server := &rpc.Generic{Handler: h}
