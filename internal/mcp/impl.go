@@ -4,19 +4,20 @@ import (
 	"context"
 	"path/filepath"
 	"runtime/debug"
+	"slices"
+	"sync"
 
 	"github.com/humanitec/canyon-cli/internal/rpc"
 )
 
 type Impl struct {
 	Instructions string
+	Tools        []Tool
+
+	lock sync.Mutex
 }
 
 var _ McpIo = (*Impl)(nil)
-
-func (m *Impl) SetNotifications(notifications chan<- ServerNotification) {
-
-}
 
 func (m *Impl) SetLevel(ctx context.Context, request SetLevelRequest) (*SetLevelResponse, error) {
 	return &SetLevelResponse{}, nil
@@ -49,7 +50,7 @@ func (m *Impl) Initialize(ctx context.Context, request InitializeRequest) (*Init
 		ServerInfo:      Implementation{Name: filepath.Base(bi.Main.Path), Version: bi.Main.Version},
 		Instructions:    m.Instructions,
 		Capabilities: ServerCapabilities{
-			Tools:     ServerToolsCapabilities{},
+			Tools:     ServerToolsCapabilities{ListChanged: true},
 			Resources: ServerResourcesCapabilities{},
 			Prompts:   ServerPromptsCapabilities{},
 		},
@@ -57,15 +58,36 @@ func (m *Impl) Initialize(ctx context.Context, request InitializeRequest) (*Init
 }
 
 func (m *Impl) ListTools(ctx context.Context, request ListToolsRequest) (*ListToolsResponse, error) {
-	return &ListToolsResponse{
-		Tools: []Tool{{
-			Name:        "thing",
-			Description: "Do thing",
-			InputSchema: map[string]interface{}{"type": "object"},
-		}},
-	}, nil
+	resp := make([]ToolResponse, len(m.Tools))
+	for i, tool := range m.Tools {
+		resp[i] = ToolResponse{
+			Name:        tool.Name,
+			Description: tool.Description,
+			InputSchema: tool.InputSchema,
+		}
+	}
+	return &ListToolsResponse{Tools: resp}, nil
 }
 
 func (m *Impl) CallTool(ctx context.Context, request CallToolRequest) (*CallToolResponse, error) {
-	return nil, rpc.JsonRpcError{Code: rpc.JsonRpcInvalidRequestError, Message: "tool not found"}
+	i := slices.IndexFunc(m.Tools, func(tool Tool) bool {
+		return tool.Name == request.Name
+	})
+	if i == -1 {
+		return nil, rpc.JsonRpcError{Code: rpc.JsonRpcInvalidRequestError, Message: "tool not found"}
+	}
+	if c, err := m.Tools[i].Callable(ctx, request.Arguments); err != nil {
+		return &CallToolResponse{
+			Contents: append(c, NewTextToolResponseContentWithAudience(err.Error(), "assistant")),
+			IsError:  true,
+		}, nil
+	} else {
+		return &CallToolResponse{Contents: c, IsError: false}, nil
+	}
+}
+
+func (m *Impl) InjectTools(t ...Tool) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	m.Tools = append(m.Tools, t...)
 }

@@ -28,7 +28,7 @@ var rootCmd = &cobra.Command{
 				_, _ = fmt.Fprintln(os.Stderr, fmt.Errorf("failed to open log file: %v", err))
 				os.Exit(1)
 			}
-			w = io.MultiWriter(logf, cmd.ErrOrStderr())
+			w = logf
 			go func() {
 				<-cmd.Context().Done()
 				_ = logf.Close()

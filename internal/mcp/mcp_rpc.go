@@ -56,11 +56,11 @@ type ListToolsRequest struct {
 }
 
 type ListToolsResponse struct {
-	NextCursor string `json:"nextCursor,omitempty"`
-	Tools      []Tool `json:"tools"`
+	NextCursor string         `json:"nextCursor,omitempty"`
+	Tools      []ToolResponse `json:"tools"`
 }
 
-type Tool struct {
+type ToolResponse struct {
 	Name        string                 `json:"name"`
 	Description string                 `json:"description"`
 	InputSchema map[string]interface{} `json:"inputSchema"`
@@ -300,10 +300,8 @@ func (sn ServerNotification) ToJsonRpcNotificationInner() rpc.JsonRpcNotificatio
 			Params: raw,
 		}
 	} else if sn.ToolListChangedNotification != nil {
-		raw, _ := json.Marshal(sn.ToolListChangedNotification)
 		return rpc.JsonRpcNotificationInner{
 			Method: "notifications/tools/list_changed",
-			Params: raw,
 		}
 	} else {
 		return rpc.JsonRpcNotificationInner{}
@@ -320,7 +318,6 @@ type ToolListChangedNotification struct {
 }
 
 type McpIo interface {
-	SetNotifications(notifications chan<- ServerNotification)
 	Initialize(context.Context, InitializeRequest) (*InitializeResponse, error)
 	ListTools(context.Context, ListToolsRequest) (*ListToolsResponse, error)
 	CallTool(context.Context, CallToolRequest) (*CallToolResponse, error)
