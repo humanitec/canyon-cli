@@ -69,7 +69,7 @@ func NewCallPathTool() mcp.Tool {
 			"name":            map[string]interface{}{"type": "string", "description": "The name of the path to call"},
 			"arguments":       map[string]interface{}{"type": "object", "description": "The arguments of the path to call, these must match the input schema"},
 			"idempotency_key": map[string]interface{}{"type": "string", "description": "An idempotency key to use to continue the request if it times out, this should be a short globally unique alphanumeric string"},
-		}, "required": []interface{}{"org_id", "name", "idempotency_key"}},
+		}, "required": []interface{}{"org_id", "name", "arguments", "idempotency_key"}},
 		Callable: func(ctx context.Context, arguments map[string]interface{}) ([]mcp.CallToolResponseContent, error) {
 			name, _ := arguments["name"].(string)
 			args, _ := arguments["arguments"].(map[string]interface{})
