@@ -28,6 +28,7 @@ func NewDummyMetadataKeysTool() mcp.Tool {
 				{Key: "Github-Repo-Url", Description: "The GitHub repository URL where the source code of a workload can be found"},
 				{Key: "Git-Tag", Description: "The Git tag that the container image of this workload comes from"},
 				{Key: "Grafana-Dashboard-Url", Description: "The grafana dashboard for the operations metrics"},
+				{Key: "Aws-Arn", Description: "The AWS ARN id of the related resource"},
 			})
 			return []mcp.CallToolResponseContent{
 				mcp.NewTextToolResponseContent("The following workload and resource metadata keys are known for this org in JSON format: %s", string(raw)),
