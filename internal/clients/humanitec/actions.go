@@ -109,6 +109,10 @@ type CallActionPipelineRequestBody struct {
 	Inputs map[string]interface{} `json:"inputs"`
 }
 
+type CallActionPipelineParams struct {
+	IdempotencyKey string
+}
+
 type CallActionPipelineResult struct {
 	Outputs map[string]interface{} `json:"outputs"`
 }
@@ -123,11 +127,16 @@ func (r CallActionPipelineResponse) StatusCode() int {
 	return r.HTTPResponse.StatusCode
 }
 
-func (w *WrappedHumanitecClientImpl) CallActionPipeline(ctx context.Context, orgId, id string, body CallActionPipelineRequestBody) (*CallActionPipelineResponse, error) {
+func (w *WrappedHumanitecClientImpl) CallActionPipeline(ctx context.Context, orgId, id string, params *CallActionPipelineParams, body CallActionPipelineRequestBody) (*CallActionPipelineResponse, error) {
 	raw, _ := json.Marshal(body)
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, w.apiPrefix+fmt.Sprintf("/orgs/%s/action-pipelines/%s/calls", orgId, id), bytes.NewReader(raw))
 	if err != nil {
 		return &CallActionPipelineResponse{}, err
+	}
+	if params != nil {
+		if params.IdempotencyKey != "" {
+			req.Header.Add("Idempotency-Key", params.IdempotencyKey)
+		}
 	}
 	if err := w.requestEditor(ctx, req); err != nil {
 		return &CallActionPipelineResponse{}, err
