@@ -2,8 +2,11 @@ package tools
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"github.com/humanitec/canyon-cli/internal/clients/humanitec"
 	"github.com/humanitec/canyon-cli/internal/mcp"
@@ -19,7 +22,7 @@ The list of available paths may change over time so consider listing the availab
 			"type":     "object",
 			"required": []interface{}{"org_id"},
 			"properties": map[string]interface{}{
-				"org_id": map[string]interface{}{"type": "string"},
+				"org_id": map[string]interface{}{"type": "string", "description": "The organization ID"},
 			}},
 		Callable: func(ctx context.Context, arguments map[string]interface{}) ([]mcp.CallToolResponseContent, error) {
 			hc, err := humanitec.NewHumanitecClientWithCurrentToken(ctx)
@@ -62,10 +65,11 @@ func NewCallPathTool() mcp.Tool {
 		Name:        "call-canyon-path",
 		Description: "Call a canyon path previously discovered through list-canyon-paths",
 		InputSchema: map[string]interface{}{"type": "object", "properties": map[string]interface{}{
-			"org_id":    map[string]interface{}{"type": "string"},
-			"name":      map[string]interface{}{"type": "string"},
-			"arguments": map[string]interface{}{"type": "object"},
-		}, "required": []interface{}{"org_id", "name"}},
+			"org_id":          map[string]interface{}{"type": "string", "description": "The organization ID of the org in which the path is defined"},
+			"name":            map[string]interface{}{"type": "string", "description": "The name of the path to call"},
+			"arguments":       map[string]interface{}{"type": "object", "description": "The arguments of the path to call, these must match the input schema"},
+			"idempotency_key": map[string]interface{}{"type": "string", "description": "An idempotency key to use to continue the request if it times out, this should be a short globally unique alphanumeric string"},
+		}, "required": []interface{}{"org_id", "name", "arguments", "idempotency_key"}},
 		Callable: func(ctx context.Context, arguments map[string]interface{}) ([]mcp.CallToolResponseContent, error) {
 			name, _ := arguments["name"].(string)
 			args, _ := arguments["arguments"].(map[string]interface{})
@@ -75,12 +79,24 @@ func NewCallPathTool() mcp.Tool {
 				return nil, err
 			}
 
-			if r, err := hc.CallActionPipeline(ctx, arguments["org_id"].(string), name, humanitec.CallActionPipelineRequestBody{
+			idempotencyKey, _ := arguments["idempotency_key"].(string)
+			if idempotencyKey == "" {
+				idempotencyKeyRaw := make([]byte, 10)
+				_, _ = rand.Read(idempotencyKeyRaw)
+				idempotencyKey = hex.EncodeToString(idempotencyKeyRaw)
+			}
+
+			if r, err := hc.CallActionPipeline(ctx, arguments["org_id"].(string), name, &humanitec.CallActionPipelineParams{IdempotencyKey: idempotencyKey}, humanitec.CallActionPipelineRequestBody{
 				Inputs: args,
 			}); err != nil {
 				return nil, err
 			} else if r.JSON200 == nil {
-				return nil, fmt.Errorf("unexpected response from humanitec: %s %s", r.HTTPResponse.Status, string(r.Body))
+				if r.StatusCode() == http.StatusGatewayTimeout {
+					return []mcp.CallToolResponseContent{
+						mcp.NewTextToolResponseContent("The path timed out after executing for some time, you can make the identity request with idempotency key '%s' to continue waiting", idempotencyKey),
+					}, nil
+				}
+				return nil, fmt.Errorf("unexpected response from humanitec, you can be able to continue the request with idempotency key '%s' to continue waiting: %s %s", idempotencyKey, r.HTTPResponse.Status, string(r.Body))
 			} else {
 				raw, _ := json.Marshal(r.JSON200)
 				return []mcp.CallToolResponseContent{

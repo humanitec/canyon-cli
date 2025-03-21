@@ -16,6 +16,7 @@ func New() mcp.McpIo {
 			NewRenderCSVAsTable(),
 			NewRenderNetworkAsGraph(),
 			NewRenderTreeAsTree(),
+			NewDummyMetadataKeysTool(),
 		},
 	}
 }
