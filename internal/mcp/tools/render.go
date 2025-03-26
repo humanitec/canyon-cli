@@ -3,11 +3,14 @@ package tools
 import (
 	"bytes"
 	"context"
+	_ "embed"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"html/template"
 	"log/slog"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/pkg/browser"
@@ -15,38 +18,40 @@ import (
 	"github.com/humanitec/canyon-cli/internal/mcp"
 )
 
-// RenderCSVAsTable renders csv as a table.
+//go:embed render_csv.html.tmpl
+var renderCsvTemplate string
+
+//go:embed render_tree.html.tmpl
+var renderTreeTemplate string
+
+//go:embed render_graph.html.tmpl
+var renderGraphTemplate string
+
+func init() {
+
+	f := func(path string, defaultContent string) string {
+		raw, err := os.ReadFile(path)
+		if err == nil {
+			if len(raw) == 0 {
+				_ = os.WriteFile(path, []byte(defaultContent), 0644)
+			} else {
+				return string(raw)
+			}
+		}
+		return defaultContent
+	}
+
+	h, err := os.UserHomeDir()
+	if err == nil {
+		renderCsvTemplate = f(filepath.Join(h, "canyon-render-csv-template.html.tmpl"), renderCsvTemplate)
+		renderTreeTemplate = f(filepath.Join(h, "canyon-render-tree-template.html.tmpl"), renderTreeTemplate)
+		renderGraphTemplate = f(filepath.Join(h, "canyon-render-graph-template.html.tmpl"), renderGraphTemplate)
+	}
+}
+
+// NewRenderCSVAsTable renders csv as a table.
 func NewRenderCSVAsTable() mcp.Tool {
-	tmpl, err := template.New("").Parse(`
-<!DOCTYPE html>
-<html>
-<head>
-	<meta charset="utf-8">
-</head>
-<body>
-	<table>
-	{{ with .header }}
-	<thead>
-		<tr>
-			{{ range .}}
-			<th scope="col">{{.}}</th>	
-			{{ end}}
-		</tr>
-	</thead>
-	{{ end }}
-	<tbody>
-		{{ range .rows}}
-		<tr>
-			{{ range . }}
-			<td>{{ . }}</td>
-			{{ end }}
-		</tr>
-		{{ end }}
-	</tbody>
-	</table>
-</body>
-</html>
-`)
+	tmpl, err := template.New("").Parse(renderCsvTemplate)
 	if err != nil {
 		panic(err)
 	}
@@ -89,28 +94,9 @@ func NewRenderCSVAsTable() mcp.Tool {
 	}
 }
 
-// RenderTreeAsTree renders a hierarchy as basic html. Use https://d3js.org/d3-hierarchy/hierarchy instead in the future.
+// NewRenderTreeAsTree renders a hierarchy as basic html. Use https://d3js.org/d3-hierarchy/hierarchy instead in the future.
 func NewRenderTreeAsTree() mcp.Tool {
-	tmpl, err := template.New("").Parse(`
-{{define "T"}}
-	{{ .name }}
-	<ol>
-	{{ range .children}}
-	<li>{{ template "T" . }}</li>
-	{{ end }}
-	</ol>
-{{end}}
-
-<!DOCTYPE html>
-<html>
-<head>
-	<meta charset="utf-8">
-</head>
-<body>
-	{{ template "T" .root }}
-</body>
-</html>
-`)
+	tmpl, err := template.New("").Parse(renderTreeTemplate)
 	if err != nil {
 		panic(err)
 	}
@@ -129,10 +115,12 @@ func NewRenderTreeAsTree() mcp.Tool {
 					"type":        "object",
 					"description": "A node in the tree structure",
 					"properties": map[string]interface{}{
-						"name":     map[string]interface{}{"type": "string"},
+						"name":     map[string]interface{}{"type": "string", "description": "The name of the node"},
+						"class":    map[string]interface{}{"type": "string", "description": "The class of the node. Well known classes are: 'org', 'app', 'env_type', 'env', 'workload', 'resource', and 'other' but arbitrary strings can be used too"},
+						"data":     map[string]interface{}{"type": "object", "description": "Arbitrary additional metadata to include on the node visualisation"},
 						"children": map[string]interface{}{"type": "array", "items": map[string]interface{}{"$ref": "#/$defs/node"}},
 					},
-					"required": []interface{}{"name"},
+					"required": []interface{}{"name", "class"},
 				},
 			},
 		},
@@ -154,17 +142,7 @@ func NewRenderTreeAsTree() mcp.Tool {
 }
 
 func NewRenderNetworkAsGraph() mcp.Tool {
-	tmpl, err := template.New("").Parse(`
-<!DOCTYPE html>
-<html>
-<head>
-	<meta charset="utf-8">
-</head>
-<body>
-	<pre><code>{{ .data }}</code></pre>
-</body>
-</html>
-`)
+	tmpl, err := template.New("").Parse(renderGraphTemplate)
 	if err != nil {
 		panic(err)
 	}
@@ -179,16 +157,17 @@ func NewRenderNetworkAsGraph() mcp.Tool {
 					"description": "A node in the network graph",
 					"properties": map[string]interface{}{
 						"id":    map[string]interface{}{"type": "string"},
-						"group": map[string]interface{}{"type": "integer"},
+						"class": map[string]interface{}{"type": "string", "description": "The class of the node. Well known classes are: 'org', 'app', 'env_type', 'env', 'workload', 'resource', and 'other' but arbitrary strings can be used too"},
+						"data":  map[string]interface{}{"type": "object", "description": "Arbitrary additional metadata to include on the node visualisation"},
 					},
-					"required": []interface{}{"id"},
+					"required": []interface{}{"id", "class"},
 				}},
 				"links": map[string]interface{}{"type": "array", "description": "The list of links between nodes in the network", "items": map[string]interface{}{
 					"type":        "object",
 					"description": "A link in the network graph",
 					"properties": map[string]interface{}{
-						"source": map[string]interface{}{"type": "string"},
-						"target": map[string]interface{}{"type": "string"},
+						"source": map[string]interface{}{"type": "string", "description": "The source node id of the link"},
+						"target": map[string]interface{}{"type": "string", "description": "The target node id of the link"},
 					},
 					"required": []interface{}{"source", "target"},
 				}},

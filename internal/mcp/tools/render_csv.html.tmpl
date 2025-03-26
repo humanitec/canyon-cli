@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+</head>
+<body>
+	<table>
+	{{ with .header }}
+	<thead>
+		<tr>
+			{{ range .}}
+			<th scope="col">{{.}}</th>
+			{{ end}}
+		</tr>
+	</thead>
+	{{ end }}
+	<tbody>
+		{{ range .rows}}
+		<tr>
+			{{ range . }}
+			<td>{{ . }}</td>
+			{{ end }}
+		</tr>
+		{{ end }}
+	</tbody>
+	</table>
+</body>
+</html>
