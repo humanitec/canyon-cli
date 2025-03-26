@@ -3,12 +3,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"math/rand/v2"
 
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 
 	"github.com/humanitec/canyon-cli/internal/mcp"
+	"github.com/humanitec/canyon-cli/internal/mcp/tools"
 	"github.com/humanitec/canyon-cli/internal/ref"
 	"github.com/humanitec/canyon-cli/internal/rpc"
 )
@@ -42,16 +44,17 @@ var rpcCmd = &cobra.Command{
 				}
 			}
 		}
+		requestId := int(rand.Int64())
 		rawRawParams, _ := json.Marshal(intermediate)
+		slog.Info("executing method with params", slog.String("method", args[0]), slog.String("params", string(rawRawParams)), slog.Int("request_id", requestId))
 
-		h := mcp.AsHandler(&mcp.Impl{})
+		h := mcp.AsHandler(tools.New())
 		h = rpc.RecoveryMiddleware(h)
 		h = rpc.LoggingMiddleware(h)
 		server := &rpc.Generic{Handler: h}
 		in := server.In()
 		defer close(in)
 
-		requestId := int(rand.Int64())
 		go func() {
 			in <- rpc.JsonRpcRequest{
 				Method: args[0],
