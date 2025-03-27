@@ -1,21 +1,1646 @@
-{{define "T"}}
-	<span class="{{ .class }}">{{ .name }}</span>
-	{{ with .data }}
-	<pre><code>{{ . }}</code></pre>
-	{{ end }}
-	<ol>
-	{{ range .children}}
-	<li>{{ template "T" . }}</li>
-	{{ end }}
-	</ol>
-{{end}}
-
 <!DOCTYPE html>
 <html>
-<head>
-	<meta charset="utf-8">
-</head>
-<body>
-	{{ template "T" .root }}
-</body>
+  <head>
+    <title>Canyon</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      /**
+       * TreeJS is a JavaScript librarie for displaying TreeViews
+       * on the web.
+       *
+       * @author Matthias Thalmann
+       */
+
+      function TreeView(root, container, options) {
+        var self = this;
+
+        /*
+         * Konstruktor
+         */
+        if (typeof root === "undefined") {
+          throw new Error("Parameter 1 must be set (root)");
+        }
+
+        if (!(root instanceof TreeNode)) {
+          throw new Error("Parameter 1 must be of type TreeNode");
+        }
+
+        if (container) {
+          if (!TreeUtil.isDOM(container)) {
+            container = document.querySelector(container);
+
+            if (container instanceof Array) {
+              container = container[0];
+            }
+
+            if (!TreeUtil.isDOM(container)) {
+              throw new Error(
+                "Parameter 2 must be either DOM-Object or CSS-QuerySelector (#, .)"
+              );
+            }
+          }
+        } else {
+          container = null;
+        }
+
+        if (!options || typeof options !== "object") {
+          options = {};
+        }
+
+        /*
+         * Methods
+         */
+        this.setRoot = function (_root) {
+          if (root instanceof TreeNode) {
+            root = _root;
+          }
+        };
+
+        this.getRoot = function () {
+          return root;
+        };
+
+        this.expandAllNodes = function () {
+          root.setExpanded(true);
+
+          root.getChildren().forEach(function (child) {
+            TreeUtil.expandNode(child);
+          });
+        };
+
+        this.expandPath = function (path) {
+          if (!(path instanceof TreePath)) {
+            throw new Error("Parameter 1 must be of type TreePath");
+          }
+
+          path.getPath().forEach(function (node) {
+            node.setExpanded(true);
+          });
+        };
+
+        this.collapseAllNodes = function () {
+          root.setExpanded(false);
+
+          root.getChildren().forEach(function (child) {
+            TreeUtil.collapseNode(child);
+          });
+        };
+
+        this.setContainer = function (_container) {
+          if (TreeUtil.isDOM(_container)) {
+            container = _container;
+          } else {
+            _container = document.querySelector(_container);
+
+            if (_container instanceof Array) {
+              _container = _container[0];
+            }
+
+            if (!TreeUtil.isDOM(_container)) {
+              throw new Error(
+                "Parameter 1 must be either DOM-Object or CSS-QuerySelector (#, .)"
+              );
+            }
+          }
+        };
+
+        this.getContainer = function () {
+          return container;
+        };
+
+        this.setOptions = function (_options) {
+          if (typeof _options === "object") {
+            options = _options;
+          }
+        };
+
+        this.changeOption = function (option, value) {
+          options[option] = value;
+        };
+
+        this.getOptions = function () {
+          return options;
+        };
+
+        // TODO: set selected key: up down; expand right; collapse left; enter: open;
+        this.getSelectedNodes = function () {
+          return TreeUtil.getSelectedNodesForNode(root);
+        };
+
+        this.reload = function () {
+          if (container == null) {
+            console.warn("No container specified");
+            return;
+          }
+
+          container.classList.add("tj_container");
+
+          var cnt = document.createElement("ul");
+
+          if (TreeUtil.getProperty(options, "show_root", true)) {
+            cnt.appendChild(renderNode(root));
+          } else {
+            root.getChildren().forEach(function (child) {
+              cnt.appendChild(renderNode(child));
+            });
+          }
+
+          container.innerHTML = "";
+          container.appendChild(cnt);
+        };
+
+        function renderNode(node) {
+          var li_outer = document.createElement("li");
+          var span_desc = document.createElement("span");
+          span_desc.className = "tj_description";
+          span_desc.tj_node = node;
+
+          if (!node.isEnabled()) {
+            li_outer.setAttribute("disabled", "");
+            node.setExpanded(false);
+            node.setSelected(false);
+          }
+
+          if (node.isSelected()) {
+            span_desc.classList.add("selected");
+          }
+
+          span_desc.addEventListener("click", function (e) {
+            var cur_el = e.target;
+
+            while (
+              typeof cur_el.tj_node === "undefined" ||
+              cur_el.classList.contains("tj_container")
+            ) {
+              cur_el = cur_el.parentElement;
+            }
+
+            var node_cur = cur_el.tj_node;
+
+            if (typeof node_cur === "undefined") {
+              return;
+            }
+
+            if (node_cur.isEnabled()) {
+              if (e.ctrlKey == false) {
+                if (!node_cur.isLeaf()) {
+                  node_cur.toggleExpanded();
+                  self.reload();
+                } else {
+                  node_cur.open();
+                }
+
+                node_cur.on("click")(e, node_cur);
+              }
+
+              if (e.ctrlKey == true) {
+                node_cur.toggleSelected();
+                self.reload();
+              } else {
+                var rt = node_cur.getRoot();
+
+                if (rt instanceof TreeNode) {
+                  TreeUtil.getSelectedNodesForNode(rt).forEach(function (_nd) {
+                    _nd.setSelected(false);
+                  });
+                }
+                node_cur.setSelected(true);
+
+                self.reload();
+              }
+            }
+          });
+
+          span_desc.addEventListener("contextmenu", function (e) {
+            var cur_el = e.target;
+
+            while (
+              typeof cur_el.tj_node === "undefined" ||
+              cur_el.classList.contains("tj_container")
+            ) {
+              cur_el = cur_el.parentElement;
+            }
+
+            var node_cur = cur_el.tj_node;
+
+            if (typeof node_cur === "undefined") {
+              return;
+            }
+
+            if (typeof node_cur.getListener("contextmenu") !== "undefined") {
+              node_cur.on("contextmenu")(e, node_cur);
+              e.preventDefault();
+            } else if (typeof TreeConfig.context_menu === "function") {
+              TreeConfig.context_menu(e, node_cur);
+              e.preventDefault();
+            }
+          });
+
+          if (
+            node.isLeaf() &&
+            !TreeUtil.getProperty(node.getOptions(), "forceParent", false)
+          ) {
+            var ret = "";
+            // var icon = TreeUtil.getProperty(node.getOptions(), "icon", "");
+            // if(icon != ""){
+            // 	ret += '<span class="tj_icon">' + icon + '</span>';
+            // }else if((icon = TreeUtil.getProperty(options, "leaf_icon", "")) != ""){
+            // 	ret += '<span class="tj_icon">' + icon + '</span>';
+            // }else{
+            // 	ret += '<span class="tj_icon">' + TreeConfig.leaf_icon + '</span>';
+            // }
+
+            span_desc.innerHTML = ret + node.toString() + "</span>";
+            span_desc.classList.add("tj_leaf");
+            span_desc.setAttribute("title", node.toString());
+
+            li_outer.appendChild(span_desc);
+          } else {
+            var ret = "";
+            if (node.isExpanded()) {
+              ret +=
+                '<span class="tj_mod_icon">' + TreeConfig.open_icon + "</span>";
+            } else {
+              ret +=
+                '<span class="tj_mod_icon">' +
+                TreeConfig.close_icon +
+                "</span>";
+            }
+
+            // var icon = TreeUtil.getProperty(node.getOptions(), "icon", "");
+            // if(icon != ""){
+            // 	ret += '<span class="tj_icon">' + icon + '</span>';
+            // }else if((icon = TreeUtil.getProperty(options, "parent_icon", "")) != ""){
+            // 	ret += '<span class="tj_icon">' + icon + '</span>';
+            // }else{
+            // 	ret += '<span class="tj_icon">' + TreeConfig.parent_icon + '</span>';
+            // }
+
+            span_desc.innerHTML = ret + node.toString() + "</span>";
+            span_desc.setAttribute("title", node.toString());
+
+            li_outer.appendChild(span_desc);
+
+            if (node.isExpanded()) {
+              var ul_container = document.createElement("ul");
+
+              node.getChildren().forEach(function (child) {
+                ul_container.appendChild(renderNode(child));
+              });
+
+              li_outer.appendChild(ul_container);
+            }
+          }
+
+          return li_outer;
+        }
+
+        if (typeof container !== "undefined") this.reload();
+      }
+
+      function TreeNode(userObject, options) {
+        var children = new Array();
+        var self = this;
+        var events = new Array();
+
+        var expanded = true;
+        var enabled = true;
+        var selected = false;
+
+        /*
+         * Konstruktor
+         */
+        if (userObject) {
+          if (
+            typeof userObject !== "string" &&
+            typeof userObject.toString !== "function"
+          ) {
+            throw new Error(
+              "Parameter 1 must be of type String or Object, where it must have the function toString()"
+            );
+          }
+        } else {
+          userObject = "";
+        }
+
+        if (!options || typeof options !== "object") {
+          options = {};
+        } else {
+          expanded = TreeUtil.getProperty(options, "expanded", true);
+          enabled = TreeUtil.getProperty(options, "enabled", true);
+          selected = TreeUtil.getProperty(options, "selected", false);
+        }
+
+        /*
+         * Methods
+         */
+        this.addChild = function (node) {
+          if (!TreeUtil.getProperty(options, "allowsChildren", true)) {
+            console.warn(
+              "Option allowsChildren is set to false, no child added"
+            );
+            return;
+          }
+
+          if (node instanceof TreeNode) {
+            children.push(node);
+
+            //Konstante hinzufügen (workaround)
+            Object.defineProperty(node, "parent", {
+              value: this,
+              writable: false,
+              enumerable: true,
+              configurable: true,
+            });
+          } else {
+            throw new Error("Parameter 1 must be of type TreeNode");
+          }
+        };
+
+        this.removeChildPos = function (pos) {
+          if (typeof children[pos] !== "undefined") {
+            if (typeof children[pos] !== "undefined") {
+              children.splice(pos, 1);
+            }
+          }
+        };
+
+        this.removeChild = function (node) {
+          if (!(node instanceof TreeNode)) {
+            throw new Error("Parameter 1 must be of type TreeNode");
+          }
+
+          this.removeChildPos(this.getIndexOfChild(node));
+        };
+
+        this.getChildren = function () {
+          return children;
+        };
+
+        this.getChildCount = function () {
+          return children.length;
+        };
+
+        this.getIndexOfChild = function (node) {
+          for (var i = 0; i < children.length; i++) {
+            if (children[i].equals(node)) {
+              return i;
+            }
+          }
+
+          return -1;
+        };
+
+        this.getRoot = function () {
+          var node = this;
+
+          while (typeof node.parent !== "undefined") {
+            node = node.parent;
+          }
+
+          return node;
+        };
+
+        this.setUserObject = function (_userObject) {
+          if (
+            !(typeof _userObject === "string") ||
+            typeof _userObject.toString !== "function"
+          ) {
+            throw new Error(
+              "Parameter 1 must be of type String or Object, where it must have the function toString()"
+            );
+          } else {
+            userObject = _userObject;
+          }
+        };
+
+        this.getUserObject = function () {
+          return userObject;
+        };
+
+        this.setOptions = function (_options) {
+          if (typeof _options === "object") {
+            options = _options;
+          }
+        };
+
+        this.changeOption = function (option, value) {
+          options[option] = value;
+        };
+
+        this.getOptions = function () {
+          return options;
+        };
+
+        this.isLeaf = function () {
+          return children.length == 0;
+        };
+
+        this.setExpanded = function (_expanded) {
+          if (this.isLeaf()) {
+            return;
+          }
+
+          if (typeof _expanded === "boolean") {
+            if (expanded == _expanded) {
+              return;
+            }
+
+            expanded = _expanded;
+
+            if (_expanded) {
+              this.on("expand")(this);
+            } else {
+              this.on("collapse")(this);
+            }
+
+            this.on("toggle_expanded")(this);
+          }
+        };
+
+        this.toggleExpanded = function () {
+          if (expanded) {
+            this.setExpanded(false);
+          } else {
+            this.setExpanded(true);
+          }
+        };
+
+        this.isExpanded = function () {
+          if (this.isLeaf()) {
+            return true;
+          } else {
+            return expanded;
+          }
+        };
+
+        this.setEnabled = function (_enabled) {
+          if (typeof _enabled === "boolean") {
+            if (enabled == _enabled) {
+              return;
+            }
+
+            enabled = _enabled;
+
+            if (_enabled) {
+              this.on("enable")(this);
+            } else {
+              this.on("disable")(this);
+            }
+
+            this.on("toggle_enabled")(this);
+          }
+        };
+
+        this.toggleEnabled = function () {
+          if (enabled) {
+            this.setEnabled(false);
+          } else {
+            this.setEnabled(true);
+          }
+        };
+
+        this.isEnabled = function () {
+          return enabled;
+        };
+
+        this.setSelected = function (_selected) {
+          if (typeof _selected !== "boolean") {
+            return;
+          }
+
+          if (selected == _selected) {
+            return;
+          }
+
+          selected = _selected;
+
+          if (_selected) {
+            this.on("select")(this);
+          } else {
+            this.on("deselect")(this);
+          }
+
+          this.on("toggle_selected")(this);
+        };
+
+        this.toggleSelected = function () {
+          if (selected) {
+            this.setSelected(false);
+          } else {
+            this.setSelected(true);
+          }
+        };
+
+        this.isSelected = function () {
+          return selected;
+        };
+
+        this.open = function () {
+          if (!this.isLeaf()) {
+            this.on("open")(this);
+          }
+        };
+
+        this.on = function (ev, callback) {
+          if (typeof callback === "undefined") {
+            if (typeof events[ev] !== "function") {
+              return function () {};
+            } else {
+              return events[ev];
+            }
+          }
+
+          if (typeof callback !== "function") {
+            throw new Error("Argument 2 must be of type function");
+          }
+
+          events[ev] = callback;
+        };
+
+        this.getListener = function (ev) {
+          return events[ev];
+        };
+
+        this.equals = function (node) {
+          if (node instanceof TreeNode) {
+            if (node.getUserObject() == userObject) {
+              return true;
+            }
+          }
+
+          return false;
+        };
+
+        this.toString = function () {
+          if (typeof userObject === "string") {
+            return userObject;
+          } else {
+            return userObject.name;
+          }
+        };
+      }
+
+      function TreePath(root, node) {
+        var nodes = new Array();
+
+        this.setPath = function (root, node) {
+          nodes = new Array();
+
+          while (typeof node !== "undefined" && !node.equals(root)) {
+            nodes.push(node);
+            node = node.parent;
+          }
+
+          if (node.equals(root)) {
+            nodes.push(root);
+          } else {
+            nodes = new Array();
+            throw new Error("Node is not contained in the tree of root");
+          }
+
+          nodes = nodes.reverse();
+
+          return nodes;
+        };
+
+        this.getPath = function () {
+          return nodes;
+        };
+
+        this.toString = function () {
+          return nodes.join(" - ");
+        };
+
+        if (root instanceof TreeNode && node instanceof TreeNode) {
+          this.setPath(root, node);
+        }
+      }
+
+      /*
+       * Util-Methods
+       */
+      const TreeUtil = {
+        default_leaf_icon: "<span>&#9642;</span>",
+        default_parent_icon: "<span>&#128449;</span>",
+        default_open_icon: "<span>&#9207;</span>",
+        default_close_icon: "<span>&#9205;</span>",
+
+        isDOM: function (obj) {
+          try {
+            return obj instanceof HTMLElement;
+          } catch (e) {
+            return (
+              typeof obj === "object" &&
+              obj.nodeType === 1 &&
+              typeof obj.style === "object" &&
+              typeof obj.ownerDocument === "object"
+            );
+          }
+        },
+
+        getProperty: function (options, opt, def) {
+          if (typeof options[opt] === "undefined") {
+            return def;
+          }
+
+          return options[opt];
+        },
+
+        expandNode: function (node) {
+          node.setExpanded(true);
+
+          if (!node.isLeaf()) {
+            node.getChildren().forEach(function (child) {
+              TreeUtil.expandNode(child);
+            });
+          }
+        },
+
+        collapseNode: function (node) {
+          node.setExpanded(false);
+
+          if (!node.isLeaf()) {
+            node.getChildren().forEach(function (child) {
+              TreeUtil.collapseNode(child);
+            });
+          }
+        },
+
+        getSelectedNodesForNode: function (node) {
+          if (!(node instanceof TreeNode)) {
+            throw new Error("Parameter 1 must be of type TreeNode");
+          }
+
+          var ret = new Array();
+
+          if (node.isSelected()) {
+            ret.push(node);
+          }
+
+          node.getChildren().forEach(function (child) {
+            if (child.isSelected()) {
+              if (ret.indexOf(child) == -1) {
+                ret.push(child);
+              }
+            }
+
+            if (!child.isLeaf()) {
+              TreeUtil.getSelectedNodesForNode(child).forEach(function (_node) {
+                if (ret.indexOf(_node) == -1) {
+                  ret.push(_node);
+                }
+              });
+            }
+          });
+
+          return ret;
+        },
+      };
+
+      var TreeConfig = {
+        leaf_icon: TreeUtil.default_leaf_icon,
+        parent_icon: TreeUtil.default_parent_icon,
+        open_icon: TreeUtil.default_open_icon,
+        close_icon: TreeUtil.default_close_icon,
+        context_menu: undefined,
+      };
+    </script>
+    <style>
+      @font-face {
+        font-family: "Telegraf";
+        src: local("Trickster"),
+          url("PPTelegraf-Regular.otf") format("opentype");
+      }
+
+      * {
+        font-family: "Telegraf";
+      }
+
+      .tj_container * {
+        position: relative;
+        box-sizing: border-box;
+      }
+
+      .tj_container ul {
+        padding-left: 20px;
+        list-style-type: none;
+      }
+
+      .tj_container > ul:first-of-type {
+        padding: 0;
+      }
+
+      .tj_container li span.tj_description {
+        cursor: pointer;
+        padding: 2px 5px;
+        display: block;
+        border-radius: 2px;
+        color: var(--text, #171717);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        font-size: 10pt;
+        border-left: solid 4px transparent; /* Always reserve space for the indicator */
+
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+
+        text-align: left;
+      }
+
+      .tj_container li span.tj_description:hover {
+        background-color: var(--tableRow, #f0d4cc);
+      }
+
+      .tj_container li span.tj_mod_icon,
+      .tj_container li span.tj_icon {
+        display: inline-block;
+      }
+
+      .tj_container li span.tj_mod_icon,
+      .tj_container li span.tj_mod_icon * {
+        width: 1em;
+        height: 1em;
+      }
+
+      .tj_mod_icon > span {
+        font-size: 12pt;
+      }
+      .tj_icon > span {
+        font-size: 8pt;
+      }
+
+      .tj_container li span.tj_description.tj_leaf {
+        padding-left: 1.5em;
+        font-size: 10pt;
+      }
+
+      .tj_container li[disabled=""]:hover span.tj_description {
+        cursor: default;
+        background-color: var(--tableRow, #f0d4cc);
+        border-left-color: var(
+          --border,
+          #ff4444
+        ); /* Only change the border color */
+      }
+
+      .tj_container span.tj_description.selected {
+        background-color: var(--tableRow, #f0d4cc);
+        border-left-color: var(
+          --border,
+          #ff4444
+        ); /* Only change the border color */
+      }
+
+      .tj_container span.tj_description.selected:hover {
+        background-color: var(--tableRow, #f0d4cc);
+        border-left-color: var(
+          --border,
+          #ff4444
+        ); /* Only change the border color */
+      }
+    </style>
+    <script>
+      // Define theme colors
+      const lightTheme = {
+        text: "#171717",
+        text2: "#343434",
+        link: "#423b57",
+        tableRowBorder: "#ddbab1",
+        border: "#ff4444",
+        headerBG: "#fff2ee",
+        tableRow: "#f0d4cc",
+        buttonBG: "#ea9290",
+        brand: "#f15a26",
+        mainBG: "#F8F1EF",
+        secondBG: "#F2E6E2",
+        successGreen: "#09983a",
+        primary: "#ffffff",
+        secondary: "#f0d4cc",
+        background: "#fff2ee",
+      };
+
+      const darkTheme = {
+        text: "#FFFFFF",
+        text2: "#EAEAEA",
+        link: "#FFFFFF",
+        tableRowBorder: "#8577B0",
+        border: "#7C66CF",
+        headerBG: "#150E20",
+        tableRow: "#150E20",
+        buttonBG: "#423B57",
+        brand: "#F15A26",
+        mainBG: "#161616",
+        secondBG: "#292538",
+        successGreen: "#50D37D",
+        primary: "#1f1f1f",
+        secondary: "#3d2c27",
+        background: "#2a1a14",
+      };
+
+      // Get user's theme preference from localStorage or system preference
+      function getThemePreference() {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme) {
+          return savedTheme;
+        }
+
+        // Check for system preference and return light or dark directly
+        if (
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches
+        ) {
+          return "dark";
+        }
+
+        return "light"; // Default to light
+      }
+
+      // Set initial theme
+      const initialTheme = getThemePreference();
+      document.documentElement.setAttribute("data-theme", initialTheme);
+
+      // Apply theme colors based on preference
+      function applyThemeColors() {
+        const currentTheme =
+          document.documentElement.getAttribute("data-theme");
+        let colors;
+
+        if (currentTheme === "dark") {
+          colors = darkTheme;
+        } else {
+          // Default to light theme for any other value
+          colors = lightTheme;
+        }
+
+        // Configure Tailwind with the selected theme colors
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: colors,
+            },
+          },
+        };
+
+        // Set CSS variables for the tree component
+        document.documentElement.style.setProperty("--text", colors.text);
+        document.documentElement.style.setProperty("--text2", colors.text2);
+        document.documentElement.style.setProperty(
+          "--tableRow",
+          colors.tableRow
+        );
+        document.documentElement.style.setProperty("--border", colors.border);
+        document.documentElement.style.setProperty("--mainBG", colors.mainBG);
+        document.documentElement.style.setProperty(
+          "--secondBG",
+          colors.secondBG
+        );
+      }
+
+      // Apply initial theme
+      applyThemeColors();
+    </script>
+  </head>
+  <body class="font-sans m-0 p-0 bg-mainBG h-screen flex flex-col">
+    <!-- Menubar -->
+    <div
+      class="flex justify-between items-center bg-headerBG px-8 py-4 border-b border-border"
+    >
+      <div class="text-text text-text text-lg">
+        <img
+          src="https://cdn.glitch.global/1f44bda7-6694-4547-8f1b-1fa1f48b5711/image.png?v=1742980720762"
+          alt="Logo"
+          class="h-[1em] inline-block"
+        />
+      </div>
+      <div class="flex items-center gap-4">
+        <select
+          id="theme-selector"
+          class="bg-headerBG text-text border border-border rounded py-1 px-2 text-sm"
+        >
+          <option value="light">🌝</option>
+          <option value="dark">🌚</option>
+        </select>
+        <div
+          class="text-link text-md cursor-not-allowed"
+          title="We're still working on our docs."
+        >
+          Documentation
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="flex flex-col flex-1 transition-all duration-500 overflow-hidden px-8 pt-8 pb-8"
+    >
+      <style>
+        /* Hide scrollbars but keep functionality */
+        .scrollbar-hide {
+          scrollbar-width: none; /* Firefox */
+          -ms-overflow-style: none; /* IE and Edge */
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none; /* Chrome, Safari and Opera */
+        }
+
+        /* Make scrollbars transparent */
+        .scrollbar-transparent {
+          scrollbar-width: thin; /* Firefox */
+          scrollbar-color: transparent transparent; /* Firefox */
+        }
+        .scrollbar-transparent::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+          background-color: transparent;
+        }
+        .scrollbar-transparent::-webkit-scrollbar-thumb {
+          background-color: rgba(0, 0, 0, 0.1);
+          border-radius: 4px;
+        }
+        .scrollbar-transparent::-webkit-scrollbar-track {
+          background-color: transparent;
+        }
+      </style>
+      <script>
+        // Theme switching functionality
+        document.addEventListener("DOMContentLoaded", function () {
+          const themeSelector = document.getElementById("theme-selector");
+
+          // Set the dropdown to match the current theme
+          themeSelector.value = getThemePreference();
+
+          // Listen for theme changes
+          themeSelector.addEventListener("change", function () {
+            const selectedTheme = this.value;
+            document.documentElement.setAttribute("data-theme", selectedTheme);
+            localStorage.setItem("theme", selectedTheme);
+            applyThemeColors();
+
+            // Force redraw of the page to apply new theme
+            document.body.style.display = "none";
+            setTimeout(() => {
+              document.body.style.display = "";
+            }, 5);
+          });
+
+          // Listen for system theme changes and update if no saved preference
+          if (window.matchMedia) {
+            window
+              .matchMedia("(prefers-color-scheme: dark)")
+              .addEventListener("change", function (e) {
+                // Only apply system preference if there's no saved theme
+                if (!localStorage.getItem("theme")) {
+                  // Set theme based on new system preference
+                  const newTheme = e.matches ? "dark" : "light";
+                  document.documentElement.setAttribute("data-theme", newTheme);
+                  themeSelector.value = newTheme;
+                  applyThemeColors();
+
+                  // Force redraw
+                  document.body.style.display = "none";
+                  setTimeout(() => {
+                    document.body.style.display = "";
+                  }, 5);
+                }
+              });
+          }
+        });
+      </script>
+      <div class="grid grid-cols-5 gap-1 h-full transition-all duration-500">
+        <div
+          class="col-span-1 h-full overflow-hidden duration-500 border rounded-md border-border"
+        >
+          <div
+            id="tree-container"
+            class="p-4 w-full h-full bg-secondBG overflow-scroll scrollbar-transparent"
+          ></div>
+        </div>
+        <div class="col-span-4 h-full overflow-scroll ml-4">
+          <div
+            class="overflow-scroll scrollbar-transparent h-full border rounded-md border-border bg-secondBG p-4"
+          >
+            <h1 class="text-3xl text-text mb-4 node-name"></h1>
+            <div id="node-metadata" class="text-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      // Data
+      const data = {{ toRawJsonJs . }};
+
+      // Store pre-generated metadata for each node
+      const nodeMetadataMap = new Map();
+
+      // Function to generate random metadata based on object class
+      const generateMetadata = (node) => {
+        const userObject = node.getUserObject();
+        const nodeClass = userObject.class;
+        const nodeName = userObject.name;
+
+        if (!nodeClass) {
+          return null; // No metadata for objects without a class
+        }
+
+        // Helper function to get a random number between min and max
+        const randomNumber = (min, max, decimals = 0) => {
+          const num = Math.random() * (max - min) + min;
+          return decimals === 0
+            ? Math.floor(num)
+            : Number(num.toFixed(decimals));
+        };
+
+        // Helper function to get a random date within the last 30 days
+        const randomRecentDate = () => {
+          const now = new Date();
+          const daysAgo = randomNumber(0, 30);
+          const date = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
+          return date.toISOString();
+        };
+
+        // Helper function to get a random element from an array
+        const randomElement = (array) => {
+          return array[Math.floor(Math.random() * array.length)];
+        };
+
+        // Generate metadata based on class
+        switch (nodeClass) {
+          case "org":
+            return {
+              id: `org-${randomNumber(1000, 9999)}`,
+              name: nodeName,
+              created_at: `${2020 + randomNumber(0, 5)}-${String(
+                randomNumber(1, 12)
+              ).padStart(2, "0")}-${String(randomNumber(1, 28)).padStart(
+                2,
+                "0"
+              )}T00:00:00Z`,
+              members: randomNumber(5, 100),
+              teams: randomNumber(2, 15),
+              applications: randomNumber(5, 50),
+              environments: randomNumber(2, 10),
+              compliance: [
+                { gdpr: randomElement(["compliant", "in-progress"]) },
+                {
+                  hipaa: randomElement([
+                    "compliant",
+                    "in-progress",
+                    "not-applicable",
+                  ]),
+                },
+                {
+                  sox: randomElement([
+                    "compliant",
+                    "in-progress",
+                    "not-applicable",
+                  ]),
+                },
+              ],
+            };
+
+          case "app":
+            return {
+              uptime: `${randomNumber(1, 90)}d ${randomNumber(
+                0,
+                23
+              )}h ${randomNumber(0, 59)}m`,
+              deployments: [
+                { total: randomNumber(50, 500) },
+                { successful: randomNumber(40, 490) },
+                { failed: randomNumber(1, 10) },
+                { last_deployment: randomRecentDate() },
+              ],
+              performance: [
+                { response_time_avg_ms: randomNumber(50, 500) },
+                { error_rate: randomNumber(0, 5, 3) },
+                { availability: randomNumber(99, 100, 3) },
+                { apdex_score: randomNumber(80, 100, 2) / 100 },
+              ],
+              dependencies: [
+                "payment-gateway",
+                "fraud-detection",
+                "customer-database",
+                "notification-service",
+              ].slice(0, randomNumber(1, 4)),
+            };
+
+          case "env_type":
+            return {
+              id: nodeName.toLowerCase().replace(/\s+/g, "-"),
+              description: `${nodeName} env type`,
+              auto_scaling: randomElement([true, false]),
+              high_availability: randomElement([true, false]),
+              backup_enabled: randomElement([true, false]),
+              compliance_level: randomElement(["standard", "high", "maximum"]),
+            };
+
+          case "env":
+            return {
+              id: nodeName.toLowerCase().replace(/\s+/g, "-"),
+              status: randomElement(["operational", "degraded", "maintenance"]),
+              region: randomElement([
+                "us-east-1",
+                "us-west-2",
+                "eu-central-1",
+                "ap-southeast-1",
+              ]),
+              created_at: `${2022 + randomNumber(0, 3)}-${String(
+                randomNumber(1, 12)
+              ).padStart(2, "0")}-${String(randomNumber(1, 28)).padStart(
+                2,
+                "0"
+              )}T00:00:00Z`,
+              last_updated: randomRecentDate(),
+              compliance: [
+                { pci_dss: randomElement(["compliant", "not-applicable"]) },
+                { gdpr: randomElement(["compliant", "in-progress"]) },
+                { sox: randomElement(["compliant", "not-applicable"]) },
+              ],
+              security: [
+                { vulnerability_count: randomNumber(0, 5) },
+                { critical_issues: randomNumber(0, 2) },
+                { last_security_scan: randomRecentDate() },
+              ],
+              cost: [
+                { monthly_estimate: randomNumber(5000, 50000) },
+                { currency: "USD" },
+                {
+                  breakdown: [
+                    { compute: randomNumber(2000, 20000) },
+                    { storage: randomNumber(1000, 10000) },
+                    { network: randomNumber(500, 5000) },
+                    { managed_services: randomNumber(500, 5000) },
+                  ],
+                },
+              ],
+            };
+
+          case "workload":
+            return {
+              id: nodeName,
+              type: randomElement(["stateful", "stateless"]),
+              status: randomElement(["running", "degraded", "starting"]),
+              replicas: [
+                { desired: randomNumber(2, 10) },
+                { available: randomNumber(1, 10) },
+                { unavailable: randomNumber(0, 2) },
+              ],
+              resources: [
+                {
+                  cpu: [
+                    { requests: String(randomNumber(1, 4)) },
+                    { limits: String(randomNumber(2, 8)) },
+                    { usage_avg: randomNumber(0.5, 3.5, 1).toString() },
+                    { usage_peak: randomNumber(1.0, 7.0, 1).toString() },
+                  ],
+                },
+                {
+                  memory: [
+                    { requests: `${randomNumber(1, 8)}Gi` },
+                    { limits: `${randomNumber(2, 16)}Gi` },
+                    { usage_avg: `${randomNumber(0.5, 7.5, 1)}Gi` },
+                    { usage_peak: `${randomNumber(1.0, 15.0, 1)}Gi` },
+                  ],
+                },
+              ],
+              metrics: [
+                { requests_per_second: randomNumber(100, 2000) },
+                { response_time_ms: randomNumber(10, 200) },
+                { error_rate: randomNumber(0, 1, 3) },
+              ],
+              health_checks: [
+                { readiness: randomElement(["passing", "failing"]) },
+                { liveness: randomElement(["passing", "failing"]) },
+                { last_failure: randomElement([randomRecentDate(), "never"]) },
+              ],
+            };
+
+          case "resource":
+            // Check the name to determine the type of resource
+            if (
+              nodeName.toLowerCase().includes("s3") ||
+              nodeName.toLowerCase().includes("bucket")
+            ) {
+              return {
+                id: nodeName.split(":")[0].trim(),
+                type: "s3",
+                status: randomElement(["operational", "degraded"]),
+                metrics: [
+                  { total_objects: randomNumber(1000, 10000000) },
+                  {
+                    total_size: `${randomNumber(1, 10)}.${randomNumber(
+                      1,
+                      9
+                    )}TB`,
+                  },
+                  { daily_uploads: randomNumber(100, 50000) },
+                  { daily_downloads: randomNumber(500, 150000) },
+                ],
+                performance: [
+                  { upload_latency_ms: randomNumber(50, 200) },
+                  { download_latency_ms: randomNumber(30, 150) },
+                  { availability: randomNumber(99.9, 100, 3) },
+                ],
+                cost: [
+                  { monthly_estimate: randomNumber(500, 5000) },
+                  { currency: "USD" },
+                ],
+                compliance: [
+                  { encryption: "AES-256" },
+                  { object_lock: randomElement([true, false]) },
+                  {
+                    retention_policy: randomElement([
+                      "1 year",
+                      "3 years",
+                      "5 years",
+                      "7 years",
+                    ]),
+                  },
+                ],
+              };
+            } else if (
+              nodeName.toLowerCase().includes("db") ||
+              nodeName.toLowerCase().includes("database") ||
+              nodeName.toLowerCase().includes("postgres") ||
+              nodeName.toLowerCase().includes("mysql") ||
+              nodeName.toLowerCase().includes("mongo")
+            ) {
+              return {
+                id: nodeName.split(":")[0].trim(),
+                type: randomElement(["postgresql", "mysql", "mongodb"]),
+                version: `${randomNumber(10, 16)}.${randomNumber(0, 9)}`,
+                status: randomElement(["healthy", "degraded"]),
+                size: `${randomNumber(10, 1000)}GB`,
+                connections: [
+                  { active: randomNumber(10, 200) },
+                  { idle: randomNumber(5, 50) },
+                  { max: randomNumber(200, 1000) },
+                ],
+                performance: [
+                  { queries_per_second: randomNumber(500, 5000) },
+                  { read_iops: randomNumber(1000, 10000) },
+                  { write_iops: randomNumber(500, 5000) },
+                  { avg_query_time_ms: randomNumber(5, 50) },
+                ],
+                storage: [
+                  { allocated: `${randomNumber(100, 2000)}GB` },
+                  { used: `${randomNumber(50, 1000)}GB` },
+                  { usage_percent: randomNumber(10, 90, 1) },
+                ],
+                backups: [
+                  { last_successful: randomRecentDate() },
+                  { retention_days: randomNumber(7, 90) },
+                  { size: `${randomNumber(10, 900)}GB` },
+                ],
+              };
+            } else if (
+              nodeName.toLowerCase().includes("redis") ||
+              nodeName.toLowerCase().includes("cache")
+            ) {
+              return {
+                id: nodeName.split(":")[0].trim(),
+                type: "redis",
+                version: `${randomNumber(5, 7)}.${randomNumber(0, 9)}`,
+                status: randomElement(["healthy", "degraded"]),
+                connections: [
+                  { active: randomNumber(50, 500) },
+                  { max: randomNumber(1000, 10000) },
+                ],
+                performance: [
+                  { operations_per_second: randomNumber(5000, 50000) },
+                  { hit_rate: randomNumber(80, 99, 2) / 100 },
+                  { miss_rate: randomNumber(1, 20, 2) / 100 },
+                  { evictions: randomNumber(0, 500) },
+                ],
+                memory: [
+                  { allocated: `${randomNumber(1, 64)}GB` },
+                  { used: `${randomNumber(1, 48)}GB` },
+                  { usage_percent: randomNumber(10, 90) },
+                  { fragmentation_ratio: randomNumber(100, 150, 2) / 100 },
+                ],
+              };
+            } else {
+              // Generic resource
+              return {
+                id: nodeName.split(":")[0].trim(),
+                type: "generic",
+                status: randomElement(["operational", "degraded"]),
+                created_at: randomRecentDate(),
+                last_accessed: randomRecentDate(),
+                metrics: [
+                  { availability: randomNumber(99, 100, 2) },
+                  { response_time_ms: randomNumber(10, 200) },
+                ],
+              };
+            }
+
+          case "other":
+            return {
+              id: `other-${randomNumber(1000, 9999)}`,
+              name: nodeName,
+              description: `Other resource: ${nodeName}`,
+              created_at: randomRecentDate(),
+              last_updated: randomRecentDate(),
+              status: randomElement(["active", "inactive", "pending"]),
+              tags: ["tag1", "tag2", "tag3"].slice(0, randomNumber(1, 3)),
+            };
+
+          default:
+            return null;
+        }
+      };
+
+      // Function to generate metadata for a node and all its children recursively
+      const generateMetadataForTree = (node) => {
+        // Generate metadata for this node and store it in the map
+        // Use the node's toString() as a unique identifier
+        const nodeId = node.toString();
+        const metadata = generateMetadata(node);
+        if (metadata) {
+          nodeMetadataMap.set(nodeId, metadata);
+        }
+
+        // Process children recursively
+        if (!node.isLeaf()) {
+          node.getChildren().forEach((child) => {
+            generateMetadataForTree(child);
+          });
+        }
+      };
+
+      // Function to render metadata as HTML elements
+      const renderMetadataAsHTML = (metadata) => {
+        // Helper function to render a single key-value pair
+        const renderKeyValue = (key, value) => {
+          const container = document.createElement("div");
+          container.className = "flex flex-col mb-2";
+
+          // Handle different value types
+          if (value === null) {
+            const keyElement = document.createElement("div");
+            keyElement.className = "text-text2 text-sm mr-2";
+            keyElement.textContent = key;
+            container.appendChild(keyElement);
+
+            const valueElement = document.createElement("div");
+            valueElement.className = "text-text2";
+            valueElement.textContent = "null";
+            container.appendChild(valueElement);
+          } else if (typeof value === "object" && !Array.isArray(value)) {
+            // For nested objects, create a recursive container
+            const keyElement = document.createElement("div");
+            keyElement.className = "text-text2 text-sm mr-2";
+            keyElement.textContent = key;
+            container.appendChild(keyElement);
+
+            const valueElement = document.createElement("div");
+            valueElement.className = "text-text2";
+            valueElement.appendChild(renderObject(value));
+            container.appendChild(valueElement);
+          } else if (Array.isArray(value)) {
+            // Check if this is an array of objects
+            const containsObjects = value.some(
+              (item) => typeof item === "object" && item !== null
+            );
+
+            if (containsObjects) {
+              // Create a container for the entire array section
+              const arraySection = document.createElement("div");
+              arraySection.className =
+                "rounded-md p-3 bg-opacity-40 bg-tableRow";
+
+              // Add the array key as a header above the array items
+              const keyElement = document.createElement("div");
+              keyElement.className = "text-text text-lg mb-3";
+              keyElement.textContent = key;
+              arraySection.appendChild(keyElement);
+
+              // Create a container for array items
+              const arrayItemsContainer = document.createElement("div");
+              arrayItemsContainer.className = "flex flex-row flex-wrap";
+
+              // Add the array items
+              value.forEach((item, index) => {
+                const itemContainer = document.createElement("div");
+                itemContainer.className = "mr-4 mb-2";
+
+                if (typeof item === "object" && item !== null) {
+                  // Render object inside the array
+                  itemContainer.appendChild(renderObject(item));
+                } else {
+                  // Handle primitive values in arrays
+                  itemContainer.textContent = item;
+                }
+
+                arrayItemsContainer.appendChild(itemContainer);
+              });
+
+              // Add the items container to the array section
+              arraySection.appendChild(arrayItemsContainer);
+
+              container.appendChild(arraySection);
+            } else {
+              // For arrays of primitive values, list them horizontally
+              const keyElement = document.createElement("div");
+              keyElement.className = "text-text2 text-sm mr-2";
+              keyElement.textContent = key;
+              container.appendChild(keyElement);
+
+              const valueElement = document.createElement("div");
+              valueElement.className = "text-text2";
+
+              const list = document.createElement("div");
+              list.className = "flex flex-row flex-wrap";
+
+              value.forEach((item) => {
+                const itemElement = document.createElement("div");
+                itemElement.className = "ml-2 first:ml-0";
+                itemElement.textContent = item;
+                list.appendChild(itemElement);
+              });
+
+              valueElement.appendChild(list);
+              container.appendChild(valueElement);
+            }
+          } else {
+            // For primitive values
+            const keyElement = document.createElement("div");
+            keyElement.className = "text-text2 text-sm mr-2";
+            keyElement.textContent = key;
+            container.appendChild(keyElement);
+
+            const valueElement = document.createElement("div");
+            valueElement.className = "text-text2";
+            valueElement.textContent = value;
+            container.appendChild(valueElement);
+          }
+          return container;
+        };
+
+        // Helper function to render an object
+        const renderObject = (obj) => {
+          const container = document.createElement("div");
+          container.className = "";
+
+          Object.entries(obj).forEach(([key, value]) => {
+            container.appendChild(renderKeyValue(key, value));
+          });
+
+          return container;
+        };
+
+        // Create the main container
+        const mainContainer = document.createElement("div");
+        mainContainer.className = "overflow-scroll scrollbar-transparent";
+
+        // Render the metadata object
+        mainContainer.appendChild(renderObject(metadata));
+
+        return mainContainer;
+      };
+
+      const openNodeDetails = (node) => {
+        const elements = document.querySelectorAll(".node-name");
+        elements.forEach((element) => {
+          element.innerHTML = node.getUserObject().name;
+        });
+
+        // Get pre-generated metadata from the map
+        const nodeId = node.toString();
+        const metadata = nodeMetadataMap.get(nodeId);
+        const metadataContainer = document.getElementById("node-metadata");
+
+        if (metadata) {
+          // Render metadata as HTML elements instead of JSON
+          metadataContainer.innerHTML = "";
+          metadataContainer.appendChild(renderMetadataAsHTML(metadata));
+        } else {
+          metadataContainer.innerHTML = ""; // Clear metadata if none exists
+        }
+      };
+
+      const addChildren = (node, children) => {
+        for (child of children) {
+          childNode = new TreeNode(child);
+          childNode.on("select", (node) => {
+            openNodeDetails(node);
+          });
+          node.addChild(childNode);
+          if (child.children) {
+            addChildren(childNode, child.children);
+          }
+        }
+      };
+      window.onload = () => {
+        const rootNode = new TreeNode(data.root);
+        rootNode.on("select", (node) => {
+          openNodeDetails(node);
+        });
+        if (data.root.children) {
+          addChildren(rootNode, data.root.children);
+        }
+
+        // Generate metadata for the entire tree when it's loaded
+        generateMetadataForTree(rootNode);
+
+        // Display details for the root node initially
+        openNodeDetails(rootNode);
+
+        const tree = new TreeView(rootNode, "#tree-container");
+        tree.reload();
+
+        // Custom behavior to override the default tree.js behavior
+        // We need to wait a bit for the tree to be fully rendered
+        setTimeout(() => {
+          // Override the default click behavior
+          const treeContainer = document.getElementById("tree-container");
+
+          // Prevent the default click behavior on the description spans
+          treeContainer.addEventListener(
+            "click",
+            function (e) {
+              // If the click is on the description span but not on the arrow icon
+              if (
+                e.target.closest(".tj_description") &&
+                !e.target.closest(".tj_mod_icon")
+              ) {
+                e.stopPropagation(); // Stop event propagation
+
+                // Find the node associated with this description
+                let element = e.target;
+                while (element && !element.tj_node) {
+                  element = element.parentElement;
+                }
+
+                if (element && element.tj_node) {
+                  const node = element.tj_node;
+
+                  // Select the node and show details without toggling expansion
+                  const root = node.getRoot();
+                  if (root instanceof TreeNode) {
+                    TreeUtil.getSelectedNodesForNode(root).forEach(function (
+                      n
+                    ) {
+                      n.setSelected(false);
+                    });
+                  }
+
+                  node.setSelected(true);
+                  openNodeDetails(node);
+                  tree.reload();
+                }
+              }
+            },
+            true
+          ); // Use capture phase to intercept events before they reach the default handlers
+
+          // Add click handlers to the arrow icons
+          treeContainer.addEventListener(
+            "click",
+            function (e) {
+              // If the click is on the arrow icon
+              if (e.target.closest(".tj_mod_icon")) {
+                e.stopPropagation(); // Stop event propagation
+
+                // Find the node associated with this arrow
+                let element = e.target.closest(".tj_description");
+                if (element && element.tj_node) {
+                  const node = element.tj_node;
+
+                  // Toggle expansion only
+                  if (!node.isLeaf()) {
+                    node.toggleExpanded();
+                    tree.reload();
+
+                    // Re-apply our custom event handlers after reload
+                    setTimeout(() => {
+                      applyCustomBehavior();
+                    }, 0);
+                  }
+                }
+              }
+            },
+            true
+          ); // Use capture phase
+        }, 100);
+
+        // Function to apply custom behavior after tree reloads
+        function applyCustomBehavior() {
+          // Make arrow icons more visually distinct as clickable elements
+          document.querySelectorAll(".tj_mod_icon").forEach((icon) => {
+            icon.style.cursor = "pointer";
+          });
+        }
+
+        // Initial application of custom behavior
+        applyCustomBehavior();
+      };
+    </script>
+  </body>
 </html>

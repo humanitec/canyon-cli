@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/Masterminds/sprig/v3"
 	"github.com/pkg/browser"
 
 	"github.com/humanitec/canyon-cli/internal/mcp"
@@ -26,6 +27,8 @@ var renderTreeTemplate string
 
 //go:embed render_graph.html.tmpl
 var renderGraphTemplate string
+
+var funcMap template.FuncMap
 
 func init() {
 
@@ -47,11 +50,17 @@ func init() {
 		renderTreeTemplate = f(filepath.Join(h, "canyon-render-tree-template.html.tmpl"), renderTreeTemplate)
 		renderGraphTemplate = f(filepath.Join(h, "canyon-render-graph-template.html.tmpl"), renderGraphTemplate)
 	}
+
+	funcMap = sprig.HtmlFuncMap()
+	funcMap["toRawJsonJs"] = func(content interface{}) template.JS {
+		raw, _ := json.Marshal(content)
+		return template.JS(raw)
+	}
 }
 
 // NewRenderCSVAsTable renders csv as a table.
 func NewRenderCSVAsTable() mcp.Tool {
-	tmpl, err := template.New("").Parse(renderCsvTemplate)
+	tmpl, err := template.New("").Funcs(funcMap).Parse(renderCsvTemplate)
 	if err != nil {
 		panic(err)
 	}
@@ -66,23 +75,14 @@ func NewRenderCSVAsTable() mcp.Tool {
 			},
 			"required": []interface{}{"raw"},
 		},
-		Callable: func(ctx context.Context, m map[string]interface{}) ([]mcp.CallToolResponseContent, error) {
-			r := csv.NewReader(strings.NewReader(m["raw"].(string)))
-			rows, err := r.ReadAll()
+		Callable: func(ctx context.Context, arguments map[string]interface{}) ([]mcp.CallToolResponseContent, error) {
+			r := csv.NewReader(strings.NewReader(arguments["raw"].(string)))
+			_, err := r.ReadAll()
 			if err != nil {
 				return nil, fmt.Errorf("invalid csv content")
 			}
-			hasHeader, _ := m["first_row_is_header"].(bool)
-			var header []string
-			if hasHeader {
-				header = rows[0]
-				rows = rows[1:]
-			}
 			buffer := new(bytes.Buffer)
-			if err := tmpl.Execute(buffer, map[string]interface{}{
-				"header": header,
-				"rows":   rows,
-			}); err != nil {
+			if err := tmpl.Execute(buffer, arguments); err != nil {
 				slog.Error("failed to execute template", slog.Any("err", err))
 				return nil, fmt.Errorf("could not render html content")
 			}
@@ -96,11 +96,10 @@ func NewRenderCSVAsTable() mcp.Tool {
 
 // NewRenderTreeAsTree renders a hierarchy as basic html. Use https://d3js.org/d3-hierarchy/hierarchy instead in the future.
 func NewRenderTreeAsTree() mcp.Tool {
-	tmpl, err := template.New("").Parse(renderTreeTemplate)
+	tmpl, err := template.New("").Funcs(funcMap).Parse(renderTreeTemplate)
 	if err != nil {
 		panic(err)
 	}
-
 	return mcp.Tool{
 		Name:        "render_data_as_tree_in_browser",
 		Description: `This tool will render a hierarchy such as a tree structure or directory tree in a user friendly way in the browser.`,
@@ -142,7 +141,7 @@ func NewRenderTreeAsTree() mcp.Tool {
 }
 
 func NewRenderNetworkAsGraph() mcp.Tool {
-	tmpl, err := template.New("").Parse(renderGraphTemplate)
+	tmpl, err := template.New("").Funcs(funcMap).Parse(renderGraphTemplate)
 	if err != nil {
 		panic(err)
 	}
@@ -175,11 +174,8 @@ func NewRenderNetworkAsGraph() mcp.Tool {
 			"required": []interface{}{"nodes", "links"},
 		},
 		Callable: func(ctx context.Context, arguments map[string]interface{}) ([]mcp.CallToolResponseContent, error) {
-			raw, _ := json.MarshalIndent(arguments, "", "  ")
 			buffer := new(bytes.Buffer)
-			if err := tmpl.Execute(buffer, map[string]interface{}{
-				"data": string(raw),
-			}); err != nil {
+			if err := tmpl.Execute(buffer, arguments); err != nil {
 				slog.Error("failed to execute template", slog.Any("err", err))
 				return nil, fmt.Errorf("could not render html content")
 			}
