@@ -75,23 +75,14 @@ func NewRenderCSVAsTable() mcp.Tool {
 			},
 			"required": []interface{}{"raw"},
 		},
-		Callable: func(ctx context.Context, m map[string]interface{}) ([]mcp.CallToolResponseContent, error) {
-			r := csv.NewReader(strings.NewReader(m["raw"].(string)))
-			rows, err := r.ReadAll()
+		Callable: func(ctx context.Context, arguments map[string]interface{}) ([]mcp.CallToolResponseContent, error) {
+			r := csv.NewReader(strings.NewReader(arguments["raw"].(string)))
+			_, err := r.ReadAll()
 			if err != nil {
 				return nil, fmt.Errorf("invalid csv content")
 			}
-			hasHeader, _ := m["first_row_is_header"].(bool)
-			var header []string
-			if hasHeader {
-				header = rows[0]
-				rows = rows[1:]
-			}
 			buffer := new(bytes.Buffer)
-			if err := tmpl.Execute(buffer, map[string]interface{}{
-				"header": header,
-				"rows":   rows,
-			}); err != nil {
+			if err := tmpl.Execute(buffer, arguments); err != nil {
 				slog.Error("failed to execute template", slog.Any("err", err))
 				return nil, fmt.Errorf("could not render html content")
 			}

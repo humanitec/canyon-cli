@@ -26,3 +26,393 @@
 	</table>
 </body>
 </html>
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Canyon AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+
+    <!-- Theme Definitions and Styles -->
+    <style>
+      @font-face {
+        font-family: "Telegraf";
+        src: local("Trickster"),
+          url("https://cdn.glitch.global/1f44bda7-6694-4547-8f1b-1fa1f48b5711/PPTelegraf-Regular.otf?v=1743074949929")
+            format("opentype");
+      }
+
+      * {
+        font-family: "Telegraf";
+      }
+
+      /* AG Grid theme customization */
+      .ag-theme-alpine {
+        --ag-background-color: var(--mainBG, #f8f1ef);
+        --ag-foreground-color: var(--text, #171717);
+        --ag-border-color: transparent;
+        --ag-header-background-color: var(--tableRowBorder, #ddbab1);
+        --ag-odd-row-background-color: var(--tableRow, #f0d4cc);
+        --ag-row-border-color: transparent;
+        --ag-row-hover-color: var(--buttonBG, #ea9290);
+        --ag-selected-row-background-color: var(--tableRow, #f0d4cc);
+        --ag-borders: none;
+        --ag-borders-side-button: none;
+        --ag-borders-cell: none;
+        --ag-borders-critical: none;
+        --ag-borders-secondary: none;
+        --ag-borders-row: none;
+      }
+
+      /* Theme color variables */
+      :root[data-theme="light"] {
+        --mainBG: #f8f1ef;
+        --text: #171717;
+        --text2: #343434;
+        --link: #423b57;
+        --border: #ff4444;
+        --headerBG: #fff2ee;
+        --tableRow: #f0d4cc;
+        --tableRowBorder: #ddbab1;
+        --buttonBG: #ea9290;
+        --brand: #f15a26;
+        --secondBG: #f2e6e2;
+        --successGreen: #09983a;
+        --primary: #ffffff;
+        --secondary: #f0d4cc;
+        --background: #fff2ee;
+      }
+
+      :root[data-theme="dark"] {
+        --mainBG: #161616;
+        --text: #ffffff;
+        --text2: #eaeaea;
+        --link: #ffffff;
+        --border: #7c66cf;
+        --headerBG: #150e20;
+        --tableRow: #150e20;
+        --tableRowBorder: #8577b0;
+        --buttonBG: #423b57;
+        --brand: #f15a26;
+        --secondBG: #292538;
+        --successGreen: #50d37d;
+        --primary: #1f1f1f;
+        --secondary: #3d2c27;
+        --background: #2a1a14;
+      }
+
+      /* Scrollbar Styles */
+      .scrollbar-hide {
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE and Edge */
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none; /* Chrome, Safari and Opera */
+      }
+
+      .scrollbar-transparent {
+        scrollbar-width: thin; /* Firefox */
+        scrollbar-color: transparent transparent; /* Firefox */
+      }
+      .scrollbar-transparent::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+        background-color: transparent;
+      }
+      .scrollbar-transparent::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+      }
+      .scrollbar-transparent::-webkit-scrollbar-track {
+        background-color: transparent;
+      }
+    </style>
+  </head>
+  <body class="font-sans m-0 p-0 bg-mainBG h-screen flex flex-col">
+    <!-- Header/Menubar -->
+    <header
+      class="flex justify-between items-center bg-headerBG px-8 py-4 border-b border-border"
+    >
+      <!-- Logo -->
+      <div class="text-text text-lg">
+        <img
+          src="https://cdn.glitch.global/1f44bda7-6694-4547-8f1b-1fa1f48b5711/image.png?v=1742980720762"
+          alt="Logo"
+          class="h-[1em] inline-block"
+        />
+      </div>
+
+      <!-- Navigation and Theme Controls -->
+      <div class="flex items-center gap-4">
+        <select
+          id="theme-selector"
+          class="bg-headerBG text-text border border-border rounded py-1 px-2 text-sm"
+          aria-label="Theme selector"
+        >
+          <option value="light">🌝</option>
+          <option value="dark">🌚</option>
+        </select>
+        <div
+          class="text-link text-md cursor-not-allowed"
+          title="We're still working on our docs."
+        >
+          Documentation
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main
+      class="p-8 flex flex-col gap-4 flex-1 transition-all duration-500 overflow-hidden"
+    >
+      <!-- Filter Controls -->
+      <div class="flex gap-2.5 items-center">
+        <div class="relative">
+          <input
+            type="text"
+            id="filter-text-box"
+            placeholder="Filter table..."
+            oninput="onFilterTextBoxChanged()"
+            class="border border-border rounded py-2 px-3 text-sm bg-mainBG text-text focus:outline-none focus:ring-1 focus:ring-brand"
+            aria-label="Filter table content"
+          />
+          <button
+            id="clear-filter"
+            class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-text opacity-80 hover:opacity-100"
+            style="display: none"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <!-- Table Container -->
+      <div class="flex h-full transition-all">
+        <div class="flex h-full w-full overflow-hidden duration-500 rounded-md">
+          <div id="table" class="w-full h-full bg-mainBG ag-theme-alpine"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Scripts -->
+    <!-- Theme Management -->
+    <script>
+      // Theme configuration
+      const lightTheme = {
+        text: "#171717",
+        text2: "#343434",
+        link: "#423b57",
+        tableRowBorder: "#ddbab1",
+        border: "#ff4444",
+        headerBG: "#fff2ee",
+        tableRow: "#f0d4cc",
+        buttonBG: "#ea9290",
+        brand: "#f15a26",
+        mainBG: "#F8F1EF",
+        secondBG: "#F2E6E2",
+        successGreen: "#09983a",
+        primary: "#ffffff",
+        secondary: "#f0d4cc",
+        background: "#fff2ee",
+      };
+
+      const darkTheme = {
+        text: "#FFFFFF",
+        text2: "#EAEAEA",
+        link: "#FFFFFF",
+        tableRowBorder: "#8577B0",
+        border: "#7C66CF",
+        headerBG: "#150E20",
+        tableRow: "#150E20",
+        buttonBG: "#423B57",
+        brand: "#F15A26",
+        mainBG: "#161616",
+        secondBG: "#292538",
+        successGreen: "#50D37D",
+        primary: "#1f1f1f",
+        secondary: "#3d2c27",
+        background: "#2a1a14",
+      };
+
+      /**
+       * Get user's theme preference from localStorage or system preference
+       * @returns {string} 'light' or 'dark'
+       */
+      function getThemePreference() {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme) {
+          return savedTheme;
+        }
+
+        // Check for system preference
+        if (
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches
+        ) {
+          return "dark";
+        }
+
+        return "light"; // Default to light
+      }
+
+      /**
+       * Apply theme colors based on current preference
+       */
+      function applyThemeColors() {
+        const currentTheme =
+          document.documentElement.getAttribute("data-theme");
+        const colors = currentTheme === "dark" ? darkTheme : lightTheme;
+
+        // Configure Tailwind with the selected theme colors
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: colors,
+            },
+          },
+        };
+      }
+
+      // Set initial theme
+      const initialTheme = getThemePreference();
+      document.documentElement.setAttribute("data-theme", initialTheme);
+      applyThemeColors();
+
+      // Theme switching functionality
+      document.addEventListener("DOMContentLoaded", function () {
+        const themeSelector = document.getElementById("theme-selector");
+
+        // Set the dropdown to match the current theme
+        themeSelector.value = getThemePreference();
+
+        // Listen for theme changes
+        themeSelector.addEventListener("change", function () {
+          const selectedTheme = this.value;
+          document.documentElement.setAttribute("data-theme", selectedTheme);
+          localStorage.setItem("theme", selectedTheme);
+          applyThemeColors();
+
+          // Force redraw of the page to apply new theme
+          document.body.style.display = "none";
+          setTimeout(() => {
+            document.body.style.display = "";
+          }, 5);
+        });
+
+        // Listen for system theme changes and update if no saved preference
+        if (window.matchMedia) {
+          window
+            .matchMedia("(prefers-color-scheme: dark)")
+            .addEventListener("change", function (e) {
+              // Only apply system preference if there's no saved theme
+              if (!localStorage.getItem("theme")) {
+                // Set theme based on new system preference
+                const newTheme = e.matches ? "dark" : "light";
+                document.documentElement.setAttribute("data-theme", newTheme);
+                themeSelector.value = newTheme;
+                applyThemeColors();
+
+                // Force redraw
+                document.body.style.display = "none";
+                setTimeout(() => {
+                  document.body.style.display = "";
+                }, 5);
+              }
+            });
+        }
+      });
+    </script>
+
+    <!-- Table Data and Grid Configuration -->
+    <script>
+      // Sample CSV data
+      const csvData = {{ toRawJsonJs . }};
+
+      /**
+       * Convert CSV string to JSON array
+       * @param {string} csvString - Raw CSV data
+       * @returns {Array} Array of objects with header keys
+       */
+      function csvToJson(csvString) {
+        const rows = csvString.split("\n");
+        const headers = rows[0].split(",");
+
+        // Start from index 1 to skip the header row
+        return rows.slice(1).reduce((data, row) => {
+          const values = row.split(",");
+          const obj = {};
+
+          for (let j = 0; j < headers.length; j++) {
+            const key = headers[j].trim();
+            obj[key] = values[j].trim();
+          }
+
+          data.push(obj);
+          return data;
+        }, []);
+      }
+
+      // Process data
+      const jsonData = csvToJson(csvData.raw);
+
+      // Extract headers from CSV
+      const headers = csvData.raw.split("\n")[0].split(",");
+
+      // Create column definitions dynamically from CSV headers
+      const columnDefs = headers.map((header) => ({
+        field: header.trim(),
+      }));
+
+      // AG Grid configuration
+      const gridOptions = {
+        rowData: jsonData,
+        columnDefs: columnDefs,
+        defaultColDef: {
+          flex: 1,
+        },
+      };
+
+      /**
+       * Handle filter text changes
+       */
+      function onFilterTextBoxChanged() {
+        const filterValue =
+          document.getElementById("filter-text-box").value || "";
+        console.log(filterValue);
+        gridAPI.setGridOption("quickFilterText", filterValue);
+      }
+
+      /**
+       * Clear the filter and reset the grid
+       */
+      function clearFilter() {
+        const filterInput = document.getElementById("filter-text-box");
+        filterInput.value = "";
+        onFilterTextBoxChanged();
+        document.getElementById("clear-filter").style.display = "none";
+      }
+
+      // Initialize the grid when DOM is loaded
+      document.addEventListener("DOMContentLoaded", function () {
+        const myGridElement = document.querySelector("#table");
+        const gridAPI = agGrid.createGrid(myGridElement, gridOptions);
+
+        // Make gridAPI globally available for the filter function
+        window.gridAPI = gridAPI;
+
+        // Setup filter clear button functionality
+        const filterInput = document.getElementById("filter-text-box");
+        const clearButton = document.getElementById("clear-filter");
+
+        // Show/hide clear button based on input content
+        filterInput.addEventListener("input", function () {
+          clearButton.style.display = this.value ? "block" : "none";
+        });
+
+        // Clear filter when button is clicked
+        clearButton.addEventListener("click", clearFilter);
+      });
+    </script>
+  </body>
+</html>
