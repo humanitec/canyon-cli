@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 )
@@ -21,10 +22,15 @@ var installCmd = &cobra.Command{
 			return fmt.Errorf("cannot find the user home directory, you'll need to manage the installation manually")
 		}
 
+		command := os.Args[0]
+		if p, _ := filepath.Abs(command); p != "" {
+			command = p
+		}
+
 		mcpServerConfig := map[string]interface{}{
 			"mcpServers": map[string]interface{}{
 				"canyon": map[string]interface{}{
-					"command": os.Args[0],
+					"command": command,
 					"args": []interface{}{
 						"mcp",
 					},
@@ -48,7 +54,8 @@ If you are using 'Cline' VSCode extension, configure this in Cline extension > M
 
 If you are using 'Claude Desktop', configure this in the ~/Library/Application Support/Claude/claude_desktop_config.json file or by going to the developer settings pane.
 
-If you are using another Client, google for 'configure mcp servers in XYZ'.`, raw)
+If you are using another Client, google for 'configure mcp servers in XYZ'.
+`, raw)
 
 		return nil
 	},
