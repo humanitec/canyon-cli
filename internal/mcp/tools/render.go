@@ -183,11 +183,8 @@ func NewRenderNetworkAsGraph() mcp.Tool {
 			"required": []interface{}{"nodes", "links"},
 		},
 		Callable: func(ctx context.Context, arguments map[string]interface{}) ([]mcp.CallToolResponseContent, error) {
-			raw, _ := json.MarshalIndent(arguments, "", "  ")
 			buffer := new(bytes.Buffer)
-			if err := tmpl.Execute(buffer, map[string]interface{}{
-				"data": string(raw),
-			}); err != nil {
+			if err := tmpl.Execute(buffer, arguments); err != nil {
 				slog.Error("failed to execute template", slog.Any("err", err))
 				return nil, fmt.Errorf("could not render html content")
 			}

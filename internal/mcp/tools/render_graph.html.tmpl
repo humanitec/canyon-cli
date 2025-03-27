@@ -256,7 +256,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <script>
       // Data
-      const data = JSON.parse({{ toRawJsonJs .data }});
+      const data = {{ toRawJsonJs . }};
 
       // Function to get current theme colors
       function getThemeColors() {
