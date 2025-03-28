@@ -147,7 +147,7 @@ func NewRenderNetworkAsGraph() mcp.Tool {
 	}
 	return mcp.Tool{
 		Name:        "render_network_as_graph_in_browser",
-		Description: `This tool will render an interconnected network as a force directed graph in the browser.`,
+		Description: `This tool will render an interconnected network as a force directed graph in the browser. Use this to present relationships between entities in a visual way which may be easier than text for users to consume.`,
 		InputSchema: map[string]interface{}{
 			"type": "object",
 			"properties": map[string]interface{}{
@@ -165,8 +165,9 @@ func NewRenderNetworkAsGraph() mcp.Tool {
 					"type":        "object",
 					"description": "A link in the network graph",
 					"properties": map[string]interface{}{
-						"source": map[string]interface{}{"type": "string", "description": "The source node id of the link"},
-						"target": map[string]interface{}{"type": "string", "description": "The target node id of the link"},
+						"source":      map[string]interface{}{"type": "string", "description": "The source node id of the link"},
+						"target":      map[string]interface{}{"type": "string", "description": "The target node id of the link"},
+						"explanation": map[string]interface{}{"type": "string", "description": "An optional short label for the link describing what the relationship is"},
 					},
 					"required": []interface{}{"source", "target"},
 				}},
