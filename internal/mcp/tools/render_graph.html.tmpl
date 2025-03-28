@@ -380,8 +380,7 @@
 
       // Assign a random explanation to each link
       data.links.forEach((link) => {
-        link.explanation =
-          connectionWords[Math.floor(Math.random() * connectionWords.length)];
+        link.explanation = link.explanation || connectionWords[Math.floor(Math.random() * connectionWords.length)];
       });
 
       // Initialize the links as groups
