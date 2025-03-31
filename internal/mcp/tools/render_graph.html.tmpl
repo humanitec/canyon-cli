@@ -196,7 +196,7 @@
         --graph-node-env: var(--color-violetta-500);
         --graph-node-workload: var(--color-orange-400);
         --graph-node-resource: var(--color-red-600);
-        --graph-node-env-type: var(--color-red-800);
+        --graph-node-env_type: var(--color-red-800);
         --graph-node-other: var(--color-crevice-600);
         --graph-link: var(--color-red-300);
         --graph-link-highlight: var(--color-orange-500);
@@ -233,7 +233,7 @@
         --graph-node-env: var(--color-violetta-300);
         --graph-node-workload: var(--color-orange-100);
         --graph-node-resource: var(--color-red-200);
-        --graph-node-env-type: var(--color-red-200);
+        --graph-node-env_type: var(--color-red-200);
         --graph-node-other: var(--color-brown-100);
         --graph-link: var(--color-purple-300);
         --graph-link-highlight: var(--color-orange-600);
@@ -293,8 +293,8 @@
       .node-env {
         color: var(--graph-node-env);
       }
-      .node-env-type {
-        color: var(--graph-node-env-type);
+      .node-env_type {
+        color: var(--graph-node-env_type);
       }
       .node-workload {
         color: var(--graph-node-workload);
@@ -3097,7 +3097,7 @@
           getCssVariable("--graph-node-org"),
           getCssVariable("--graph-node-app"),
           getCssVariable("--graph-node-env"),
-          getCssVariable("--graph-node-env-type"),
+          getCssVariable("--graph-node-env_type"),
           getCssVariable("--graph-node-other"), // Using 'other' color for 'env'
           getCssVariable("--graph-node-workload"),
           getCssVariable("--graph-node-resource"),
