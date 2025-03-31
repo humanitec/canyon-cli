@@ -93,45 +93,122 @@
         --color-teal-800: #143439;
         --color-teal-900: #0b1c1e;
         --color-teal-950: #050e0f;
+        --color-darkviolet-50: #e8e8ed;
+        --color-darkviolet-100: #d3d5de;
+        --color-darkviolet-200: #a8aabd;
+        --color-darkviolet-300: #7a7d9a;
+        --color-darkviolet-400: #565971;
+        --color-darkviolet-500: #353746;
+        --color-darkviolet-600: #2a2b37;
+        --color-darkviolet-700: #1f2029;
+        --color-darkviolet-800: #16171d;
+        --color-darkviolet-900: #0b0b0f;
+        --color-darkviolet-950: #040506;
+        --color-mud-50: #fefcfb;
+        --color-mud-100: #fcf9f8;
+        --color-mud-200: #f9f3f1;
+        --color-mud-300: #f6ece9;
+        --color-mud-400: #f3e6e2;
+        --color-mud-500: #f0e0db;
+        --color-mud-600: #d5a89a;
+        --color-mud-700: #ba7059;
+        --color-mud-800: #824836;
+        --color-mud-900: #41241b;
+        --color-mud-950: #20120d;
+        --color-fanta-50: #ffffff;
+        --color-fanta-100: #fffbfa;
+        --color-fanta-200: #fffbfa;
+        --color-fanta-300: #fff7f5;
+        --color-fanta-400: #fff3f0;
+        --color-fanta-500: #fff2ee;
+        --color-fanta-600: #ffa58a;
+        --color-fanta-700: #ff5b29;
+        --color-fanta-800: #c72e00;
+        --color-fanta-900: #611700;
+        --color-fanta-950: #330c00;
+        --color-pipe-50: #f8f2f2;
+        --color-pipe-100: #f3e8e8;
+        --color-pipe-200: #e6d0d0;
+        --color-pipe-300: #dab9b9;
+        --color-pipe-400: #cda2a2;
+        --color-pipe-500: #c08989;
+        --color-pipe-600: #aa5f5f;
+        --color-pipe-700: #824545;
+        --color-pipe-800: #562e2e;
+        --color-pipe-900: #2b1717;
+        --color-pipe-950: #140b0b;
+        --color-mauve-50: #e8e7ee;
+        --color-mauve-100: #d4d2e0;
+        --color-mauve-200: #aaa5c0;
+        --color-mauve-300: #7c759f;
+        --color-mauve-400: #585275;
+        --color-mauve-500: #363248;
+        --color-mauve-600: #2b2839;
+        --color-mauve-700: #201d2a;
+        --color-mauve-800: #17151e;
+        --color-mauve-900: #0b0a0f;
+        --color-mauve-950: #050406;
+        --color-violetta-50: #f2effa;
+        --color-violetta-100: #e5e0f5;
+        --color-violetta-200: #cac1eb;
+        --color-violetta-300: #b0a2e2;
+        --color-violetta-400: #9583d8;
+        --color-violetta-500: #7c66cf;
+        --color-violetta-600: #563bba;
+        --color-violetta-700: #412c8c;
+        --color-violetta-800: #2b1d5d;
+        --color-violetta-900: #160f2f;
+        --color-violetta-950: #0b0717;
+        --color-crevice-50: #fefcfb;
+        --color-crevice-100: #fcf5f3;
+        --color-crevice-200: #f9efeb;
+        --color-crevice-300: #f6e5df;
+        --color-crevice-400: #f3dbd3;
+        --color-crevice-500: #f0d3c9;
+        --color-crevice-600: #dd9a83;
+        --color-crevice-700: #ca623f;
+        --color-crevice-800: #8c4027;
+        --color-crevice-900: #441f13;
+        --color-crevice-950: #24100a;
       }
 
       /* Define theme variables directly based on data-theme */
       [data-theme="light"] {
         --text-primary: var(--color-black-900);
-        --text-secondary: var(--color-orange-800);
+        --text-secondary: var(--color-black-700);
         --text-link: var(--color-purple-500);
         --interactive-subtle: var(--color-tan-500);
-        --border-strong: var(--color-red-500);
-        --background-header: var(--color-tan-100);
-        --background-row: var(--color-tan-200); /* General row bg */
+        --border-strong: var(--color-pipe-500);
+        --background-header: var(--color-fanta-500);
+        --background-row: var(--color-tan-200);
         --background-button-primary: var(--color-red-300);
-        --accent-brand: var(--color-orange-500);
-        --background-primary: var(--color-tan-50);
-        --background-secondary: var(--color-brown-50); /* Details bg */
+        --accent-brand: var(--color-red-500);
+        --background-primary: var(--color-mud-500);
+        --background-secondary: var(--color-mud-500); /* Tree/Details bg */
         --status-success: #09983a;
         --background-highlight-primary: var(--color-tan-50);
         --background-highlight-secondary: var(--color-tan-200);
         --background-highlight-tertiary: var(--color-tan-100);
 
         /* Graph specific semantic variables - Light */
-        --graph-node-org: var(--color-purple-100);
-        --graph-node-app: var(--color-teal-100);
-        --graph-node-env: var(--color-tan-300);
-        --graph-node-workload: var(--color-orange-100);
-        --graph-node-resource: var(--color-red-200);
-        --graph-node-other: var(--color-brown-100);
-        --graph-link: var(--color-red-300); /* Matches button primary */
-        --graph-link-highlight: var(
-          --color-orange-500
-        ); /* Matches accent brand */
+        --graph-node-org: var(--color-red-600);
+        --graph-node-app: var(--color-teal-800);
+        --graph-node-env: var(--color-violetta-500);
+        --graph-node-workload: var(--color-orange-400);
+        --graph-node-resource: var(--color-red-600);
+        --graph-node-env-type: var(--color-red-800);
+        --graph-node-other: var(--color-crevice-600);
+        --graph-link: var(--color-red-300);
+        --graph-link-highlight: var(--color-orange-500);
+        --graph-node-label-background: var(--color-black-100);
 
-        /* Metadata specific semantic variables - Light */
-        --metadata-key-color: var(--color-orange-800);
+        /* Metadata specific semantic variables */
+        --metadata-key-color: var(--color-black-700);
         --metadata-value-color: var(--color-black-900);
         --metadata-section-background: var(--color-tan-100);
-        --metadata-array-background: var(--color-tan-200);
+        --metadata-array-background: var(--color-mud-200);
         --metadata-array-header-color: var(--color-black-900);
-        --metadata-object-background: var(--color-tan-50);
+        --metadata-object-background: var(--color-mud-500);
       }
 
       [data-theme="dark"] {
@@ -140,30 +217,29 @@
         --text-link: var(--color-tan-50);
         --interactive-subtle: var(--color-purple-300);
         --border-strong: var(--color-purple-400);
-        --background-header: var(--color-purple-800);
-        --background-row: var(--color-purple-800); /* General row bg */
+        --background-header: var(--color-darkviolet-500);
+        --background-row: var(--color-purple-800);
         --background-button-primary: var(--color-purple-500);
-        --accent-brand: var(--color-orange-500);
+        --accent-brand: var(--color-violetta-500);
         --background-primary: var(--color-black-900);
-        --background-secondary: var(--color-purple-900); /* Details bg */
+        --background-secondary: var(--color-purple-900);
         --status-success: #50d37d;
         --background-highlight-primary: var(--color-black-800);
         --background-highlight-secondary: var(--color-brown-800);
         --background-highlight-tertiary: var(--color-brown-900);
-
         /* Graph specific semantic variables - Dark */
-        --graph-node-org: var(--color-purple-600);
-        --graph-node-app: var(--color-teal-600);
-        --graph-node-env: var(--color-tan-600);
-        --graph-node-workload: var(--color-orange-600);
-        --graph-node-resource: var(--color-red-600);
-        --graph-node-other: var(--color-brown-600);
-        --graph-link: var(--color-purple-300); /* Matches button primary */
-        --graph-link-highlight: var(
-          --color-orange-600
-        ); /* Matches accent brand */
+        --graph-node-org: var(--color-red-400);
+        --graph-node-app: var(--color-teal-400);
+        --graph-node-env: var(--color-violetta-300);
+        --graph-node-workload: var(--color-orange-100);
+        --graph-node-resource: var(--color-red-200);
+        --graph-node-env-type: var(--color-red-200);
+        --graph-node-other: var(--color-brown-100);
+        --graph-link: var(--color-purple-300);
+        --graph-link-highlight: var(--color-orange-600);
+        --graph-node-label-background: var(--color-black-400);
 
-        /* Metadata specific semantic variables - Dark */
+        /* Metadata specific semantic variables */
         --metadata-key-color: var(--color-purple-200);
         --metadata-value-color: var(--color-tan-50);
         --metadata-section-background: var(--color-purple-800);
@@ -171,61 +247,72 @@
         --metadata-array-header-color: var(--color-tan-50);
         --metadata-object-background: var(--color-purple-900);
       }
+
+      /* Logo Styling for Light/Dark Mode */
+      .logo-light {
+        display: none; /* Hidden by default */
+      }
+      .logo-dark {
+        display: inline-block; /* Shown by default */
+      }
+
+      [data-theme="light"] .logo-light {
+        display: inline-block;
+      }
+      [data-theme="light"] .logo-dark {
+        display: none;
+      }
+
+      [data-theme="dark"] .logo-light {
+        display: none;
+      }
+      [data-theme="dark"] .logo-dark {
+        display: inline-block;
+      }
+
+      /* Ensure both logos have the same base styles */
+      .logo-light,
+      .logo-dark {
+        height: 1em;
+        vertical-align: middle; /* Adjust vertical alignment */
+      }
+
+      /* Styling for embedded SVG icons */
+      .node-icon-shape {
+        /* Inherit fill color from parent group by default */
+        fill: currentColor;
+        stroke: currentColor; /* Also style stroke if needed */
+        stroke-width: 0.5; /* Adjust stroke width if needed */
+      }
+      .node-org {
+        color: var(--graph-node-org);
+      }
+      .node-app {
+        color: var(--graph-node-app);
+      }
+      .node-env {
+        color: var(--graph-node-env);
+      }
+      .node-env-type {
+        color: var(--graph-node-env-type);
+      }
+      .node-workload {
+        color: var(--graph-node-workload);
+      }
+      .node-resource {
+        color: var(--graph-node-resource);
+      }
+      .node-other {
+        color: var(--graph-node-other);
+      }
+
+      /* Adjust opacity rules to target the new structure */
+      .node-icon {
+        opacity: 1; /* Default opacity */
+        transition: opacity 0.3s ease-in-out;
+      }
     </style>
     <script>
-      // Define theme objects using CSS variables (Consistent with tree.html)
-      const lightTheme = {
-        "text-primary": "var(--color-black-900)",
-        "text-secondary": "var(--color-orange-800)",
-        "text-link": "var(--color-purple-500)",
-        "interactive-subtle": "var(--color-tan-500)",
-        "border-strong": "var(--color-red-500)",
-        "background-header": "var(--color-tan-100)",
-        "background-row": "var(--color-tan-200)",
-        "background-button-primary": "var(--color-red-300)",
-        "accent-brand": "var(--color-orange-500)",
-        "status-success": "#09983a",
-        "background-primary": "var(--color-tan-50)",
-        "background-secondary": "var(--color-tan-100)",
-        "background-highlight-primary": "var(--color-tan-50)",
-        "background-highlight-secondary": "var(--color-tan-200)",
-        "background-highlight-tertiary": "var(--color-tan-100)",
-
-        /* Metadata specific variables - Light */
-        "metadata-key-color": "var(--color-orange-800)",
-        "metadata-value-color": "var(--color-black-900)",
-        "metadata-section-background": "var(--color-tan-100)",
-        "metadata-array-background": "var(--color-tan-200)",
-        "metadata-array-header-color": "var(--color-black-900)",
-        "metadata-object-background": "var(--color-tan-50)",
-      };
-
-      const darkTheme = {
-        "text-primary": "var(--color-tan-50)",
-        "text-secondary": "var(--color-purple-200)",
-        "text-link": "var(--color-tan-50)",
-        "interactive-subtle": "var(--color-purple-300)",
-        "border-strong": "var(--color-purple-400)",
-        "background-header": "var(--color-purple-800)",
-        "background-row": "var(--color-purple-800)",
-        "background-button-primary": "var(--color-purple-500)",
-        "accent-brand": "var(--color-orange-500)",
-        "status-success": "#50d37d",
-        "background-primary": "var(--color-black-900)",
-        "background-secondary": "var(--color-purple-900)",
-        "background-highlight-primary": "var(--color-black-800)",
-        "background-highlight-secondary": "var(--color-brown-800)",
-        "background-highlight-tertiary": "var(--color-brown-900)",
-
-        /* Metadata specific variables - Dark */
-        "metadata-key-color": "var(--color-purple-200)",
-        "metadata-value-color": "var(--color-tan-50)",
-        "metadata-section-background": "var(--color-purple-800)",
-        "metadata-array-background": "var(--color-purple-700)",
-        "metadata-array-header-color": "var(--color-tan-50)",
-        "metadata-object-background": "var(--color-purple-900)",
-      };
-
       // Get user's theme preference from localStorage or system preference
       function getThemePreference() {
         const savedTheme = localStorage.getItem("theme");
@@ -248,18 +335,58 @@
       const initialTheme = getThemePreference();
       document.documentElement.setAttribute("data-theme", initialTheme);
 
+      // Function to get computed CSS variables for Tailwind
+      function getThemeColors() {
+        // Get all semantic color variables from CSS
+        const computedStyle = getComputedStyle(document.documentElement);
+        const semanticVars = [
+          "text-primary",
+          "text-secondary",
+          "text-link",
+          "interactive-subtle",
+          "border-strong",
+          "background-header",
+          "background-row",
+          "background-button-primary",
+          "accent-brand",
+          "status-success",
+          "background-primary",
+          "background-secondary",
+          "background-highlight-primary",
+          "background-highlight-secondary",
+          "background-highlight-tertiary",
+          "metadata-key-color",
+          "metadata-value-color",
+          "metadata-section-background",
+          "metadata-array-background",
+          "metadata-array-header-color",
+          "metadata-object-background",
+          "graph-node-org",
+          "graph-node-app",
+          "graph-node-env",
+          "graph-node-workload",
+          "graph-node-resource",
+          "graph-node-other",
+          "graph-link",
+          "graph-link-highlight",
+        ];
+
+        // Create an object with all the computed values
+        const colors = {};
+        semanticVars.forEach((varName) => {
+          // Get the value from CSS
+          const value = computedStyle.getPropertyValue(`--${varName}`).trim();
+          // Add to colors object
+          colors[varName] = value;
+        });
+
+        return colors;
+      }
+
       // Apply theme colors based on preference
       function applyThemeColors() {
-        const currentTheme =
-          document.documentElement.getAttribute("data-theme");
-        let colors;
-
-        if (currentTheme === "dark") {
-          colors = darkTheme;
-        } else {
-          // Default to light theme for any other value
-          colors = lightTheme;
-        }
+        // Get computed colors from CSS variables
+        const colors = getThemeColors();
 
         // Configure Tailwind with the selected theme colors
         tailwind.config = {
@@ -269,9 +396,6 @@
             },
           },
         };
-
-        // Apply CSS variables for non-Tailwind components
-        // This part is removed as CSS handles it via [data-theme]
       }
 
       // Apply initial theme
@@ -281,13 +405,20 @@
   <body class="font-sans m-0 p-0 bg-background-primary h-screen flex flex-col">
     <!-- Menubar -->
     <div
-      class="flex justify-between items-center bg-background-header px-8 py-4 border-b border-border-strong"
+      class="flex justify-between items-center bg-background-header p-4 border-b border-accent-brand"
     >
       <div class="text-text-primary text-lg">
+        <!-- Light mode logo -->
         <img
-          src="https://cdn.glitch.global/1f44bda7-6694-4547-8f1b-1fa1f48b5711/image.png?v=1742980720762"
-          alt="Logo"
-          class="h-[1em] inline-block"
+          src="https://cdn.glitch.global/1f44bda7-6694-4547-8f1b-1fa1f48b5711/light_logo.png?v=1743423313930"
+          alt="Logo Light"
+          class="logo-light"
+        />
+        <!-- Dark mode logo -->
+        <img
+          src="https://cdn.glitch.global/1f44bda7-6694-4547-8f1b-1fa1f48b5711/canyon.png?v=1743423174793"
+          alt="Logo Dark"
+          class="logo-dark"
         />
       </div>
       <div class="flex items-center gap-4">
@@ -387,10 +518,10 @@
           class="flex-1 transition-all h-full overflow-hidden duration-500 border rounded-md border-border-strong"
           id="graph-container"
         >
-          <div id="graph" class="w-full h-full bg-background-secondary"></div>
+          <div id="graph" class="w-full h-full"></div>
         </div>
         <div
-          class="hidden bg-background-secondary overflow-scroll scrollbar-transparent transition-all border border-border-strong rounded-md p-4 duration-500 ml-3"
+          class="hidden overflow-scroll scrollbar-transparent transition-all border border-border-strong rounded-md p-4 duration-500 ml-3"
           id="details-container"
         >
           <div id="node-details" class=""></div>
@@ -1349,6 +1480,16 @@
     <script>
       // Data
       const data = {{ toRawJsonJs . }};
+
+      // Store SVG content for icons
+      const svgIconContent = {
+        org: `<svg width="33" height="36" viewBox="0 0 33 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.7937 1.19121C15.8219 0.612007 17.0781 0.612008 18.1063 1.19121L30.4845 8.16344C31.5463 8.76149 32.2032 9.88545 32.2032 11.104V24.896C32.2032 26.1146 31.5463 27.2385 30.4845 27.8366L18.1063 34.8088C17.0781 35.388 15.8219 35.388 14.7937 34.8088L2.41548 27.8366C1.35373 27.2385 0.696831 26.1146 0.696831 24.896V11.104C0.696831 9.88545 1.35374 8.76149 2.41548 8.16344L14.7937 1.19121Z" fill="currentColor" stroke="currentColor" stroke-width="0.45"/></svg>`,
+        app: `<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M35.4728 6.67279C35.8104 7.01036 36 7.46819 36 7.94558V18L18 0H28.0544C28.5318 0 28.9896 0.189642 29.3272 0.527207L35.4728 6.67279Z" fill="currentColor"/><path d="M18 36L36 18V28.0544C36 28.5318 35.8104 28.9896 35.4728 29.3272L29.3272 35.4728C28.9896 35.8104 28.5318 36 28.0544 36H18Z" fill="currentColor"/><path d="M0 18L18 36H7.94558C7.46819 36 7.01036 35.8104 6.67279 35.4728L0.527207 29.3272C0.189642 28.9896 0 28.5318 0 28.0544V18Z" fill="currentColor"/><path d="M0 18V7.94558C0 7.46819 0.189642 7.01036 0.527207 6.67279L6.67279 0.527208C7.01036 0.189642 7.46819 0 7.94558 0H18L0 18Z" fill="currentColor"/><path d="M10.2728 19.2728C9.56985 18.5698 9.56985 17.4302 10.2728 16.7272L16.7272 10.2728C17.4302 9.56985 18.5698 9.56985 19.2728 10.2728L25.7272 16.7272C26.4302 17.4302 26.4302 18.5698 25.7272 19.2728L19.2728 25.7272C18.5698 26.4302 17.4302 26.4302 16.7272 25.7272L10.2728 19.2728Z" fill="currentColor"/></svg>`,
+        env: `<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="18" cy="18" r="18" fill="currentColor"/></svg>`,
+        workload: `<svg width="37" height="36" viewBox="0 0 37 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M36.4 10.8L29.2 18V7.2H18.4L25.6 0H36.4V10.8Z" fill="currentColor"/><path d="M7.60002 18L18.4 7.2L29.2 18L18.4 28.8L7.60002 18Z" fill="currentColor"/><path d="M7.60002 18L0.400024 25.2V36H11.2L18.4 28.8L25.6 36H36.4V25.2L29.2 18V28.8H18.4H7.60002V18Z" fill="currentColor"/><path d="M7.60002 18L0.400024 10.8V0H11.2L18.4 7.2H7.60002V18Z" fill="currentColor"/></svg>`,
+        resource: `<svg width="37" height="36" viewBox="0 0 37 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21.4715 0C23.365 0 24.9 1.53502 24.9 3.42857V12L12.9 0H21.4715Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M36.9 24V15.4286C36.9 13.535 35.365 12 33.4715 12H24.9H16.3286C14.435 12 12.9 13.535 12.9 15.4286V24L0.900024 12L12.9 0H4.3286C2.43505 0 0.900024 1.53502 0.900024 3.42857V12V20.5714C0.900024 22.465 2.43505 24 4.3286 24H12.9V32.5714C12.9 34.465 14.435 36 16.3286 36H24.9H33.4715C35.365 36 36.9 34.465 36.9 32.5714V24ZM36.9 24L24.9 36L12.9 24H21.4715C23.365 24 24.9 22.465 24.9 20.5714V12L36.9 24Z" fill="currentColor"/></svg>`,
+        other: `<svg width="36" height="35" viewBox="0 0 36 35" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18.0966 0.105279C18.2745 -0.0350929 18.5255 -0.035093 18.7034 0.105279L20.6672 1.65463C20.8011 1.76028 20.9803 1.78867 21.1403 1.72957L23.4867 0.86288C23.6993 0.784358 23.938 0.861914 24.0638 1.0504L25.4527 3.13075C25.5474 3.27261 25.7091 3.35499 25.8795 3.34822L28.3789 3.24904C28.6054 3.24005 28.8084 3.38757 28.8698 3.60571L29.5479 6.01343C29.5941 6.17761 29.7224 6.30592 29.8866 6.35215L32.2943 7.03018C32.5125 7.09161 32.66 7.29465 32.651 7.5211L32.5518 10.0205C32.545 10.1909 32.6274 10.3526 32.7693 10.4473L34.8496 11.8362C35.0381 11.962 35.1157 12.2007 35.0371 12.4133L34.1705 14.7597C34.1114 14.9197 34.1397 15.0989 34.2454 15.2328L35.7947 17.1966C35.9351 17.3745 35.9351 17.6255 35.7947 17.8034L34.2454 19.7672C34.1397 19.9011 34.1114 20.0803 34.1705 20.2403L35.0371 22.5867C35.1157 22.7993 35.0381 23.038 34.8496 23.1638L32.7693 24.5527C32.6274 24.6474 32.545 24.8091 32.5518 24.9795L32.651 27.4789C32.66 27.7053 32.5125 27.9084 32.2943 27.9698L29.8866 28.6478C29.7224 28.6941 29.5941 28.8224 29.5479 28.9866L28.8698 31.3943C28.8084 31.6124 28.6054 31.7599 28.3789 31.751L25.8795 31.6518C25.7091 31.645 25.5474 31.7274 25.4527 31.8692L24.0638 33.9496C23.938 34.1381 23.6993 34.2156 23.4867 34.1371L21.1403 33.2704C20.9803 33.2113 20.8011 33.2397 20.6672 33.3454L18.7034 34.8947C18.5255 35.0351 18.2745 35.0351 18.0966 34.8947L16.1329 33.3454C15.999 33.2397 15.8197 33.2113 15.6597 33.2704L13.3133 34.1371C13.1007 34.2156 12.862 34.1381 12.7362 33.9496L11.3473 31.8692C11.2526 31.7274 11.091 31.645 10.9205 31.6518L8.42112 31.751C8.19468 31.7599 7.99163 31.6124 7.9302 31.3943L7.25218 28.9866C7.20594 28.8224 7.07764 28.6941 6.91346 28.6478L4.50574 27.9698C4.2876 27.9084 4.14008 27.7053 4.14906 27.4789L4.24825 24.9795C4.25501 24.8091 4.17263 24.6474 4.03078 24.5527L1.95042 23.1638C1.76194 23.038 1.68438 22.7993 1.7629 22.5867L2.62959 20.2403C2.68869 20.0803 2.6603 19.9011 2.55466 19.7672L1.0053 17.8034C0.864932 17.6255 0.864931 17.3745 1.0053 17.1966L2.55466 15.2328C2.6603 15.0989 2.68869 14.9197 2.62959 14.7597L1.7629 12.4133C1.68438 12.2007 1.76194 11.962 1.95042 11.8362L4.03078 10.4473C4.17263 10.3526 4.25501 10.1909 4.24825 10.0205L4.14906 7.5211C4.14008 7.29465 4.2876 7.09161 4.50574 7.03018L6.91346 6.35215C7.07764 6.30592 7.20594 6.17761 7.25218 6.01343L7.9302 3.60571C7.99163 3.38757 8.19468 3.24005 8.42112 3.24904L10.9205 3.34822C11.091 3.35499 11.2526 3.27261 11.3473 3.13075L12.7362 1.0504C12.862 0.861914 13.1007 0.784358 13.3133 0.86288L15.6597 1.72957C15.8197 1.78867 15.999 1.76028 16.1329 1.65463L18.0966 0.105279Z" fill="currentColor"/></svg>`,
+      };
 
       // --- Metadata Generation and Display Logic (from tree.html) ---
 
@@ -2956,6 +3097,7 @@
           getCssVariable("--graph-node-org"),
           getCssVariable("--graph-node-app"),
           getCssVariable("--graph-node-env"),
+          getCssVariable("--graph-node-env-type"),
           getCssVariable("--graph-node-other"), // Using 'other' color for 'env'
           getCssVariable("--graph-node-workload"),
           getCssVariable("--graph-node-resource"),
@@ -2987,19 +3129,16 @@
           const domainIndex = color.domain().indexOf(nodeClass);
           const nodeColor =
             newPalette[domainIndex >= 0 ? domainIndex : newPalette.length - 1]; // Fallback to last color ('other')
-
-          // Apply the color directly to the path and label background
-          nodeGroup
-            .select("path")
-            .style("fill", nodeColor) // Changed from circle to path
-            .style("stroke", getBorderColor(nodeColor)); // Update border color based on new fill color
-
-          nodeGroup.select("rect.node-label-bg").style("fill", nodeColor);
         });
 
         // Update text colors
         node.select("text").style("fill", getCssVariable("--text-primary"));
         linkText.style("fill", getCssVariable("--text-primary"));
+
+        // Update node label background color
+        node
+          .select("rect.node-label-bg")
+          .style("fill", getCssVariable("--graph-node-label-background"));
 
         // Update link colors if not highlighted
         if (!currentSelectedNode) {
@@ -3072,7 +3211,7 @@
         .append("marker")
         .attr("id", (d) => d)
         .attr("viewBox", "0 -5 10 10")
-        .attr("refX", 19) // Offset along the line path, adjusted for node size approximation
+        .attr("refX", 15) // Offset adjusted for 24x24 icon (radius 12 + arrowhead size)
         .attr("refY", 0)
         .attr("markerWidth", 6)
         .attr("markerHeight", 6)
@@ -3142,39 +3281,7 @@
             .on("end", dragended)
         );
 
-      // Define symbol types based on class
-      const symbolGenerator = (d) => {
-        let symbolType;
-        let symbolSize;
-        switch (d.class) {
-          case "org":
-            symbolType = d3.symbolDiamond;
-            symbolSize = 800; // Area ~ π * 16^2
-            break;
-          case "app":
-            symbolType = d3.symbolSquare;
-            symbolSize = 600; // Area ~ π * 14^2
-            break;
-          case "env":
-            symbolType = d3.symbolCircle; // Swapped with 'other'
-            symbolSize = 500; // Area ~ π * 13^2
-            break;
-          case "workload":
-            symbolType = d3.symbolTriangle;
-            symbolSize = 450; // Area ~ π * 12^2
-            break;
-          case "resource":
-            symbolType = d3.symbolCross;
-            symbolSize = 300; // Area ~ π * 10^2
-            break;
-          default: // other
-            symbolType = d3.symbolWye; // Swapped with 'env'
-            symbolSize = 450; // Area ~ π * 12^2
-        }
-        return d3.symbol().type(symbolType).size(symbolSize)(); // Return path data string
-      };
-
-      // Utility function to adjust color brightness
+      // Utility function to adjust color brightness (Keep for label backgrounds)
       function adjustBrightness(color, amount) {
         // Parse the hex color
         let hex = color;
@@ -3203,36 +3310,82 @@
           .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
       }
 
-      // Function to get border color based on fill color and theme
-      function getBorderColor(fillColor) {
-        const theme = document.documentElement.getAttribute("data-theme");
-        // For light theme, darken the color; for dark theme, lighten it
-        return theme === "light"
-          ? adjustBrightness(fillColor, -50) // Darken for light theme
-          : adjustBrightness(fillColor, 50); // Lighten for dark theme
-      }
+      // function getBorderColor(fillColor) { ... } // Removed as it's no longer needed for nodes
 
-      // Add paths for nodes using symbols
-      node
-        .append("path")
-        .attr("d", symbolGenerator) // Use the generator function
-        .attr("class", "stroke-0.5 transition-opacity duration-300")
-        .style("stroke", function (d) {
-          const nodeColor = color(d.class || "other");
-          return getBorderColor(nodeColor);
-        })
-        .style("fill", (d) => color(d.class || "other")); // Use 'other' if class is missing
+      // Append SVG icons based on class
+      node.each(function (d) {
+        const nodeGroup = d3.select(this);
+        const className = d.class || "other";
+        const svgString = svgIconContent[className] || svgIconContent.other;
+
+        // Add class to the group for CSS targeting
+        nodeGroup.classed(`node-${className}`, true);
+
+        // Parse the SVG string
+        const parser = new DOMParser();
+        const svgDoc = parser.parseFromString(svgString, "image/svg+xml");
+        const svgElement = svgDoc.querySelector("svg");
+
+        if (svgElement) {
+          // Calculate scale factor to fit into 24x24
+          const originalWidth = parseFloat(
+            svgElement.getAttribute("width") || 24
+          );
+          const originalHeight = parseFloat(
+            svgElement.getAttribute("height") || 24
+          );
+          // Use viewBox for aspect ratio calculation if width/height are missing
+          const viewBox = svgElement.getAttribute("viewBox");
+          let vbWidth = originalWidth;
+          let vbHeight = originalHeight;
+          if (!vbWidth || !vbHeight) {
+            if (viewBox) {
+              const parts = viewBox.split(" ");
+              if (parts.length === 4) {
+                vbWidth = parseFloat(parts[2]);
+                vbHeight = parseFloat(parts[3]);
+              }
+            }
+          }
+          vbWidth = vbWidth || 24; // Fallback if still missing
+          vbHeight = vbHeight || 24;
+
+          const scaleX = 24 / vbWidth;
+          const scaleY = 24 / vbHeight;
+          const scale = Math.min(scaleX, scaleY); // Preserve aspect ratio
+
+          // Calculate translation to center the scaled icon within the 24x24 area
+          const translateX = (24 - vbWidth * scale) / 2;
+          const translateY = (24 - vbHeight * scale) / 2;
+
+          // Create a group for the icon elements
+          const iconGroup = nodeGroup
+            .append("g")
+            .attr("class", "node-icon")
+            // Scale and center the icon group within the -12, -12 offset area
+            .attr(
+              "transform",
+              `translate(${-12 + translateX}, ${
+                -12 + translateY
+              }) scale(${scale})`
+            );
+
+          // Append children (paths, circles, etc.) from the parsed SVG
+          Array.from(svgElement.children).forEach((child) => {
+            // Add a class to the shapes for styling
+            d3.select(child).classed("node-icon-shape", true);
+            iconGroup.node().appendChild(child.cloneNode(true));
+          });
+        }
+      });
 
       // Add background rectangles for node labels
       const labelBgs = node
         .append("rect")
-        .attr(
-          "class",
-          "rounded transition-opacity duration-300 opacity-80 node-label-bg"
-        )
+        .attr("class", "rounded transition-opacity duration-300  node-label-bg")
         .attr("rx", 3)
         .attr("ry", 3)
-        .style("fill", (d) => color(d.class || "other")); // Use node color for bg
+        .style("fill", getCssVariable("--graph-node-label-background")); // Use subtle background for all labels
 
       // Add labels to the nodes
       const labels = node
@@ -3312,27 +3465,9 @@
           const dy = target.y - source.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          // Approximate target node radius based on symbol size
-          let targetRadius = 12; // Default
-          switch (target.class) {
-            case "org":
-              targetRadius = 16;
-              break;
-            case "app":
-              targetRadius = 14;
-              break;
-            case "env":
-              targetRadius = 13;
-              break; // Circle
-            case "workload":
-              targetRadius = 12;
-              break; // Triangle
-            case "resource":
-              targetRadius = 10;
-              break; // Cross
-            // default uses 12
-          }
-          const offset = targetRadius + 6; // Node radius + marker refX adjustment approximation
+          // Use fixed radius for 24x24 icons
+          const targetRadius = 12;
+          const offset = targetRadius + 3; // Node radius (12) + marker refX adjustment (15 - 12 = 3)
 
           // Calculate the adjusted target coordinates
           const targetX = target.x - (dx / dist) * offset;
@@ -3481,14 +3616,14 @@
         });
 
         // Reduce opacity for all nodes
-        node.select("path").style("opacity", 0.2); // Changed from circle to path
+        node.select(".node-icon").style("opacity", 0.2); // Target icon group
         node.select("text").style("opacity", 0.2);
         node.select("rect.node-label-bg").style("opacity", 0.2);
 
         // Highlight the selected node and its connections
         node
           .filter((d) => currentConnectedNodeIds.has(d.id))
-          .select("path") // Changed from circle to path
+          .select(".node-icon") // Target icon group
           .style("opacity", 1);
 
         node
@@ -3500,6 +3635,23 @@
           .filter((d) => currentConnectedNodeIds.has(d.id))
           .select("rect.node-label-bg")
           .style("opacity", 0.8);
+
+        // Reset all links to default style first before applying highlights
+        linkGroups.each(function () {
+          const linkElement = d3.select(this).select("line");
+          const textElement = d3.select(this).select("text");
+          const bgElement = d3.select(this).select("rect");
+
+          linkElement
+            .style("opacity", null) // Remove explicit opacity if set
+            .style("stroke-opacity", 0.6) // Reset to default dim state
+            .style("stroke", getCssVariable("--graph-link")) // Reset color
+            .style("stroke-width", 2) // Reset width
+            .attr("marker-end", "url(#arrowhead)"); // Reset marker
+
+          textElement.style("opacity", 0); // Hide text
+          bgElement.style("opacity", 0); // Hide background
+        });
 
         // Highlight connected links
         linkGroups.each(function (d) {
@@ -3559,7 +3711,7 @@
         if (currentSearchTerm) {
           applySearchFilter(currentSearchTerm);
         } else {
-          node.select("path").style("opacity", 1); // Changed from circle to path
+          node.select(".node-icon").style("opacity", 1); // Target icon group
           node.select("text").style("opacity", 1);
           node.select("rect.node-label-bg").style("opacity", 0.8);
         }
@@ -3642,7 +3794,7 @@
       function applySearchFilter(searchTerm) {
         if (!searchTerm) {
           // If search is cleared, reset all nodes to full opacity
-          node.select("path").style("opacity", 1); // Changed from circle to path
+          node.select(".node-icon").style("opacity", 1); // Target icon group
           node.select("text").style("opacity", 1);
           node.select("rect.node-label-bg").style("opacity", 0.8);
 
@@ -3667,7 +3819,7 @@
           }
 
           // Use Tailwind's opacity classes by setting style directly
-          nodeElement.select("path").style("opacity", matches ? 1 : 0.1); // Changed from circle to path
+          nodeElement.select(".node-icon").style("opacity", matches ? 1 : 0.1); // Target icon group
           nodeElement.select("text").style("opacity", matches ? 1 : 0.1);
           nodeElement
             .select("rect.node-label-bg")

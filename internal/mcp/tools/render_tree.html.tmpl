@@ -796,6 +796,83 @@
         --color-teal-800: #143439;
         --color-teal-900: #0b1c1e;
         --color-teal-950: #050e0f;
+        --color-darkviolet-50: #e8e8ed;
+        --color-darkviolet-100: #d3d5de;
+        --color-darkviolet-200: #a8aabd;
+        --color-darkviolet-300: #7a7d9a;
+        --color-darkviolet-400: #565971;
+        --color-darkviolet-500: #353746;
+        --color-darkviolet-600: #2a2b37;
+        --color-darkviolet-700: #1f2029;
+        --color-darkviolet-800: #16171d;
+        --color-darkviolet-900: #0b0b0f;
+        --color-darkviolet-950: #040506;
+        --color-mud-50: #fefcfb;
+        --color-mud-100: #fcf9f8;
+        --color-mud-200: #f9f3f1;
+        --color-mud-300: #f6ece9;
+        --color-mud-400: #f3e6e2;
+        --color-mud-500: #f0e0db;
+        --color-mud-600: #d5a89a;
+        --color-mud-700: #ba7059;
+        --color-mud-800: #824836;
+        --color-mud-900: #41241b;
+        --color-mud-950: #20120d;
+        --color-fanta-50: #ffffff;
+        --color-fanta-100: #fffbfa;
+        --color-fanta-200: #fffbfa;
+        --color-fanta-300: #fff7f5;
+        --color-fanta-400: #fff3f0;
+        --color-fanta-500: #fff2ee;
+        --color-fanta-600: #ffa58a;
+        --color-fanta-700: #ff5b29;
+        --color-fanta-800: #c72e00;
+        --color-fanta-900: #611700;
+        --color-fanta-950: #330c00;
+        --color-pipe-50: #f8f2f2;
+        --color-pipe-100: #f3e8e8;
+        --color-pipe-200: #e6d0d0;
+        --color-pipe-300: #dab9b9;
+        --color-pipe-400: #cda2a2;
+        --color-pipe-500: #c08989;
+        --color-pipe-600: #aa5f5f;
+        --color-pipe-700: #824545;
+        --color-pipe-800: #562e2e;
+        --color-pipe-900: #2b1717;
+        --color-pipe-950: #140b0b;
+        --color-mauve-50: #e8e7ee;
+        --color-mauve-100: #d4d2e0;
+        --color-mauve-200: #aaa5c0;
+        --color-mauve-300: #7c759f;
+        --color-mauve-400: #585275;
+        --color-mauve-500: #363248;
+        --color-mauve-600: #2b2839;
+        --color-mauve-700: #201d2a;
+        --color-mauve-800: #17151e;
+        --color-mauve-900: #0b0a0f;
+        --color-mauve-950: #050406;
+        --color-violetta-50: #f2effa;
+        --color-violetta-100: #e5e0f5;
+        --color-violetta-200: #cac1eb;
+        --color-violetta-300: #b0a2e2;
+        --color-violetta-400: #9583d8;
+        --color-violetta-500: #7c66cf;
+        --color-violetta-600: #563bba;
+        --color-violetta-700: #412c8c;
+        --color-violetta-800: #2b1d5d;
+        --color-violetta-900: #160f2f;
+        --color-violetta-950: #0b0717;
+        --color-crevice-50: #fefcfb;
+        --color-crevice-100: #fcf5f3;
+        --color-crevice-200: #f9efeb;
+        --color-crevice-300: #f6e5df;
+        --color-crevice-400: #f3dbd3;
+        --color-crevice-500: #f0d3c9;
+        --color-crevice-600: #dd9a83;
+        --color-crevice-700: #ca623f;
+        --color-crevice-800: #8c4027;
+        --color-crevice-900: #441f13;
+        --color-crevice-950: #24100a;
       }
 
       /* Tree specific styles - Keep these */
@@ -939,18 +1016,16 @@
       /* Define theme variables directly based on data-theme - These will be applied by the script */
       [data-theme="light"] {
         --text-primary: var(--color-black-900);
-        --text-secondary: var(--color-orange-800);
+        --text-secondary: var(--color-black-700);
         --text-link: var(--color-purple-500);
         --interactive-subtle: var(--color-tan-500);
-        --border-strong: var(--color-red-500);
-        --background-header: var(--color-tan-100);
-        --background-row: var(
-          --color-tan-200
-        ); /* General row bg, keep for details pane */
+        --border-strong: var(--color-pipe-500);
+        --background-header: var(--color-fanta-500);
+        --background-row: var(--color-tan-200);
         --background-button-primary: var(--color-red-300);
-        --accent-brand: var(--color-orange-500);
-        --background-primary: var(--color-tan-50);
-        --background-secondary: var(--color-tan-100); /* Tree/Details bg */
+        --accent-brand: var(--color-red-500);
+        --background-primary: var(--color-mud-500);
+        --background-secondary: var(--color-mud-500); /* Tree/Details bg */
         --status-success: #09983a;
         --background-highlight-primary: var(--color-tan-50);
         --background-highlight-secondary: var(--color-tan-200);
@@ -959,18 +1034,18 @@
         /* Tree specific semantic variables */
         --tree-connector-color: var(--color-black-200);
         --tree-item-background-hover: var(--color-tan-100);
-        --tree-item-background-selected: var(--color-tan-200);
-        --tree-item-border-selected: var(--color-red-500);
+        --tree-item-background-selected: var(--color-crevice-500);
+        --tree-item-border-selected: var(--color-pipe-500);
         --tree-item-background-disabled: var(--color-tan-100);
         --tree-item-border-disabled: var(--color-black-300);
 
         /* Metadata specific semantic variables */
-        --metadata-key-color: var(--color-orange-800);
+        --metadata-key-color: var(--color-black-700);
         --metadata-value-color: var(--color-black-900);
         --metadata-section-background: var(--color-tan-100);
-        --metadata-array-background: var(--color-tan-200);
+        --metadata-array-background: var(--color-mud-200);
         --metadata-array-header-color: var(--color-black-900);
-        --metadata-object-background: var(--color-tan-50);
+        --metadata-object-background: var(--color-mud-500);
       }
 
       [data-theme="dark"] {
@@ -979,18 +1054,12 @@
         --text-link: var(--color-tan-50);
         --interactive-subtle: var(--color-purple-300);
         --border-strong: var(--color-purple-400);
-        --background-header: var(--color-purple-800);
-        --background-row: var(
-          --color-purple-800
-        ); /* General row bg, keep for details pane */
+        --background-header: var(--color-darkviolet-500);
+        --background-row: var(--color-purple-800);
         --background-button-primary: var(--color-purple-500);
-        --accent-brand: var(--color-orange-500);
-        --background-primary: var(
-          --color-black-900
-        ); /* Adjusted from black-500 */
-        --background-secondary: var(
-          --color-purple-900
-        ); /* Adjusted from purple-700 */
+        --accent-brand: var(--color-violetta-500);
+        --background-primary: var(--color-black-900);
+        --background-secondary: var(--color-purple-900);
         --status-success: #50d37d;
         --background-highlight-primary: var(--color-black-800);
         --background-highlight-secondary: var(--color-brown-800);
@@ -1012,57 +1081,37 @@
         --metadata-array-header-color: var(--color-tan-50);
         --metadata-object-background: var(--color-purple-900);
       }
+
+      /* Logo Styling for Light/Dark Mode */
+      .logo-light {
+        display: none; /* Hidden by default */
+      }
+      .logo-dark {
+        display: inline-block; /* Shown by default */
+      }
+
+      [data-theme="light"] .logo-light {
+        display: inline-block;
+      }
+      [data-theme="light"] .logo-dark {
+        display: none;
+      }
+
+      [data-theme="dark"] .logo-light {
+        display: none;
+      }
+      [data-theme="dark"] .logo-dark {
+        display: inline-block;
+      }
+
+      /* Ensure both logos have the same base styles */
+      .logo-light,
+      .logo-dark {
+        height: 1em;
+        vertical-align: middle; /* Adjust vertical alignment */
+      }
     </style>
     <script>
-      // Define theme objects using CSS variables
-      const lightTheme = {
-        "text-primary": "var(--color-black-900)",
-        "text-secondary": "var(--color-orange-800)",
-        "text-link": "var(--color-purple-500)",
-        "interactive-subtle": "var(--color-tan-500)",
-        "border-strong": "var(--color-red-300)",
-        "background-header": "var(--color-tan-100)",
-        "background-row": "var(--color-tan-200)",
-        "background-button-primary": "var(--color-red-300)",
-        "accent-brand": "var(--color-orange-500)",
-        "status-success": "#09983a",
-        "background-primary": "var(--color-tan-50)",
-        "background-secondary": "var(--color-tan-100)",
-        "background-highlight-primary": "var(--color-brown-50)",
-        "background-highlight-secondary": "var(--color-tan-100)",
-        "background-highlight-tertiary": "var(--color-tan-100)",
-        "metadata-key-color": "var(--color-orange-800)",
-        "metadata-value-color": "var(--color-black-900)",
-        "metadata-section-background": "var(--color-tan-100)",
-        "metadata-array-background": "var(--color-tan-200)",
-        "metadata-array-header-color": "var(--color-black-900)",
-        "metadata-object-background": "var(--color-tan-50)",
-      };
-
-      const darkTheme = {
-        "text-primary": "var(--color-tan-50)",
-        "text-secondary": "var(--color-purple-200)",
-        "text-link": "var(--color-tan-50)",
-        "interactive-subtle": "var(--color-purple-300)",
-        "border-strong": "var(--color-purple-400)",
-        "background-header": "var(--color-purple-800)",
-        "background-row": "var(--color-purple-800)",
-        "background-button-primary": "var(--color-purple-500)",
-        "accent-brand": "var(--color-orange-500)",
-        "status-success": "#50d37d",
-        "background-primary": "var(--color-black-900)",
-        "background-secondary": "var(--color-purple-900)",
-        "background-highlight-primary": "var(--color-black-800)",
-        "background-highlight-secondary": "var(--color-brown-800)",
-        "background-highlight-tertiary": "var(--color-brown-900)",
-        "metadata-key-color": "var(--color-purple-200)",
-        "metadata-value-color": "var(--color-tan-50)",
-        "metadata-section-background": "var(--color-purple-800)",
-        "metadata-array-background": "var(--color-purple-700)",
-        "metadata-array-header-color": "var(--color-tan-50)",
-        "metadata-object-background": "var(--color-purple-900)",
-      };
-
       // Get user's theme preference from localStorage or system preference
       function getThemePreference() {
         const savedTheme = localStorage.getItem("theme");
@@ -1085,18 +1134,56 @@
       const initialTheme = getThemePreference();
       document.documentElement.setAttribute("data-theme", initialTheme);
 
+      // Function to get computed CSS variables for Tailwind
+      function getThemeColors() {
+        // Get all semantic color variables from CSS
+        const computedStyle = getComputedStyle(document.documentElement);
+        const semanticVars = [
+          "text-primary",
+          "text-secondary",
+          "text-link",
+          "interactive-subtle",
+          "border-strong",
+          "background-header",
+          "background-row",
+          "background-button-primary",
+          "accent-brand",
+          "status-success",
+          "background-primary",
+          "background-secondary",
+          "background-highlight-primary",
+          "background-highlight-secondary",
+          "background-highlight-tertiary",
+          "metadata-key-color",
+          "metadata-value-color",
+          "metadata-section-background",
+          "metadata-array-background",
+          "metadata-array-header-color",
+          "metadata-object-background",
+          "tree-connector-color",
+          "tree-item-background-hover",
+          "tree-item-background-selected",
+          "tree-item-border-selected",
+          "tree-item-background-disabled",
+          "tree-item-border-disabled",
+        ];
+
+        // Create an object with all the computed values
+        const colors = {};
+        semanticVars.forEach((varName) => {
+          // Get the value from CSS
+          const value = computedStyle.getPropertyValue(`--${varName}`).trim();
+          // Add to colors object
+          colors[varName] = value;
+        });
+
+        return colors;
+      }
+
       // Apply theme colors based on preference
       function applyThemeColors() {
-        const currentTheme =
-          document.documentElement.getAttribute("data-theme");
-        let colors;
-
-        if (currentTheme === "dark") {
-          colors = darkTheme;
-        } else {
-          // Default to light theme for any other value
-          colors = lightTheme;
-        }
+        // Get computed colors from CSS variables
+        const colors = getThemeColors();
 
         // Configure Tailwind with the selected theme colors
         tailwind.config = {
@@ -1106,9 +1193,6 @@
             },
           },
         };
-
-        // Apply CSS variables for non-Tailwind components (like the tree)
-        // This part is removed as CSS handles it via [data-theme]
       }
 
       // Apply initial theme
@@ -1118,13 +1202,20 @@
   <body class="font-sans m-0 p-0 bg-background-primary h-screen flex flex-col">
     <!-- Menubar -->
     <div
-      class="flex justify-between items-center bg-background-header px-8 py-4 border-b border-border-strong"
+      class="flex justify-between items-center bg-background-header p-4 border-b border-accent-brand"
     >
       <div class="text-text-primary text-lg">
+        <!-- Light mode logo -->
         <img
-          src="https://cdn.glitch.global/1f44bda7-6694-4547-8f1b-1fa1f48b5711/image.png?v=1742980720762"
-          alt="Logo"
-          class="h-[1em] inline-block"
+          src="https://cdn.glitch.global/1f44bda7-6694-4547-8f1b-1fa1f48b5711/light_logo.png?v=1743423313930"
+          alt="Logo Light"
+          class="logo-light"
+        />
+        <!-- Dark mode logo -->
+        <img
+          src="https://cdn.glitch.global/1f44bda7-6694-4547-8f1b-1fa1f48b5711/canyon.png?v=1743423174793"
+          alt="Logo Dark"
+          class="logo-dark"
         />
       </div>
       <div class="flex items-center gap-4">
@@ -1203,7 +1294,7 @@
         >
           <div
             id="tree-container"
-            class="p-4 w-full h-full bg-background-secondary overflow-scroll scrollbar-transparent"
+            class="p-4 w-full h-full overflow-scroll scrollbar-transparent"
           ></div>
         </div>
         <div
@@ -1212,7 +1303,7 @@
         ></div>
         <div id="details-column" class="h-full overflow-hidden">
           <div
-            class="overflow-scroll scrollbar-transparent h-full border rounded-md border-border-strong bg-background-secondary p-4"
+            class="overflow-scroll scrollbar-transparent h-full border rounded-md border-border-strong p-4"
           >
             <h1 class="text-3xl text-text-primary mb-4 node-name"></h1>
             <div id="node-metadata" class=""></div>
@@ -2284,7 +2375,7 @@
     </div>
     <script>
       // Data
-      const data = {{ toRawJsonJs . }};;
+      const data = {{ toRawJsonJs . }};
 
       // Store pre-generated metadata for each node
       const nodeMetadataMap = new Map();
