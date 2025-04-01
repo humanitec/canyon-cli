@@ -34,6 +34,12 @@ The list of available paths may change over time so consider listing the availab
 			if sum, err := hc.ListActionPipelineSummaries(ctx, arguments["org_id"].(string)); err != nil {
 				return nil, err
 			} else if sum.JSON200 == nil {
+				// This is a hack for demos while the action pipelines are feature flagged off
+				if sum.StatusCode() == http.StatusForbidden || sum.StatusCode() == http.StatusMethodNotAllowed {
+					return []mcp.CallToolResponseContent{
+						mcp.NewTextToolResponseContent("There are no paths available in this org"),
+					}, nil
+				}
 				return nil, fmt.Errorf("unexpected response from humanitec: %s %s", sum.HTTPResponse.Status, string(sum.Body))
 			} else {
 				for _, summary := range sum.JSON200 {
@@ -91,6 +97,12 @@ func NewCallPathTool() mcp.Tool {
 			}); err != nil {
 				return nil, err
 			} else if r.JSON200 == nil {
+				// This is a hack for demos while the action pipelines are feature flagged off
+				if r.StatusCode() == http.StatusForbidden || r.StatusCode() == http.StatusMethodNotAllowed {
+					return []mcp.CallToolResponseContent{
+						mcp.NewTextToolResponseContent("There are no paths available in this org"),
+					}, nil
+				}
 				if r.StatusCode() == http.StatusGatewayTimeout {
 					return []mcp.CallToolResponseContent{
 						mcp.NewTextToolResponseContent("The path timed out after executing for some time, you can make the identity request with idempotency key '%s' to continue waiting", idempotencyKey),
