@@ -2,46 +2,317 @@
 <html>
   <head>
     <title>Canyon</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      * {
+        font-family: "Archivo", sans-serif;
+      }
+
+      :root {
+        /* Base color palette */
+        --color-tan-50: #fcf9f8;
+        --color-tan-100: #f9f2f1;
+        --color-tan-200: #f1e3df;
+        --color-tan-300: #ebd6d1;
+        --color-tan-400: #e3c6bf;
+        --color-tan-500: #ddbab1;
+        --color-tan-600: #c48778;
+        --color-tan-700: #a75c49;
+        --color-tan-800: #6e3c30;
+        --color-tan-900: #391f19;
+        --color-tan-950: #1c100c;
+        --color-black-50: #e8e8e8;
+        --color-black-100: #d1d1d1;
+        --color-black-200: #a3a3a3;
+        --color-black-300: #737373;
+        --color-black-400: #454545;
+        --color-black-500: #171717;
+        --color-black-600: #141414;
+        --color-black-700: #141414;
+        --color-black-800: #121212;
+        --color-black-900: #121212;
+        --color-black-950: #0f0f0f;
+        --color-red-50: #ffebeb;
+        --color-red-100: #ffdbdb;
+        --color-red-200: #ffb3b3;
+        --color-red-300: #ff8f8f;
+        --color-red-400: #ff6b6b;
+        --color-red-500: #ff4444;
+        --color-red-600: #ff0505;
+        --color-red-700: #c20000;
+        --color-red-800: #800000;
+        --color-red-900: #420000;
+        --color-red-950: #1f0000;
+        --color-brown-50: #f2e6e3;
+        --color-brown-100: #e7d0ca;
+        --color-brown-200: #ce9e92;
+        --color-brown-300: #b76f5d;
+        --color-brown-400: #8a4d3d;
+        --color-brown-500: #532e25;
+        --color-brown-600: #43251e;
+        --color-brown-700: #311b16;
+        --color-brown-800: #20120e;
+        --color-brown-900: #120a08;
+        --color-brown-950: #070403;
+        --color-purple-50: #ebeaf1;
+        --color-purple-100: #d8d4e2;
+        --color-purple-200: #aea7c3;
+        --color-purple-300: #877ca6;
+        --color-purple-400: #635983;
+        --color-purple-500: #423b57;
+        --color-purple-600: #352f46;
+        --color-purple-700: #272334;
+        --color-purple-800: #191721;
+        --color-purple-900: #0e0c12;
+        --color-purple-950: #070609;
+        --color-orange-50: #fdede7;
+        --color-orange-100: #fcded4;
+        --color-orange-200: #f9bda9;
+        --color-orange-300: #f79c7e;
+        --color-orange-400: #f47b53;
+        --color-orange-500: #f15a26;
+        --color-orange-600: #d33f0e;
+        --color-orange-700: #9e2f0a;
+        --color-orange-800: #691f07;
+        --color-orange-900: #351003;
+        --color-orange-950: #180702;
+        --color-teal-50: #e8f5f7;
+        --color-teal-100: #d2ecef;
+        --color-teal-200: #a1d7de;
+        --color-teal-300: #73c3ce;
+        --color-teal-400: #42aebd;
+        --color-teal-500: #32838e;
+        --color-teal-600: #286971;
+        --color-teal-700: #1f5057;
+        --color-teal-800: #143439;
+        --color-teal-900: #0b1c1e;
+        --color-teal-950: #050e0f;
+        --color-darkviolet-50: #e8e8ed;
+        --color-darkviolet-100: #d3d5de;
+        --color-darkviolet-200: #a8aabd;
+        --color-darkviolet-300: #7a7d9a;
+        --color-darkviolet-400: #565971;
+        --color-darkviolet-500: #353746;
+        --color-darkviolet-600: #2a2b37;
+        --color-darkviolet-700: #1f2029;
+        --color-darkviolet-800: #16171d;
+        --color-darkviolet-900: #0b0b0f;
+        --color-darkviolet-950: #040506;
+        --color-mud-50: #fefcfb;
+        --color-mud-100: #fcf9f8;
+        --color-mud-200: #f9f3f1;
+        --color-mud-300: #f6ece9;
+        --color-mud-400: #f3e6e2;
+        --color-mud-500: #f0e0db;
+        --color-mud-600: #d5a89a;
+        --color-mud-700: #ba7059;
+        --color-mud-800: #824836;
+        --color-mud-900: #41241b;
+        --color-mud-950: #20120d;
+        --color-fanta-50: #ffffff;
+        --color-fanta-100: #fffbfa;
+        --color-fanta-200: #fffbfa;
+        --color-fanta-300: #fff7f5;
+        --color-fanta-400: #fff3f0;
+        --color-fanta-500: #fff2ee;
+        --color-fanta-600: #ffa58a;
+        --color-fanta-700: #ff5b29;
+        --color-fanta-800: #c72e00;
+        --color-fanta-900: #611700;
+        --color-fanta-950: #330c00;
+        --color-pipe-50: #f8f2f2;
+        --color-pipe-100: #f3e8e8;
+        --color-pipe-200: #e6d0d0;
+        --color-pipe-300: #dab9b9;
+        --color-pipe-400: #cda2a2;
+        --color-pipe-500: #c08989;
+        --color-pipe-600: #aa5f5f;
+        --color-pipe-700: #824545;
+        --color-pipe-800: #562e2e;
+        --color-pipe-900: #2b1717;
+        --color-pipe-950: #140b0b;
+        --color-mauve-50: #e8e7ee;
+        --color-mauve-100: #d4d2e0;
+        --color-mauve-200: #aaa5c0;
+        --color-mauve-300: #7c759f;
+        --color-mauve-400: #585275;
+        --color-mauve-500: #363248;
+        --color-mauve-600: #2b2839;
+        --color-mauve-700: #201d2a;
+        --color-mauve-800: #17151e;
+        --color-mauve-900: #0b0a0f;
+        --color-mauve-950: #050406;
+        --color-violetta-50: #f2effa;
+        --color-violetta-100: #e5e0f5;
+        --color-violetta-200: #cac1eb;
+        --color-violetta-300: #b0a2e2;
+        --color-violetta-400: #9583d8;
+        --color-violetta-500: #7c66cf;
+        --color-violetta-600: #563bba;
+        --color-violetta-700: #412c8c;
+        --color-violetta-800: #2b1d5d;
+        --color-violetta-900: #160f2f;
+        --color-violetta-950: #0b0717;
+        --color-crevice-50: #fefcfb;
+        --color-crevice-100: #fcf5f3;
+        --color-crevice-200: #f9efeb;
+        --color-crevice-300: #f6e5df;
+        --color-crevice-400: #f3dbd3;
+        --color-crevice-500: #f0d3c9;
+        --color-crevice-600: #dd9a83;
+        --color-crevice-700: #ca623f;
+        --color-crevice-800: #8c4027;
+        --color-crevice-900: #441f13;
+        --color-crevice-950: #24100a;
+      }
+
+      /* Define theme variables directly based on data-theme */
+      [data-theme="light"] {
+        --text-primary: var(--color-black-900);
+        --text-secondary: var(--color-black-700);
+        --text-link: var(--color-purple-500);
+        --interactive-subtle: var(--color-tan-500);
+        --border-strong: var(--color-pipe-500);
+        --background-header: var(--color-fanta-500);
+        --background-row: var(--color-tan-200);
+        --background-button-primary: var(--color-red-300);
+        --accent-brand: var(--color-red-500);
+        --background-primary: var(--color-mud-500);
+        --background-secondary: var(--color-mud-500); /* Tree/Details bg */
+        --status-success: #09983a;
+        --background-highlight-primary: var(--color-tan-50);
+        --background-highlight-secondary: var(--color-tan-200);
+        --background-highlight-tertiary: var(--color-tan-100);
+
+        /* Graph specific semantic variables - Light */
+        --graph-node-org: var(--color-red-600);
+        --graph-node-app: var(--color-teal-800);
+        --graph-node-env: var(--color-violetta-500);
+        --graph-node-workload: var(--color-orange-400);
+        --graph-node-resource: var(--color-red-600);
+        --graph-node-env_type: var(--color-red-800);
+        --graph-node-other: var(--color-crevice-600);
+        --graph-link: var(--color-red-300);
+        --graph-link-highlight: var(--color-orange-500);
+        --graph-node-label-background: var(--color-black-100);
+
+        /* Metadata specific semantic variables */
+        --metadata-key-color: var(--color-black-700);
+        --metadata-value-color: var(--color-black-900);
+        --metadata-section-background: var(--color-tan-100);
+        --metadata-array-background: var(--color-mud-200);
+        --metadata-array-header-color: var(--color-black-900);
+        --metadata-object-background: var(--color-mud-500);
+      }
+
+      [data-theme="dark"] {
+        --text-primary: var(--color-tan-50);
+        --text-secondary: var(--color-purple-200);
+        --text-link: var(--color-tan-50);
+        --interactive-subtle: var(--color-purple-300);
+        --border-strong: var(--color-purple-400);
+        --background-header: var(--color-darkviolet-500);
+        --background-row: var(--color-purple-800);
+        --background-button-primary: var(--color-purple-500);
+        --accent-brand: var(--color-violetta-500);
+        --background-primary: var(--color-black-900);
+        --background-secondary: var(--color-purple-900);
+        --status-success: #50d37d;
+        --background-highlight-primary: var(--color-black-800);
+        --background-highlight-secondary: var(--color-brown-800);
+        --background-highlight-tertiary: var(--color-brown-900);
+        /* Graph specific semantic variables - Dark */
+        --graph-node-org: var(--color-red-400);
+        --graph-node-app: var(--color-teal-400);
+        --graph-node-env: var(--color-violetta-300);
+        --graph-node-workload: var(--color-orange-100);
+        --graph-node-resource: var(--color-red-200);
+        --graph-node-env_type: var(--color-red-200);
+        --graph-node-other: var(--color-brown-100);
+        --graph-link: var(--color-purple-300);
+        --graph-link-highlight: var(--color-orange-600);
+        --graph-node-label-background: var(--color-black-400);
+
+        /* Metadata specific semantic variables */
+        --metadata-key-color: var(--color-purple-200);
+        --metadata-value-color: var(--color-tan-50);
+        --metadata-section-background: var(--color-purple-800);
+        --metadata-array-background: var(--color-purple-700);
+        --metadata-array-header-color: var(--color-tan-50);
+        --metadata-object-background: var(--color-purple-900);
+      }
+
+      /* Logo Styling for Light/Dark Mode */
+      .logo-light {
+        display: none; /* Hidden by default */
+      }
+      .logo-dark {
+        display: inline-block; /* Shown by default */
+      }
+
+      [data-theme="light"] .logo-light {
+        display: inline-block;
+      }
+      [data-theme="light"] .logo-dark {
+        display: none;
+      }
+
+      [data-theme="dark"] .logo-light {
+        display: none;
+      }
+      [data-theme="dark"] .logo-dark {
+        display: inline-block;
+      }
+
+      /* Ensure both logos have the same base styles */
+      .logo-light,
+      .logo-dark {
+        height: 1em;
+        vertical-align: middle; /* Adjust vertical alignment */
+      }
+
+      /* Styling for embedded SVG icons */
+      .node-icon-shape {
+        /* Inherit fill color from parent group by default */
+        fill: currentColor;
+        stroke: currentColor; /* Also style stroke if needed */
+        stroke-width: 0.5; /* Adjust stroke width if needed */
+      }
+      .node-org {
+        color: var(--graph-node-org);
+      }
+      .node-app {
+        color: var(--graph-node-app);
+      }
+      .node-env {
+        color: var(--graph-node-env);
+      }
+      .node-env_type {
+        color: var(--graph-node-env_type);
+      }
+      .node-workload {
+        color: var(--graph-node-workload);
+      }
+      .node-resource {
+        color: var(--graph-node-resource);
+      }
+      .node-other {
+        color: var(--graph-node-other);
+      }
+
+      /* Adjust opacity rules to target the new structure */
+      .node-icon {
+        opacity: 1; /* Default opacity */
+        transition: opacity 0.3s ease-in-out;
+      }
+    </style>
     <script>
-      // Define theme colors
-      const lightTheme = {
-        text: "#171717",
-        text2: "#343434",
-        link: "#423b57",
-        tableRowBorder: "#ddbab1",
-        border: "#ff4444",
-        headerBG: "#fff2ee",
-        tableRow: "#f0d4cc",
-        buttonBG: "#ea9290",
-        brand: "#f15a26",
-        mainBG: "#F8F1EF",
-        secondBG: "#F2E6E2",
-        successGreen: "#09983a",
-        primary: "#ffffff",
-        secondary: "#f0d4cc",
-        background: "#fff2ee",
-      };
-
-      const darkTheme = {
-        text: "#FFFFFF",
-        text2: "#EAEAEA",
-        link: "#FFFFFF",
-        tableRowBorder: "#8577B0",
-        border: "#7C66CF",
-        headerBG: "#150E20",
-        tableRow: "#150E20",
-        buttonBG: "#423B57",
-        brand: "#F15A26",
-        mainBG: "#161616",
-        secondBG: "#292538",
-        successGreen: "#50D37D",
-        primary: "#1f1f1f",
-        secondary: "#3d2c27",
-        background: "#2a1a14",
-      };
-
       // Get user's theme preference from localStorage or system preference
       function getThemePreference() {
         const savedTheme = localStorage.getItem("theme");
@@ -64,18 +335,59 @@
       const initialTheme = getThemePreference();
       document.documentElement.setAttribute("data-theme", initialTheme);
 
+      // Function to get computed CSS variables for Tailwind
+      function getThemeColors() {
+        // Get all semantic color variables from CSS
+        const computedStyle = getComputedStyle(document.documentElement);
+        const semanticVars = [
+          "text-primary",
+          "text-secondary",
+          "text-link",
+          "interactive-subtle",
+          "border-strong",
+          "background-header",
+          "background-row",
+          "background-button-primary",
+          "accent-brand",
+          "status-success",
+          "background-primary",
+          "background-secondary",
+          "background-highlight-primary",
+          "background-highlight-secondary",
+          "background-highlight-tertiary",
+          "metadata-key-color",
+          "metadata-value-color",
+          "metadata-section-background",
+          "metadata-array-background",
+          "metadata-array-header-color",
+          "metadata-object-background",
+          "graph-node-org",
+          "graph-node-app",
+          "graph-node-env",
+          "graph-node-env_type",
+          "graph-node-workload",
+          "graph-node-resource",
+          "graph-node-other",
+          "graph-link",
+          "graph-link-highlight",
+        ];
+
+        // Create an object with all the computed values
+        const colors = {};
+        semanticVars.forEach((varName) => {
+          // Get the value from CSS
+          const value = computedStyle.getPropertyValue(`--${varName}`).trim();
+          // Add to colors object
+          colors[varName] = value;
+        });
+
+        return colors;
+      }
+
       // Apply theme colors based on preference
       function applyThemeColors() {
-        const currentTheme =
-          document.documentElement.getAttribute("data-theme");
-        let colors;
-
-        if (currentTheme === "dark") {
-          colors = darkTheme;
-        } else {
-          // Default to light theme for any other value
-          colors = lightTheme;
-        }
+        // Get computed colors from CSS variables
+        const colors = getThemeColors();
 
         // Configure Tailwind with the selected theme colors
         tailwind.config = {
@@ -91,28 +403,35 @@
       applyThemeColors();
     </script>
   </head>
-  <body class="font-sans m-0 p-0 bg-mainBG h-screen flex flex-col">
+  <body class="font-sans m-0 p-0 bg-background-primary h-screen flex flex-col">
     <!-- Menubar -->
     <div
-      class="flex justify-between items-center bg-headerBG px-8 py-4 border-b border-border"
+      class="flex justify-between items-center bg-background-header p-4 border-b border-accent-brand"
     >
-      <div class="text-text font-bold text-lg">
+      <div class="text-text-primary text-lg">
+        <!-- Light mode logo -->
         <img
-          src="https://cdn.glitch.global/1f44bda7-6694-4547-8f1b-1fa1f48b5711/image.png?v=1742980720762"
-          alt="Logo"
-          class="h-[1em] inline-block"
+          src="https://cdn.glitch.global/1f44bda7-6694-4547-8f1b-1fa1f48b5711/light_logo.png?v=1743423313930"
+          alt="Logo Light"
+          class="logo-light"
+        />
+        <!-- Dark mode logo -->
+        <img
+          src="https://cdn.glitch.global/1f44bda7-6694-4547-8f1b-1fa1f48b5711/canyon.png?v=1743423174793"
+          alt="Logo Dark"
+          class="logo-dark"
         />
       </div>
       <div class="flex items-center gap-4">
         <select
           id="theme-selector"
-          class="bg-headerBG text-text border border-border rounded py-1 px-2 text-sm"
+          class="bg-background-header text-text-primary border border-border-strong rounded py-1 px-2 text-sm"
         >
           <option value="light">🌝</option>
           <option value="dark">🌚</option>
         </select>
         <div
-          class="text-link text-md cursor-not-allowed"
+          class="text-text-link underline text-md cursor-not-allowed"
           title="We're still working on our docs."
         >
           Documentation
@@ -121,37 +440,9 @@
     </div>
 
     <div
-      class="flex flex-col flex-1 transition-all duration-500 overflow-hidden"
+      class="flex flex-col flex-1 transition-all h-full duration-500 overflow-hidden"
       id="main-container"
     >
-      <style>
-        /* Hide scrollbars but keep functionality */
-        .scrollbar-hide {
-          scrollbar-width: none; /* Firefox */
-          -ms-overflow-style: none; /* IE and Edge */
-        }
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none; /* Chrome, Safari and Opera */
-        }
-
-        /* Make scrollbars transparent */
-        .scrollbar-transparent {
-          scrollbar-width: thin; /* Firefox */
-          scrollbar-color: transparent transparent; /* Firefox */
-        }
-        .scrollbar-transparent::-webkit-scrollbar {
-          width: 8px;
-          height: 8px;
-          background-color: transparent;
-        }
-        .scrollbar-transparent::-webkit-scrollbar-thumb {
-          background-color: rgba(0, 0, 0, 0.1);
-          border-radius: 4px;
-        }
-        .scrollbar-transparent::-webkit-scrollbar-track {
-          background-color: transparent;
-        }
-      </style>
       <script>
         // Theme switching functionality
         document.addEventListener("DOMContentLoaded", function () {
@@ -203,23 +494,17 @@
           }
         });
       </script>
-      <div id="button-bar" class="flex gap-2.5 px-8 pt-8 pb-2 items-center">
-        <button
-          id="reset-highlight"
-          class="bg-buttonBG text-text border-none py-2 px-4 rounded cursor-pointer text-sm transition-colors hover:bg-tableRowBorder"
-        >
-          Reset View
-        </button>
-        <div class="relative ml-2">
+      <div id="button-bar" class="flex gap-2.5 px-4 pt-4 items-center">
+        <div class="relative">
           <input
             type="text"
             id="search-nodes"
             placeholder="Search nodes..."
-            class="border border-border rounded py-2 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
+            class="border border-border-strong rounded py-2 px-3 text-sm bg-background-primary text-text-primary focus:outline-none focus:ring-1 focus:ring-accent-brand"
           />
           <button
             id="clear-search"
-            class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-text opacity-70 hover:opacity-100"
+            class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-text-primary opacity-80 hover:opacity-100"
             style="display: none"
           >
             ✕
@@ -227,100 +512,2676 @@
         </div>
       </div>
       <div
-        class="flex flex-1 p-8 pt-2.5 h-full transition-all duration-500"
+        class="flex flex-1 p-4 pt-2.5 h-full transition-all duration-500"
         id="combined-container"
       >
         <div
-          class="flex-1 transition-all h-full overflow-hidden duration-500 border rounded-md border-border"
+          class="flex-1 transition-all h-full overflow-hidden duration-500 border rounded-md border-border-strong"
           id="graph-container"
         >
-          <div id="graph" class="w-full h-full bg-mainBG"></div>
+          <div id="graph" class="w-full h-full"></div>
         </div>
         <div
-          class="hidden bg-secondBG overflow-scroll scrollbar-transparent transition-all border border-border rounded-md p-4 duration-500 ml-5"
+          class="hidden overflow-scroll scrollbar-transparent transition-all border border-border-strong rounded-md p-4 duration-500 ml-3"
           id="details-container"
         >
-          <div id="node-details"></div>
-          <div id="node-actions" class="mt-2.5">
-            <button
-              id="toggle-nodes"
-              class="bg-buttonBG text-text border-none py-2 px-4 rounded cursor-pointer text-sm transition-colors hover:bg-tableRowBorder"
-            >
-              Hide Unconnected Nodes
-            </button>
+          <div id="node-details" class=""></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden Metadata Templates -->
+    <div id="metadata-templates" style="display: none">
+      <!-- Template for 'org' -->
+      <div id="template-org">
+        <div class="space-y-2">
+          <!-- Changed from grid to space-y -->
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">ID:</div>
+            <div class="text-metadata-value-color" data-metadata-key="id"></div>
+          </div>
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">
+              Created At:
+            </div>
+            <div
+              class="text-metadata-value-color"
+              data-metadata-key="created_at"
+            ></div>
+          </div>
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">
+              Members:
+            </div>
+            <div
+              class="text-metadata-value-color"
+              data-metadata-key="members"
+            ></div>
+          </div>
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">
+              Teams:
+            </div>
+            <div
+              class="text-metadata-value-color"
+              data-metadata-key="teams"
+            ></div>
+          </div>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-metadata-key-color mb-2">Compliance</h3>
+          <div data-metadata-array="compliance" class="flex flex-wrap gap-2">
+            <!-- Compliance items will be added here -->
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div, added padding/margin -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <!-- Key above -->
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+                <!-- Value below -->
+              </div>
+            </template>
+          </div>
+        </div>
+        <div class="mt-4 mb-4">
+          <h3 class="text-metadata-key-color mb-2">External Links</h3>
+          <div data-metadata-array="external_links" class="space-y-1">
+            <template data-array-item-template>
+              <div>
+                <a
+                  data-metadata-key="service"
+                  href="#"
+                  target="_blank"
+                  class="text-text-link underline underline"
+                ></a>
+                (<span class="text-xs text-text-secondary"
+                  >Checked:
+                  <span
+                    class="text-text-secondary"
+                    data-metadata-key="last_check"
+                  ></span></span
+                >)
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <!-- Template for 'app' -->
+      <div id="template-app">
+        <div class="space-y-2">
+          <!-- Changed from grid to space-y -->
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">ID:</div>
+            <div class="text-metadata-value-color" data-metadata-key="id"></div>
+          </div>
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">
+              Uptime:
+            </div>
+            <div
+              class="text-metadata-value-color"
+              data-metadata-key="uptime"
+            ></div>
+          </div>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-metadata-key-color mb-2">Deployments</h3>
+          <div data-metadata-array="deployments" class="flex flex-wrap gap-2">
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+              </div>
+            </template>
+          </div>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-metadata-key-color mb-2">Performance</h3>
+          <div data-metadata-array="performance" class="flex flex-wrap gap-2">
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+              </div>
+            </template>
+          </div>
+        </div>
+        <div class="mt-4 mb-4">
+          <h3 class="text-metadata-key-color mb-2">External Links</h3>
+          <div data-metadata-array="external_links" class="space-y-1">
+            <template data-array-item-template>
+              <div>
+                <a
+                  data-metadata-key="service"
+                  href="#"
+                  target="_blank"
+                  class="text-text-link underline"
+                ></a>
+                (<span class="text-xs text-text-secondary"
+                  >Checked:
+                  <span
+                    class="text-text-secondary"
+                    data-metadata-key="last_check"
+                  ></span></span
+                >)
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <!-- Template for 'env_type' -->
+      <div id="template-env_type">
+        <div class="space-y-2">
+          <!-- Changed from grid to space-y -->
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">ID:</div>
+            <div class="text-metadata-value-color" data-metadata-key="id"></div>
+          </div>
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">
+              Description:
+            </div>
+            <div
+              class="text-metadata-value-color"
+              data-metadata-key="description"
+            ></div>
+          </div>
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">
+              Auto Scaling:
+            </div>
+            <div
+              class="text-metadata-value-color"
+              data-metadata-key="auto_scaling"
+            ></div>
+          </div>
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">
+              High Availability:
+            </div>
+            <div
+              class="text-metadata-value-color"
+              data-metadata-key="high_availability"
+            ></div>
+          </div>
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">
+              Backup Enabled:
+            </div>
+            <div
+              class="text-metadata-value-color"
+              data-metadata-key="backup_enabled"
+            ></div>
+          </div>
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">
+              Compliance Level:
+            </div>
+            <div
+              class="text-metadata-value-color"
+              data-metadata-key="compliance_level"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Template for 'env' -->
+      <div id="template-env" class="max-h-1">
+        <div class="space-y-2">
+          <!-- Changed from grid to space-y -->
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">ID:</div>
+            <div class="text-metadata-value-color" data-metadata-key="id"></div>
+          </div>
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">
+              Status:
+            </div>
+            <div
+              class="text-metadata-value-color"
+              data-metadata-key="status"
+            ></div>
+          </div>
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">
+              Region:
+            </div>
+            <div
+              class="text-metadata-value-color"
+              data-metadata-key="region"
+            ></div>
+          </div>
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">
+              Created At:
+            </div>
+            <div
+              class="text-metadata-value-color"
+              data-metadata-key="created_at"
+            ></div>
+          </div>
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">
+              Last Updated:
+            </div>
+            <div
+              class="text-metadata-value-color"
+              data-metadata-key="last_updated"
+            ></div>
+          </div>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-metadata-key-color mb-2">Compliance</h3>
+          <div data-metadata-array="compliance" class="flex flex-wrap gap-2">
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+              </div>
+            </template>
+          </div>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-metadata-key-color mb-2">Security</h3>
+          <div data-metadata-array="security" class="flex flex-wrap gap-2">
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+              </div>
+            </template>
+          </div>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-metadata-key-color mb-2">Cost</h3>
+          <div data-metadata-array="cost" class="flex flex-wrap gap-2">
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+              </div>
+            </template>
+          </div>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-metadata-key-color mb-2">Costs By Resource</h3>
+          <div
+            data-metadata-array="costs_by_resource"
+            class="flex flex-wrap gap-2"
+          >
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+              </div>
+            </template>
+          </div>
+        </div>
+        <div class="mt-4 mb-4">
+          <h3 class="text-metadata-key-color mb-2">External Links</h3>
+          <div data-metadata-array="external_links" class="space-y-1">
+            <template data-array-item-template>
+              <div>
+                <a
+                  data-metadata-key="service"
+                  href="#"
+                  target="_blank"
+                  class="text-text-link underline"
+                ></a>
+                (<span class="text-xs text-text-secondary"
+                  >Checked:
+                  <span
+                    class="text-text-secondary"
+                    data-metadata-key="last_check"
+                  ></span></span
+                >)
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <!-- Template for 'workload' -->
+      <div id="template-workload">
+        <div class="space-y-2">
+          <!-- Changed from grid to space-y -->
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">ID:</div>
+            <div class="text-metadata-value-color" data-metadata-key="id"></div>
+          </div>
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">Type:</div>
+            <div
+              class="text-metadata-value-color"
+              data-metadata-key="type"
+            ></div>
+          </div>
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">
+              Status:
+            </div>
+            <div
+              class="text-metadata-value-color"
+              data-metadata-key="status"
+            ></div>
+          </div>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-metadata-key-color mb-2">Replicas</h3>
+          <div data-metadata-array="replicas" class="flex flex-wrap gap-2">
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+              </div>
+            </template>
+          </div>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-metadata-key-color mb-2">CPU</h3>
+          <div data-metadata-array="cpu" class="flex flex-wrap gap-2">
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+              </div>
+            </template>
+          </div>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-metadata-key-color mb-2">Memory</h3>
+          <div data-metadata-array="memory" class="flex flex-wrap gap-2">
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+              </div>
+            </template>
+          </div>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-metadata-key-color mb-2">Metrics</h3>
+          <div data-metadata-array="metrics" class="flex flex-wrap gap-2">
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+              </div>
+            </template>
+          </div>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-metadata-key-color mb-2">Health Checks</h3>
+          <div data-metadata-array="health_checks" class="flex flex-wrap gap-2">
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+              </div>
+            </template>
+          </div>
+        </div>
+        <div class="mt-4 mb-4">
+          <h3 class="text-metadata-key-color mb-2">External Links</h3>
+          <div data-metadata-array="external_links" class="space-y-1">
+            <template data-array-item-template>
+              <div>
+                <a
+                  data-metadata-key="service"
+                  href="#"
+                  target="_blank"
+                  class="text-text-link underline"
+                ></a>
+                (<span class="text-xs text-text-secondary"
+                  >Checked:
+                  <span
+                    class="text-text-secondary"
+                    data-metadata-key="last_check"
+                  ></span></span
+                >)
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <!-- Template for 'resource' -->
+      <div id="template-resource">
+        <!-- Generic resource fields -->
+        <div class="space-y-2 mb-4">
+          <!-- Changed from grid to space-y -->
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">ID:</div>
+            <div class="text-metadata-value-color" data-metadata-key="id"></div>
+          </div>
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">Type:</div>
+            <div
+              class="text-metadata-value-color"
+              data-metadata-key="type"
+            ></div>
+          </div>
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">
+              Status:
+            </div>
+            <div
+              class="text-metadata-value-color"
+              data-metadata-key="status"
+            ></div>
+          </div>
+        </div>
+        <!-- Specific fields will be added dynamically based on resource type if needed, or use sub-templates -->
+        <!-- Example: S3 specific -->
+        <div data-resource-type="s3" style="display: none">
+          <h3 class="text-metadata-key-color mb-2">S3 Metrics</h3>
+          <div data-metadata-array="metrics" class="flex flex-wrap gap-2">
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+              </div>
+            </template>
+          </div>
+          <h3 class="text-metadata-key-color mt-4 mb-2">S3 Performance</h3>
+          <div data-metadata-array="performance" class="flex flex-wrap gap-2">
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+              </div>
+            </template>
+          </div>
+          <h3 class="text-metadata-key-color mt-4 mb-2">S3 Cost</h3>
+          <div data-metadata-array="cost" class="flex flex-wrap gap-2">
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+              </div>
+            </template>
+          </div>
+          <h3 class="text-metadata-key-color mt-4 mb-2">S3 Compliance</h3>
+          <div data-metadata-array="compliance" class="flex flex-wrap gap-2">
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+              </div>
+            </template>
+          </div>
+        </div>
+        <!-- Example: DB specific -->
+        <div data-resource-type="db" style="display: none">
+          <div class="space-y-2 mb-4">
+            <!-- Changed from grid to space-y -->
+            <div>
+              <div class="text-metadata-key-color text-xs font-medium">
+                Version:
+              </div>
+              <div
+                class="text-metadata-value-color"
+                data-metadata-key="version"
+              ></div>
+            </div>
+            <div>
+              <div class="text-metadata-key-color text-xs font-medium">
+                Size:
+              </div>
+              <div
+                class="text-metadata-value-color"
+                data-metadata-key="size"
+              ></div>
+            </div>
+          </div>
+          <h3 class="text-metadata-key-color mb-2">DB Connections</h3>
+          <div data-metadata-array="connections" class="flex flex-wrap gap-2">
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+              </div>
+            </template>
+          </div>
+          <h3 class="text-metadata-key-color mt-4 mb-2">DB Performance</h3>
+          <div data-metadata-array="performance" class="flex flex-wrap gap-2">
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+              </div>
+            </template>
+          </div>
+          <h3 class="text-metadata-key-color mt-4 mb-2">DB Storage</h3>
+          <div data-metadata-array="storage" class="flex flex-wrap gap-2">
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+              </div>
+            </template>
+          </div>
+          <h3 class="text-metadata-key-color mt-4 mb-2">DB Backups</h3>
+          <div data-metadata-array="backups" class="flex flex-wrap gap-2">
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+              </div>
+            </template>
+          </div>
+        </div>
+        <!-- Example: Redis specific -->
+        <div data-resource-type="redis" style="display: none">
+          <div class="space-y-2 mb-4">
+            <!-- Added space-y -->
+            <div>
+              <div class="text-metadata-key-color text-xs font-medium">
+                Version:
+              </div>
+              <div
+                class="text-metadata-value-color"
+                data-metadata-key="version"
+              ></div>
+            </div>
+          </div>
+          <h3 class="text-metadata-key-color mt-4 mb-2">Redis Connections</h3>
+          <div data-metadata-array="connections" class="flex flex-wrap gap-2">
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+              </div>
+            </template>
+          </div>
+          <h3 class="text-metadata-key-color mt-4 mb-2">Redis Performance</h3>
+          <div data-metadata-array="performance" class="flex flex-wrap gap-2">
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+              </div>
+            </template>
+          </div>
+          <h3 class="text-metadata-key-color mt-4 mb-2">Redis Memory</h3>
+          <div data-metadata-array="memory" class="flex flex-wrap gap-2">
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+              </div>
+            </template>
+          </div>
+        </div>
+        <!-- Generic Resource Fields -->
+        <div data-resource-type="generic" style="display: none">
+          <div class="space-y-2 mb-4">
+            <!-- Changed from grid to space-y -->
+            <div>
+              <div class="text-metadata-key-color text-xs font-medium">
+                Created At:
+              </div>
+              <div
+                class="text-metadata-value-color"
+                data-metadata-key="created_at"
+              ></div>
+            </div>
+            <div>
+              <div class="text-metadata-key-color text-xs font-medium">
+                Last Accessed:
+              </div>
+              <div
+                class="text-metadata-value-color"
+                data-metadata-key="last_accessed"
+              ></div>
+            </div>
+          </div>
+          <h3 class="text-metadata-key-color mb-2">Generic Metrics</h3>
+          <div data-metadata-array="metrics" class="flex flex-wrap gap-2">
+            <template data-array-item-template>
+              <div
+                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+              >
+                <!-- Changed span to div -->
+                <div
+                  class="text-metadata-key-color text-xs font-medium"
+                  data-metadata-key="key"
+                ></div>
+                <div
+                  class="text-metadata-value-color"
+                  data-metadata-key="value"
+                ></div>
+              </div>
+            </template>
+          </div>
+        </div>
+        <!-- Common External Links -->
+        <div class="mt-4 mb-4">
+          <h3 class="text-metadata-key-color mb-2">External Links</h3>
+          <div data-metadata-array="external_links" class="space-y-1">
+            <template data-array-item-template>
+              <div>
+                <a
+                  data-metadata-key="service"
+                  href="#"
+                  target="_blank"
+                  class="text-text-link underline"
+                ></a>
+                (<span class="text-xs text-text-secondary"
+                  >Checked:
+                  <span
+                    class="text-text-secondary"
+                    data-metadata-key="last_check"
+                  ></span></span
+                >)
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <!-- Template for 'other' -->
+      <div id="template-other">
+        <div class="space-y-2">
+          <!-- Changed from grid to space-y -->
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">ID:</div>
+            <div class="text-metadata-value-color" data-metadata-key="id"></div>
+          </div>
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">Name:</div>
+            <div
+              class="text-metadata-value-color"
+              data-metadata-key="name"
+            ></div>
+          </div>
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">
+              Description:
+            </div>
+            <div
+              class="text-metadata-value-color"
+              data-metadata-key="description"
+            ></div>
+          </div>
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">
+              Created At:
+            </div>
+            <div
+              class="text-metadata-value-color"
+              data-metadata-key="created_at"
+            ></div>
+          </div>
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">
+              Last Updated:
+            </div>
+            <div
+              class="text-metadata-value-color"
+              data-metadata-key="last_updated"
+            ></div>
+          </div>
+          <div>
+            <div class="text-metadata-key-color text-xs font-medium">
+              Status:
+            </div>
+            <div
+              class="text-metadata-value-color"
+              data-metadata-key="status"
+            ></div>
+          </div>
+        </div>
+        <div class="mt-4">
+          <h3 class="text-metadata-key-color mb-2">Tags</h3>
+          <div data-metadata-array="tags" class="flex flex-wrap gap-2">
+            <template data-array-item-template>
+              <span
+                class="bg-metadata-array-background p-1 rounded text-sm text-metadata-value-color"
+                data-metadata-key="value"
+              ></span>
+            </template>
+          </div>
+        </div>
+        <div class="mt-4 mb-4">
+          <h3 class="text-metadata-key-color mb-2">External Links</h3>
+          <div data-metadata-array="external_links" class="space-y-1">
+            <template data-array-item-template>
+              <div>
+                <a
+                  data-metadata-key="service"
+                  href="#"
+                  target="_blank"
+                  class="text-text-link underline"
+                ></a>
+                (<span class="text-xs text-text-secondary"
+                  >Checked:
+                  <span
+                    class="text-text-secondary"
+                    data-metadata-key="last_check"
+                  ></span></span
+                >)
+              </div>
+            </template>
           </div>
         </div>
       </div>
     </div>
+    <!-- End Hidden Metadata Templates -->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <script>
       // Data
       const data = {{ toRawJsonJs . }};
 
-      // Function to get current theme colors
-      function getThemeColors() {
-        const currentTheme =
-          document.documentElement.getAttribute("data-theme");
-        let colors;
+      // Store SVG content for icons
+      const svgIconContent = {
+        org: `<svg width="33" height="36" viewBox="0 0 33 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.7937 1.19121C15.8219 0.612007 17.0781 0.612008 18.1063 1.19121L30.4845 8.16344C31.5463 8.76149 32.2032 9.88545 32.2032 11.104V24.896C32.2032 26.1146 31.5463 27.2385 30.4845 27.8366L18.1063 34.8088C17.0781 35.388 15.8219 35.388 14.7937 34.8088L2.41548 27.8366C1.35373 27.2385 0.696831 26.1146 0.696831 24.896V11.104C0.696831 9.88545 1.35374 8.76149 2.41548 8.16344L14.7937 1.19121Z" fill="currentColor" stroke="currentColor" stroke-width="0.45"/></svg>`,
+        app: `<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M35.4728 6.67279C35.8104 7.01036 36 7.46819 36 7.94558V18L18 0H28.0544C28.5318 0 28.9896 0.189642 29.3272 0.527207L35.4728 6.67279Z" fill="currentColor"/><path d="M18 36L36 18V28.0544C36 28.5318 35.8104 28.9896 35.4728 29.3272L29.3272 35.4728C28.9896 35.8104 28.5318 36 28.0544 36H18Z" fill="currentColor"/><path d="M0 18L18 36H7.94558C7.46819 36 7.01036 35.8104 6.67279 35.4728L0.527207 29.3272C0.189642 28.9896 0 28.5318 0 28.0544V18Z" fill="currentColor"/><path d="M0 18V7.94558C0 7.46819 0.189642 7.01036 0.527207 6.67279L6.67279 0.527208C7.01036 0.189642 7.46819 0 7.94558 0H18L0 18Z" fill="currentColor"/><path d="M10.2728 19.2728C9.56985 18.5698 9.56985 17.4302 10.2728 16.7272L16.7272 10.2728C17.4302 9.56985 18.5698 9.56985 19.2728 10.2728L25.7272 16.7272C26.4302 17.4302 26.4302 18.5698 25.7272 19.2728L19.2728 25.7272C18.5698 26.4302 17.4302 26.4302 16.7272 25.7272L10.2728 19.2728Z" fill="currentColor"/></svg>`,
+        env: `<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="18" cy="18" r="18" fill="currentColor"/></svg>`,
+        workload: `<svg width="37" height="36" viewBox="0 0 37 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M36.4 10.8L29.2 18V7.2H18.4L25.6 0H36.4V10.8Z" fill="currentColor"/><path d="M7.60002 18L18.4 7.2L29.2 18L18.4 28.8L7.60002 18Z" fill="currentColor"/><path d="M7.60002 18L0.400024 25.2V36H11.2L18.4 28.8L25.6 36H36.4V25.2L29.2 18V28.8H18.4H7.60002V18Z" fill="currentColor"/><path d="M7.60002 18L0.400024 10.8V0H11.2L18.4 7.2H7.60002V18Z" fill="currentColor"/></svg>`,
+        resource: `<svg width="37" height="36" viewBox="0 0 37 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21.4715 0C23.365 0 24.9 1.53502 24.9 3.42857V12L12.9 0H21.4715Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M36.9 24V15.4286C36.9 13.535 35.365 12 33.4715 12H24.9H16.3286C14.435 12 12.9 13.535 12.9 15.4286V24L0.900024 12L12.9 0H4.3286C2.43505 0 0.900024 1.53502 0.900024 3.42857V12V20.5714C0.900024 22.465 2.43505 24 4.3286 24H12.9V32.5714C12.9 34.465 14.435 36 16.3286 36H24.9H33.4715C35.365 36 36.9 34.465 36.9 32.5714V24ZM36.9 24L24.9 36L12.9 24H21.4715C23.365 24 24.9 22.465 24.9 20.5714V12L36.9 24Z" fill="currentColor"/></svg>`,
+        env_type: `<svg width="36" height="35" viewBox="0 0 36 35" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18.0966 0.105279C18.2745 -0.0350929 18.5255 -0.035093 18.7034 0.105279L20.6672 1.65463C20.8011 1.76028 20.9803 1.78867 21.1403 1.72957L23.4867 0.86288C23.6993 0.784358 23.938 0.861914 24.0638 1.0504L25.4527 3.13075C25.5474 3.27261 25.7091 3.35499 25.8795 3.34822L28.3789 3.24904C28.6054 3.24005 28.8084 3.38757 28.8698 3.60571L29.5479 6.01343C29.5941 6.17761 29.7224 6.30592 29.8866 6.35215L32.2943 7.03018C32.5125 7.09161 32.66 7.29465 32.651 7.5211L32.5518 10.0205C32.545 10.1909 32.6274 10.3526 32.7693 10.4473L34.8496 11.8362C35.0381 11.962 35.1157 12.2007 35.0371 12.4133L34.1705 14.7597C34.1114 14.9197 34.1397 15.0989 34.2454 15.2328L35.7947 17.1966C35.9351 17.3745 35.9351 17.6255 35.7947 17.8034L34.2454 19.7672C34.1397 19.9011 34.1114 20.0803 34.1705 20.2403L35.0371 22.5867C35.1157 22.7993 35.0381 23.038 34.8496 23.1638L32.7693 24.5527C32.6274 24.6474 32.545 24.8091 32.5518 24.9795L32.651 27.4789C32.66 27.7053 32.5125 27.9084 32.2943 27.9698L29.8866 28.6478C29.7224 28.6941 29.5941 28.8224 29.5479 28.9866L28.8698 31.3943C28.8084 31.6124 28.6054 31.7599 28.3789 31.751L25.8795 31.6518C25.7091 31.645 25.5474 31.7274 25.4527 31.8692L24.0638 33.9496C23.938 34.1381 23.6993 34.2156 23.4867 34.1371L21.1403 33.2704C20.9803 33.2113 20.8011 33.2397 20.6672 33.3454L18.7034 34.8947C18.5255 35.0351 18.2745 35.0351 18.0966 34.8947L16.1329 33.3454C15.999 33.2397 15.8197 33.2113 15.6597 33.2704L13.3133 34.1371C13.1007 34.2156 12.862 34.1381 12.7362 33.9496L11.3473 31.8692C11.2526 31.7274 11.091 31.645 10.9205 31.6518L8.42112 31.751C8.19468 31.7599 7.99163 31.6124 7.9302 31.3943L7.25218 28.9866C7.20594 28.8224 7.07764 28.6941 6.91346 28.6478L4.50574 27.9698C4.2876 27.9084 4.14008 27.7053 4.14906 27.4789L4.24825 24.9795C4.25501 24.8091 4.17263 24.6474 4.03078 24.5527L1.95042 23.1638C1.76194 23.038 1.68438 22.7993 1.7629 22.5867L2.62959 20.2403C2.68869 20.0803 2.6603 19.9011 2.55466 19.7672L1.0053 17.8034C0.864932 17.6255 0.864931 17.3745 1.0053 17.1966L2.55466 15.2328C2.6603 15.0989 2.68869 14.9197 2.62959 14.7597L1.7629 12.4133C1.68438 12.2007 1.76194 11.962 1.95042 11.8362L4.03078 10.4473C4.17263 10.3526 4.25501 10.1909 4.24825 10.0205L4.14906 7.5211C4.14008 7.29465 4.2876 7.09161 4.50574 7.03018L6.91346 6.35215C7.07764 6.30592 7.20594 6.17761 7.25218 6.01343L7.9302 3.60571C7.99163 3.38757 8.19468 3.24005 8.42112 3.24904L10.9205 3.34822C11.091 3.35499 11.2526 3.27261 11.3473 3.13075L12.7362 1.0504C12.862 0.861914 13.1007 0.784358 13.3133 0.86288L15.6597 1.72957C15.8197 1.78867 15.999 1.76028 16.1329 1.65463L18.0966 0.105279Z" fill="currentColor"/></svg>`,
+        other: `<svg width="36" height="35" viewBox="0 0 36 35" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18.0966 0.105279C18.2745 -0.0350929 18.5255 -0.035093 18.7034 0.105279L20.6672 1.65463C20.8011 1.76028 20.9803 1.78867 21.1403 1.72957L23.4867 0.86288C23.6993 0.784358 23.938 0.861914 24.0638 1.0504L25.4527 3.13075C25.5474 3.27261 25.7091 3.35499 25.8795 3.34822L28.3789 3.24904C28.6054 3.24005 28.8084 3.38757 28.8698 3.60571L29.5479 6.01343C29.5941 6.17761 29.7224 6.30592 29.8866 6.35215L32.2943 7.03018C32.5125 7.09161 32.66 7.29465 32.651 7.5211L32.5518 10.0205C32.545 10.1909 32.6274 10.3526 32.7693 10.4473L34.8496 11.8362C35.0381 11.962 35.1157 12.2007 35.0371 12.4133L34.1705 14.7597C34.1114 14.9197 34.1397 15.0989 34.2454 15.2328L35.7947 17.1966C35.9351 17.3745 35.9351 17.6255 35.7947 17.8034L34.2454 19.7672C34.1397 19.9011 34.1114 20.0803 34.1705 20.2403L35.0371 22.5867C35.1157 22.7993 35.0381 23.038 34.8496 23.1638L32.7693 24.5527C32.6274 24.6474 32.545 24.8091 32.5518 24.9795L32.651 27.4789C32.66 27.7053 32.5125 27.9084 32.2943 27.9698L29.8866 28.6478C29.7224 28.6941 29.5941 28.8224 29.5479 28.9866L28.8698 31.3943C28.8084 31.6124 28.6054 31.7599 28.3789 31.751L25.8795 31.6518C25.7091 31.645 25.5474 31.7274 25.4527 31.8692L24.0638 33.9496C23.938 34.1381 23.6993 34.2156 23.4867 34.1371L21.1403 33.2704C20.9803 33.2113 20.8011 33.2397 20.6672 33.3454L18.7034 34.8947C18.5255 35.0351 18.2745 35.0351 18.0966 34.8947L16.1329 33.3454C15.999 33.2397 15.8197 33.2113 15.6597 33.2704L13.3133 34.1371C13.1007 34.2156 12.862 34.1381 12.7362 33.9496L11.3473 31.8692C11.2526 31.7274 11.091 31.645 10.9205 31.6518L8.42112 31.751C8.19468 31.7599 7.99163 31.6124 7.9302 31.3943L7.25218 28.9866C7.20594 28.8224 7.07764 28.6941 6.91346 28.6478L4.50574 27.9698C4.2876 27.9084 4.14008 27.7053 4.14906 27.4789L4.24825 24.9795C4.25501 24.8091 4.17263 24.6474 4.03078 24.5527L1.95042 23.1638C1.76194 23.038 1.68438 22.7993 1.7629 22.5867L2.62959 20.2403C2.68869 20.0803 2.6603 19.9011 2.55466 19.7672L1.0053 17.8034C0.864932 17.6255 0.864931 17.3745 1.0053 17.1966L2.55466 15.2328C2.6603 15.0989 2.68869 14.9197 2.62959 14.7597L1.7629 12.4133C1.68438 12.2007 1.76194 11.962 1.95042 11.8362L4.03078 10.4473C4.17263 10.3526 4.25501 10.1909 4.24825 10.0205L4.14906 7.5211C4.14008 7.29465 4.2876 7.09161 4.50574 7.03018L6.91346 6.35215C7.07764 6.30592 7.20594 6.17761 7.25218 6.01343L7.9302 3.60571C7.99163 3.38757 8.19468 3.24005 8.42112 3.24904L10.9205 3.34822C11.091 3.35499 11.2526 3.27261 11.3473 3.13075L12.7362 1.0504C12.862 0.861914 13.1007 0.784358 13.3133 0.86288L15.6597 1.72957C15.8197 1.78867 15.999 1.76028 16.1329 1.65463L18.0966 0.105279Z" fill="currentColor"/></svg>`,
+      };
 
-        if (currentTheme === "dark") {
-          colors = darkTheme;
-        } else {
-          colors = lightTheme; // Default to light theme for any other value
+      // --- Metadata Generation and Display Logic (from tree.html) ---
+
+      // Store pre-generated metadata for each node
+      const nodeMetadataMap = new Map();
+
+      // Function to generate random metadata based on object class (adapted for graph node structure)
+      const generateMetadata = (node) => {
+        const nodeClass = node.class;
+        const nodeName = node.id; // Use node.id as name for graph nodes
+
+        if (!nodeClass) {
+          return null; // No metadata for objects without a class
         }
 
-        return colors;
+        // Helper function to get a random number between min and max
+        const randomNumber = (min, max, decimals = 0) => {
+          const num = Math.random() * (max - min) + min;
+          return decimals === 0
+            ? Math.floor(num)
+            : Number(num.toFixed(decimals));
+        };
+
+        // Helper function to get a random date within the last 30 days
+        const randomRecentDate = () => {
+          const now = new Date();
+          const daysAgo = randomNumber(0, 30);
+          const date = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
+          return date.toISOString();
+        };
+
+        // Helper function to get a random date within a specific range
+        const randomDateInRange = (startYear, endYear) => {
+          const year = randomNumber(startYear, endYear);
+          const month = randomNumber(1, 12);
+          const day = randomNumber(1, 28);
+          return `${year}-${String(month).padStart(2, "0")}-${String(
+            day
+          ).padStart(2, "0")}T00:00:00Z`;
+        };
+
+        // Helper function to get a random element from an array
+        const randomElement = (array) => {
+          return array[Math.floor(Math.random() * array.length)];
+        };
+
+        // Helper function to generate external service links
+        const generateExternalLinks = (nodeType, id) => {
+          // Define possible external services based on node type
+          const servicesByType = {
+            org: [
+              "DataDog",
+              "Snyk",
+              "Wiz",
+              "Splunk",
+              "PagerDuty",
+              "GitHub Enterprise",
+              "GitLab Enterprise",
+              "ServiceNow",
+              "Jira",
+              "Confluence",
+              "Okta",
+              "SonarQube",
+              "Artifactory",
+              "Nexus",
+              "Dynatrace",
+            ],
+            app: [
+              "DataDog",
+              "Snyk",
+              "Wiz",
+              "Splunk",
+              "PagerDuty",
+              "GitHub Enterprise",
+              "GitLab Enterprise",
+              "Jenkins",
+              "CircleCI",
+              "ArgoCD",
+              "Harness",
+              "Spinnaker",
+              "New Relic",
+              "AppDynamics",
+              "Dynatrace",
+              "Sentry",
+              "Grafana",
+            ],
+            env: [
+              "DataDog",
+              "Snyk",
+              "Wiz",
+              "Splunk",
+              "PagerDuty",
+              "AWS Console",
+              "GCP Console",
+              "Azure Portal",
+              "Terraform Cloud",
+              "CloudHealth",
+              "CloudCheckr",
+              "Prisma Cloud",
+              "Lacework",
+              "Aqua Security",
+            ],
+            workload: [
+              "DataDog",
+              "Snyk",
+              "Wiz",
+              "Splunk",
+              "Kubernetes Dashboard",
+              "ArgoCD",
+              "Prometheus",
+              "Grafana",
+              "Istio",
+              "Linkerd",
+              "Jaeger",
+              "Kiali",
+              "Sysdig",
+              "Dynatrace",
+            ],
+            resource: [
+              "DataDog",
+              "Splunk",
+              "AWS Console",
+              "GCP Console",
+              "Azure Portal",
+              "Grafana",
+              "Prometheus",
+              "Elasticsearch",
+              "Kibana",
+              "MongoDB Atlas",
+              "Snowflake",
+              "Databricks",
+              "Confluent Cloud",
+              "Redis Enterprise",
+            ],
+          };
+
+          // Get relevant services for this node type or use a default set
+          const relevantServices = servicesByType[nodeType] || [
+            "DataDog",
+            "Snyk",
+            "Wiz",
+            "Splunk",
+          ];
+
+          // Select a random number of services (between 3 and 6 for enterprise)
+          const numServices = randomNumber(
+            3,
+            Math.min(6, relevantServices.length)
+          );
+
+          // Shuffle and take the first numServices elements
+          const selectedServices = [...relevantServices]
+            .sort(() => 0.5 - Math.random())
+            .slice(0, numServices);
+
+          // Generate links for each selected service
+          return selectedServices.map((service) => {
+            // Generate a plausible URL based on the service
+            let url;
+            switch (service) {
+              case "DataDog":
+                url = `https://app.datadoghq.com/dashboard/enterprise-${randomNumber(
+                  100000,
+                  999999
+                )}/${id}`;
+                break;
+              case "Snyk":
+                url = `https://app.snyk.io/org/enterprise-canyon/project/${randomNumber(
+                  10000,
+                  99999
+                )}`;
+                break;
+              case "Wiz":
+                url = `https://app.wiz.io/enterprise/projects/${id}`;
+                break;
+              case "Splunk":
+                url = `https://splunk.enterprise.canyon.com/en-US/app/search/search?q=${id}`;
+                break;
+              case "PagerDuty":
+                url = `https://enterprise-canyon.pagerduty.com/service-directory/${randomNumber(
+                  10000,
+                  99999
+                )}`;
+                break;
+              case "GitHub Enterprise":
+                url = `https://github.enterprise.canyon.com/${id}`;
+                break;
+              case "GitLab Enterprise":
+                url = `https://gitlab.enterprise.canyon.com/canyon/${id}`;
+                break;
+              case "Jenkins":
+                url = `https://jenkins.enterprise.canyon.com/job/${id}/`;
+                break;
+              case "CircleCI":
+                url = `https://app.circleci.com/pipelines/enterprise/canyon/${id}`;
+                break;
+              case "AWS Console":
+                url = `https://console.aws.amazon.com/console/home?region=us-east-1#${nodeType}/${id}`;
+                break;
+              case "GCP Console":
+                url = `https://console.cloud.google.com/${nodeType}/${id}`;
+                break;
+              case "Azure Portal":
+                url = `https://portal.azure.com/#@canyon.onmicrosoft.com/resource/${id}`;
+                break;
+              case "Kubernetes Dashboard":
+                url = `https://k8s.enterprise.canyon.com/#!/${nodeType}/${id}`;
+                break;
+              case "ArgoCD":
+                url = `https://argocd.enterprise.canyon.com/applications/${id}`;
+                break;
+              case "Prometheus":
+                url = `https://prometheus.enterprise.canyon.com/graph?g0.expr=${id}`;
+                break;
+              case "Grafana":
+                url = `https://grafana.enterprise.canyon.com/d/enterprise-${randomNumber(
+                  10000,
+                  99999
+                )}/${id}`;
+                break;
+              case "ServiceNow":
+                url = `https://canyon.service-now.com/nav_to.do?uri=cmdb_ci_service.do?sys_id=${randomNumber(
+                  10000,
+                  99999
+                )}`;
+                break;
+              case "Jira":
+                url = `https://canyon.atlassian.net/browse/CANYON-${randomNumber(
+                  1000,
+                  9999
+                )}`;
+                break;
+              case "Confluence":
+                url = `https://canyon.atlassian.net/wiki/spaces/CANYON/pages/${randomNumber(
+                  10000000,
+                  99999999
+                )}`;
+                break;
+              case "Okta":
+                url = `https://canyon.okta.com/admin/app/${randomNumber(
+                  10000,
+                  99999
+                )}`;
+                break;
+              case "SonarQube":
+                url = `https://sonar.enterprise.canyon.com/dashboard?id=${id}`;
+                break;
+              case "Artifactory":
+                url = `https://artifactory.enterprise.canyon.com/ui/repos/tree/General/${id}`;
+                break;
+              case "Nexus":
+                url = `https://nexus.enterprise.canyon.com/#browse/browse:${id}`;
+                break;
+              case "Dynatrace":
+                url = `https://abc12345.live.dynatrace.com/#dashboard;id=${randomNumber(
+                  10000,
+                  99999
+                )}`;
+                break;
+              case "New Relic":
+                url = `https://one.newrelic.com/nr1-core/apm/application/${randomNumber(
+                  10000,
+                  99999
+                )}`;
+                break;
+              case "AppDynamics":
+                url = `https://canyon.saas.appdynamics.com/controller/#/location=APP_DASHBOARD&application=${randomNumber(
+                  10000,
+                  99999
+                )}`;
+                break;
+              case "Sentry":
+                url = `https://canyon.sentry.io/issues/?project=${randomNumber(
+                  10000,
+                  99999
+                )}`;
+                break;
+              case "Terraform Cloud":
+                url = `https://app.terraform.io/app/canyon/workspaces/${id}`;
+                break;
+              case "CloudHealth":
+                url = `https://apps.cloudhealthtech.com/assets/${randomNumber(
+                  10000,
+                  99999
+                )}`;
+                break;
+              case "CloudCheckr":
+                url = `https://app.cloudcheckr.com/Resource/ResourceDetail?resourceId=${randomNumber(
+                  10000,
+                  99999
+                )}`;
+                break;
+              case "Prisma Cloud":
+                url = `https://app.prismacloud.io/resources?resource=${id}`;
+                break;
+              case "Lacework":
+                url = `https://canyon.lacework.net/ui/investigation/resources/${randomNumber(
+                  10000,
+                  99999
+                )}`;
+                break;
+              case "Aqua Security":
+                url = `https://cloud.aquasec.com/containers/${randomNumber(
+                  10000,
+                  99999
+                )}`;
+                break;
+              case "Istio":
+                url = `https://istio.enterprise.canyon.com/kiali/console/graph/namespaces/?namespaces=${id}`;
+                break;
+              case "Linkerd":
+                url = `https://linkerd.enterprise.canyon.com/namespaces/${id}`;
+                break;
+              case "Jaeger":
+                url = `https://jaeger.enterprise.canyon.com/search?service=${id}`;
+                break;
+              case "Kiali":
+                url = `https://kiali.enterprise.canyon.com/console/graph/namespaces/?namespaces=${id}`;
+                break;
+              case "Sysdig":
+                url = `https://app.sysdigcloud.com/#/events/l:${randomNumber(
+                  10000,
+                  99999
+                )}`;
+                break;
+              case "Elasticsearch":
+                url = `https://elasticsearch.enterprise.canyon.com/_dashboards/app/discover#/?_g=()`;
+                break;
+              case "Kibana":
+                url = `https://kibana.enterprise.canyon.com/app/kibana#/discover?_g=()`;
+                break;
+              case "MongoDB Atlas":
+                url = `https://cloud.mongodb.com/v2/projects/${randomNumber(
+                  10000,
+                  99999
+                )}/clusters`;
+                break;
+              case "Snowflake":
+                url = `https://app.snowflake.com/canyon/data/databases/${id}`;
+                break;
+              case "Databricks":
+                url = `https://canyon.cloud.databricks.com/?o=${randomNumber(
+                  10000,
+                  99999
+                )}`;
+                break;
+              case "Confluent Cloud":
+                url = `https://confluent.cloud/environments/${randomNumber(
+                  10000,
+                  99999
+                )}/clusters`;
+                break;
+              case "Redis Enterprise":
+                url = `https://app.redislabs.com/#/subscriptions/${randomNumber(
+                  10000,
+                  99999
+                )}/bdb`;
+                break;
+              default:
+                url = `https://${service.toLowerCase()}.enterprise.canyon.com/${id}`;
+            }
+
+            return {
+              service: service,
+              url: url,
+              last_check: randomRecentDate(),
+            };
+          });
+        };
+
+        // Generate metadata based on class
+        switch (nodeClass) {
+          case "org":
+            const orgId = `enterprise-${nodeName
+              .toLowerCase()
+              .replace(/\s+/g, "-")}`;
+            return {
+              id: orgId,
+              name: nodeName,
+              created_at: randomDateInRange(2015, 2020),
+              members: randomNumber(500, 15000),
+              teams: randomNumber(50, 200),
+              compliance: [
+                { gdpr: randomElement(["compliant", "in-progress"]) },
+                { hipaa: randomElement(["compliant", "in-progress"]) },
+                { sox: randomElement(["compliant", "in-progress"]) },
+                { pci_dss: randomElement(["compliant", "in-progress"]) },
+                { iso_27001: randomElement(["compliant", "in-progress"]) },
+                { nist_800_53: randomElement(["compliant", "in-progress"]) },
+                {
+                  fedramp: randomElement([
+                    "high",
+                    "moderate",
+                    "in-progress",
+                    "not-applicable",
+                  ]),
+                },
+              ],
+              external_links: generateExternalLinks("org", orgId),
+            };
+
+          case "app":
+            const appId = nodeName.toLowerCase().replace(/\s+/g, "-");
+            return {
+              id: appId,
+              uptime: `${randomNumber(90, 365)}d ${randomNumber(
+                0,
+                23
+              )}h ${randomNumber(0, 59)}m`,
+              deployments: [
+                { total: randomNumber(500, 5000) },
+                { successful: randomNumber(495, 4990) },
+                { failed: randomNumber(5, 20) },
+                { last_deployment: randomRecentDate() },
+                {
+                  deployment_frequency: randomElement([
+                    "multiple times per day",
+                    "daily",
+                    "weekly",
+                  ]),
+                },
+                {
+                  lead_time: randomElement(["< 1 hour", "< 1 day", "< 1 week"]),
+                },
+                {
+                  mean_time_to_recovery: randomElement([
+                    "< 1 hour",
+                    "< 4 hours",
+                    "< 24 hours",
+                  ]),
+                },
+              ],
+              performance: [
+                { response_time_avg_ms: randomNumber(20, 200) },
+                { error_rate: randomNumber(0, 1, 4) },
+                { availability: randomNumber(99.9, 100, 4) },
+                { apdex_score: randomNumber(95, 100, 2) / 100 },
+                { p95_latency_ms: randomNumber(50, 500) },
+                { p99_latency_ms: randomNumber(100, 1000) },
+                { requests_per_minute: randomNumber(1000, 100000) },
+              ],
+              dependencies: [
+                randomElement([
+                  "payment-gateway",
+                  "fraud-detection",
+                  "customer-database",
+                  "notification-service",
+                  "authentication-service",
+                  "logging-service",
+                  "metrics-service",
+                  "search-service",
+                  "recommendation-engine",
+                  "content-delivery-network",
+                ]),
+                randomElement([
+                  "payment-gateway",
+                  "fraud-detection",
+                  "customer-database",
+                  "notification-service",
+                  "authentication-service",
+                  "logging-service",
+                  "metrics-service",
+                  "search-service",
+                  "recommendation-engine",
+                  "content-delivery-network",
+                ]),
+                randomElement([
+                  "payment-gateway",
+                  "fraud-detection",
+                  "customer-database",
+                  "notification-service",
+                  "authentication-service",
+                  "logging-service",
+                  "metrics-service",
+                  "search-service",
+                  "recommendation-engine",
+                  "content-delivery-network",
+                ]),
+                randomElement([
+                  "payment-gateway",
+                  "fraud-detection",
+                  "customer-database",
+                  "notification-service",
+                  "authentication-service",
+                  "logging-service",
+                  "metrics-service",
+                  "search-service",
+                  "recommendation-engine",
+                  "content-delivery-network",
+                ]),
+              ],
+              external_links: generateExternalLinks("app", appId),
+            };
+
+          case "env_type":
+            return {
+              id: nodeName.toLowerCase().replace(/\s+/g, "-"),
+              description: `${nodeName} environment type for enterprise workloads`,
+              auto_scaling: randomElement([true, false]),
+              high_availability: randomElement([true, false]),
+              backup_enabled: true,
+              compliance_level: randomElement(["standard", "high", "maximum"]),
+              multi_region: randomElement([true, false]),
+              disaster_recovery: randomElement([
+                "active-active",
+                "active-passive",
+                "pilot-light",
+                "warm-standby",
+              ]),
+              data_classification: randomElement([
+                "public",
+                "internal",
+                "confidential",
+                "restricted",
+              ]),
+              sla: randomElement(["99.9%", "99.95%", "99.99%", "99.999%"]),
+              maintenance_window: randomElement([
+                "Sundays 01:00-05:00 UTC",
+                "Saturdays 22:00-02:00 UTC",
+                "Wednesdays 03:00-07:00 UTC",
+              ]),
+            };
+
+          case "env":
+            const envId = nodeName.toLowerCase().replace(/\s+/g, "-");
+            return {
+              id: envId,
+              status: randomElement(["operational", "degraded", "maintenance"]),
+              region: randomElement([
+                "us-east-1",
+                "us-west-2",
+                "eu-central-1",
+                "eu-west-1",
+                "ap-southeast-1",
+                "ap-northeast-1",
+                "sa-east-1",
+                "ca-central-1",
+                "ap-south-1",
+                "ap-east-1",
+                "me-south-1",
+                "af-south-1",
+              ]),
+              created_at: randomDateInRange(2020, 2024),
+              last_updated: randomRecentDate(),
+              compliance: [
+                { pci_dss: randomElement(["compliant", "not-applicable"]) },
+                { gdpr: randomElement(["compliant", "in-progress"]) },
+                { sox: randomElement(["compliant", "not-applicable"]) },
+                {
+                  hipaa: randomElement([
+                    "compliant",
+                    "in-progress",
+                    "not-applicable",
+                  ]),
+                },
+                { iso_27001: randomElement(["compliant", "in-progress"]) },
+                { nist_800_53: randomElement(["compliant", "in-progress"]) },
+                {
+                  fedramp: randomElement([
+                    "high",
+                    "moderate",
+                    "in-progress",
+                    "not-applicable",
+                  ]),
+                },
+              ],
+              security: [
+                { vulnerability_count: randomNumber(0, 10) },
+                { critical_issues: randomNumber(0, 2) },
+                { high_issues: randomNumber(0, 5) },
+                { medium_issues: randomNumber(1, 15) },
+                { low_issues: randomNumber(5, 30) },
+                { last_security_scan: randomRecentDate() },
+                { next_scheduled_scan: randomRecentDate() },
+                { security_score: randomNumber(85, 100) + "%" },
+              ],
+              cost: [
+                { monthly_estimate: randomNumber(50000, 500000) },
+                { currency: "USD" },
+                { year_over_year_change: randomNumber(-15, 25, 1) + "%" },
+                { forecast_next_month: randomNumber(50000, 550000) },
+                {
+                  budget_status: randomElement([
+                    "under budget",
+                    "on track",
+                    "over budget",
+                  ]),
+                },
+              ],
+              costs_by_resource: [
+                { compute: randomNumber(20000, 200000) },
+                { storage: randomNumber(10000, 100000) },
+                { network: randomNumber(5000, 50000) },
+                { managed_services: randomNumber(5000, 50000) },
+                { databases: randomNumber(10000, 100000) },
+                { analytics: randomNumber(5000, 50000) },
+                { security_services: randomNumber(5000, 30000) },
+                { monitoring: randomNumber(5000, 30000) },
+              ],
+              external_links: generateExternalLinks("env", envId),
+            };
+
+          case "workload":
+            const workloadId = nodeName;
+            return {
+              id: workloadId,
+              type: randomElement([
+                "stateful",
+                "stateless",
+                "job",
+                "cronjob",
+                "daemonset",
+              ]),
+              status: randomElement([
+                "running",
+                "degraded",
+                "starting",
+                "restarting",
+                "scaling",
+              ]),
+              replicas: [
+                { desired: randomNumber(3, 20) },
+                { available: randomNumber(3, 20) },
+                { unavailable: randomNumber(0, 2) },
+                { min_replicas: randomNumber(2, 5) },
+                { max_replicas: randomNumber(20, 50) },
+                {
+                  autoscaling_metric: randomElement([
+                    "CPU",
+                    "Memory",
+                    "Custom",
+                    "Requests",
+                  ]),
+                },
+                { autoscaling_target: randomNumber(50, 80) + "%" },
+              ],
+              cpu: [
+                { requests: String(randomNumber(2, 8)) },
+                { limits: String(randomNumber(4, 16)) },
+                { usage_avg: randomNumber(1.5, 6.5, 1).toString() },
+                { usage_peak: randomNumber(3.0, 14.0, 1).toString() },
+                { throttling_events: randomNumber(0, 10) },
+                { utilization: randomNumber(40, 85) + "%" },
+              ],
+              memory: [
+                { requests: `${randomNumber(4, 16)}Gi` },
+                { limits: `${randomNumber(8, 32)}Gi` },
+                { usage_avg: `${randomNumber(3.5, 14.5, 1)}Gi` },
+                { usage_peak: `${randomNumber(6.0, 28.0, 1)}Gi` },
+                { oom_events: randomNumber(0, 3) },
+                { gc_time_ms: randomNumber(50, 500) },
+                { utilization: randomNumber(40, 85) + "%" },
+              ],
+              metrics: [
+                { requests_per_second: randomNumber(1000, 10000) },
+                { response_time_p50_ms: randomNumber(5, 50) },
+                { response_time_p95_ms: randomNumber(20, 200) },
+                { response_time_p99_ms: randomNumber(50, 500) },
+                { error_rate: randomNumber(0, 0.5, 4) },
+                { success_rate: randomNumber(99.5, 100, 4) + "%" },
+                { throughput_mbps: randomNumber(10, 500, 1) },
+                { saturation: randomNumber(10, 80) + "%" },
+              ],
+              health_checks: [
+                { readiness: randomElement(["passing", "failing"]) },
+                { liveness: randomElement(["passing", "failing"]) },
+                {
+                  startup: randomElement([
+                    "passing",
+                    "failing",
+                    "not configured",
+                  ]),
+                },
+                { last_failure: randomElement([randomRecentDate(), "never"]) },
+                { probe_interval_seconds: randomNumber(5, 30) },
+                { probe_timeout_seconds: randomNumber(1, 5) },
+                { failure_threshold: randomNumber(1, 5) },
+                { success_threshold: randomNumber(1, 3) },
+              ],
+              network: [
+                { ingress_mbps: randomNumber(5, 500, 1) },
+                { egress_mbps: randomNumber(5, 500, 1) },
+                { connections: randomNumber(100, 10000) },
+                { latency_ms: randomNumber(1, 50, 1) },
+                { packet_loss: randomNumber(0, 0.1, 4) + "%" },
+              ],
+              storage: [
+                {
+                  volume_type: randomElement([
+                    "EBS",
+                    "EFS",
+                    "PVC",
+                    "emptyDir",
+                    "hostPath",
+                  ]),
+                },
+                { volume_size: `${randomNumber(10, 1000)}Gi` },
+                { iops: randomNumber(1000, 10000) },
+                { throughput_mbps: randomNumber(50, 500) },
+                { utilization: randomNumber(10, 90) + "%" },
+              ],
+              external_links: generateExternalLinks("workload", workloadId),
+            };
+
+          case "resource":
+            // Check the name to determine the type of resource
+            if (
+              nodeName.toLowerCase().includes("s3") ||
+              nodeName.toLowerCase().includes("bucket")
+            ) {
+              const s3Id = nodeName.split(":")[0].trim();
+              return {
+                id: s3Id,
+                type: "s3",
+                status: randomElement([
+                  "operational",
+                  "degraded",
+                  "optimizing",
+                ]),
+                region: randomElement([
+                  "us-east-1",
+                  "us-west-2",
+                  "eu-central-1",
+                  "eu-west-1",
+                  "ap-southeast-1",
+                  "ap-northeast-1",
+                ]),
+                metrics: [
+                  { total_objects: randomNumber(10000000, 1000000000) },
+                  {
+                    total_size: `${randomNumber(10, 100)}.${randomNumber(
+                      1,
+                      9
+                    )}TB`,
+                  },
+                  { daily_uploads: randomNumber(50000, 500000) },
+                  { daily_downloads: randomNumber(150000, 1500000) },
+                  { average_object_size: `${randomNumber(1, 100)}MB` },
+                  { largest_object: `${randomNumber(1, 50)}GB` },
+                  { smallest_object: `${randomNumber(1, 100)}KB` },
+                ],
+                performance: [
+                  { upload_latency_ms: randomNumber(20, 100) },
+                  { download_latency_ms: randomNumber(10, 80) },
+                  { availability: randomNumber(99.95, 100, 4) },
+                  { throughput_mbps: randomNumber(100, 10000) },
+                  { requests_per_second: randomNumber(1000, 100000) },
+                  { error_rate: randomNumber(0, 0.1, 4) },
+                ],
+                cost: [
+                  { monthly_estimate: randomNumber(5000, 50000) },
+                  { currency: "USD" },
+                  { storage_cost: randomNumber(3000, 30000) },
+                  { transfer_cost: randomNumber(1000, 10000) },
+                  { request_cost: randomNumber(500, 5000) },
+                  { cost_per_gb: `$${randomNumber(0.01, 0.05, 3)}` },
+                ],
+                compliance: [
+                  { encryption: randomElement(["AES-256", "KMS", "DSSE-KMS"]) },
+                  { object_lock: randomElement([true, false]) },
+                  {
+                    versioning: randomElement([
+                      "Enabled",
+                      "Suspended",
+                      "Disabled",
+                    ]),
+                  },
+                  { public_access: "Blocked" },
+                  {
+                    retention_policy: randomElement([
+                      "1 year",
+                      "3 years",
+                      "5 years",
+                      "7 years",
+                    ]),
+                  },
+                  { lifecycle_rules: randomNumber(1, 10) },
+                  { replication: randomElement(["Enabled", "Disabled"]) },
+                  { logging: randomElement(["Enabled", "Disabled"]) },
+                ],
+                external_links: generateExternalLinks("resource", s3Id),
+              };
+            } else if (
+              nodeName.toLowerCase().includes("db") ||
+              nodeName.toLowerCase().includes("database") ||
+              nodeName.toLowerCase().includes("postgres") ||
+              nodeName.toLowerCase().includes("mysql") ||
+              nodeName.toLowerCase().includes("mongo")
+            ) {
+              const dbId = nodeName.split(":")[0].trim();
+              const dbType = randomElement([
+                "postgresql",
+                "mysql",
+                "mongodb",
+                "aurora",
+                "dynamodb",
+              ]);
+              const isRelational = ["postgresql", "mysql", "aurora"].includes(
+                dbType
+              );
+
+              return {
+                id: dbId,
+                type: dbType,
+                version: isRelational
+                  ? `${randomNumber(10, 16)}.${randomNumber(0, 9)}`
+                  : dbType === "mongodb"
+                  ? `${randomNumber(4, 6)}.${randomNumber(0, 9)}`
+                  : "N/A",
+                status: randomElement([
+                  "healthy",
+                  "degraded",
+                  "maintenance",
+                  "scaling",
+                ]),
+                instance_class: randomElement([
+                  "db.r6g.2xlarge",
+                  "db.r6g.4xlarge",
+                  "db.r6g.8xlarge",
+                  "db.r6g.12xlarge",
+                  "db.r6g.16xlarge",
+                ]),
+                multi_az: randomElement([true, false]),
+                size: `${randomNumber(100, 10000)}GB`,
+                connections: [
+                  { active: randomNumber(100, 2000) },
+                  { idle: randomNumber(50, 500) },
+                  { max: randomNumber(2000, 10000) },
+                  {
+                    connection_pooling: randomElement([
+                      "pgbouncer",
+                      "proxysql",
+                      "none",
+                    ]),
+                  },
+                  { connection_timeout_ms: randomNumber(1000, 10000) },
+                ],
+                performance: [
+                  { queries_per_second: randomNumber(5000, 50000) },
+                  { read_iops: randomNumber(10000, 100000) },
+                  { write_iops: randomNumber(5000, 50000) },
+                  { avg_query_time_ms: randomNumber(1, 20) },
+                  { slow_queries_per_hour: randomNumber(0, 100) },
+                  { buffer_cache_hit_ratio: randomNumber(95, 99.9, 1) + "%" },
+                  { index_hit_ratio: randomNumber(95, 99.9, 1) + "%" },
+                  { cpu_utilization: randomNumber(20, 80) + "%" },
+                  { memory_utilization: randomNumber(40, 90) + "%" },
+                ],
+                storage: [
+                  { allocated: `${randomNumber(1000, 20000)}GB` },
+                  { used: `${randomNumber(500, 10000)}GB` },
+                  { usage_percent: randomNumber(10, 90, 1) },
+                  { iops_provisioned: randomNumber(3000, 30000) },
+                  { storage_type: randomElement(["gp3", "io1", "io2"]) },
+                  { auto_scaling: randomElement(["enabled", "disabled"]) },
+                  { throughput: `${randomNumber(125, 1000)}MB/s` },
+                ],
+                backups: [
+                  { last_successful: randomRecentDate() },
+                  { retention_days: randomNumber(7, 90) },
+                  { size: `${randomNumber(100, 9000)}GB` },
+                  {
+                    backup_window: `${randomNumber(0, 23)}:00-${randomNumber(
+                      0,
+                      23
+                    )}:00 UTC`,
+                  },
+                  {
+                    point_in_time_recovery: randomElement([
+                      "enabled",
+                      "disabled",
+                    ]),
+                  },
+                  {
+                    snapshot_frequency: randomElement([
+                      "daily",
+                      "every 6 hours",
+                      "every 12 hours",
+                    ]),
+                  },
+                  { automated_backups: randomElement(["enabled", "disabled"]) },
+                ],
+                security: [
+                  {
+                    encryption_at_rest: randomElement(["enabled", "disabled"]),
+                  },
+                  {
+                    encryption_in_transit: randomElement([
+                      "enabled",
+                      "disabled",
+                    ]),
+                  },
+                  {
+                    network_isolation: randomElement([
+                      "private subnet",
+                      "vpc",
+                      "public",
+                    ]),
+                  },
+                  {
+                    authentication: randomElement([
+                      "IAM",
+                      "password",
+                      "certificate",
+                    ]),
+                  },
+                  { audit_logging: randomElement(["enabled", "disabled"]) },
+                ],
+                external_links: generateExternalLinks("resource", dbId),
+              };
+            } else if (
+              nodeName.toLowerCase().includes("redis") ||
+              nodeName.toLowerCase().includes("cache")
+            ) {
+              const redisId = nodeName.split(":")[0].trim();
+              return {
+                id: redisId,
+                type: "redis",
+                version: `${randomNumber(5, 7)}.${randomNumber(0, 9)}`,
+                status: randomElement(["healthy", "degraded", "scaling"]),
+                cluster_mode: randomElement(["enabled", "disabled"]),
+                shards: randomNumber(1, 20),
+                replicas_per_shard: randomNumber(0, 5),
+                connections: [
+                  { active: randomNumber(500, 5000) },
+                  { max: randomNumber(10000, 100000) },
+                  { connection_timeout_ms: randomNumber(100, 5000) },
+                  { client_timeout_ms: randomNumber(1000, 10000) },
+                ],
+                performance: [
+                  { operations_per_second: randomNumber(50000, 500000) },
+                  { hit_rate: randomNumber(90, 99.9, 2) / 100 },
+                  { miss_rate: randomNumber(0.1, 10, 2) / 100 },
+                  { evictions: randomNumber(0, 5000) },
+                  { latency_us: randomNumber(100, 2000) },
+                  { throughput_mbps: randomNumber(100, 1000) },
+                  { cpu_utilization: randomNumber(20, 80) + "%" },
+                ],
+                memory: [
+                  { allocated: `${randomNumber(10, 640)}GB` },
+                  { used: `${randomNumber(5, 480)}GB` },
+                  { usage_percent: randomNumber(10, 90) },
+                  { fragmentation_ratio: randomNumber(100, 150, 2) / 100 },
+                  {
+                    max_memory_policy: randomElement([
+                      "noeviction",
+                      "allkeys-lru",
+                      "volatile-lru",
+                      "allkeys-random",
+                    ]),
+                  },
+                  { keys_count: randomNumber(1000000, 100000000) },
+                  { avg_key_size_bytes: randomNumber(10, 1000) },
+                  { largest_key_size_kb: randomNumber(1, 1000) },
+                ],
+                persistence: [
+                  { rdb_enabled: randomElement([true, false]) },
+                  { aof_enabled: randomElement([true, false]) },
+                  {
+                    backup_frequency: randomElement([
+                      "1 hour",
+                      "6 hours",
+                      "12 hours",
+                      "1 day",
+                    ]),
+                  },
+                  { last_save: randomRecentDate() },
+                ],
+                security: [
+                  { encryption_in_transit: randomElement([true, false]) },
+                  { encryption_at_rest: randomElement([true, false]) },
+                  { auth_enabled: true },
+                  {
+                    network_isolation: randomElement([
+                      "private subnet",
+                      "vpc",
+                      "public",
+                    ]),
+                  },
+                ],
+                external_links: generateExternalLinks("resource", redisId),
+              };
+            } else if (
+              nodeName.toLowerCase().includes("kafka") ||
+              nodeName.toLowerCase().includes("msk") ||
+              nodeName.toLowerCase().includes("stream")
+            ) {
+              const kafkaId = nodeName.split(":")[0].trim();
+              return {
+                id: kafkaId,
+                type: "kafka",
+                version: `${randomNumber(2, 3)}.${randomNumber(
+                  0,
+                  9
+                )}.${randomNumber(0, 9)}`,
+                status: randomElement(["healthy", "degraded", "scaling"]),
+                brokers: randomNumber(3, 30),
+                topics: randomNumber(50, 500),
+                partitions: randomNumber(500, 5000),
+                replication_factor: randomNumber(2, 3),
+                performance: [
+                  { messages_per_second: randomNumber(10000, 1000000) },
+                  { throughput_mbps: randomNumber(100, 10000) },
+                  { producer_latency_ms: randomNumber(1, 50) },
+                  { consumer_latency_ms: randomNumber(1, 100) },
+                  { retention_size_tb: randomNumber(1, 100) },
+                  { retention_hours: randomNumber(24, 168) },
+                ],
+                resources: [
+                  { cpu_utilization: randomNumber(20, 80) + "%" },
+                  { memory_utilization: randomNumber(40, 90) + "%" },
+                  { disk_utilization: randomNumber(30, 85) + "%" },
+                  { network_in_mbps: randomNumber(100, 5000) },
+                  { network_out_mbps: randomNumber(100, 5000) },
+                ],
+                consumer_groups: [
+                  { total: randomNumber(10, 100) },
+                  { active: randomNumber(5, 50) },
+                  { rebalancing: randomNumber(0, 5) },
+                  { lag_max: randomNumber(0, 10000) },
+                ],
+                security: [
+                  {
+                    encryption_in_transit: randomElement([
+                      "TLS",
+                      "PLAINTEXT",
+                      "TLS and PLAINTEXT",
+                    ]),
+                  },
+                  {
+                    authentication: randomElement([
+                      "SASL/SCRAM",
+                      "SASL/IAM",
+                      "mTLS",
+                      "None",
+                    ]),
+                  },
+                  { authorization: randomElement(["ACLs", "None"]) },
+                ],
+                external_links: generateExternalLinks("resource", kafkaId),
+              };
+            } else if (
+              nodeName.toLowerCase().includes("lambda") ||
+              nodeName.toLowerCase().includes("function")
+            ) {
+              const lambdaId = nodeName.split(":")[0].trim();
+              return {
+                id: lambdaId,
+                type: "lambda",
+                runtime: randomElement([
+                  "nodejs18.x",
+                  "python3.10",
+                  "java17",
+                  "go1.x",
+                  "dotnet6",
+                ]),
+                status: randomElement(["active", "updating", "throttled"]),
+                memory_mb: randomElement([
+                  128, 256, 512, 1024, 2048, 4096, 8192, 10240,
+                ]),
+                timeout_seconds: randomNumber(3, 900),
+                metrics: [
+                  { invocations_per_minute: randomNumber(10, 10000) },
+                  { avg_duration_ms: randomNumber(10, 5000) },
+                  { max_duration_ms: randomNumber(100, 10000) },
+                  { error_rate: randomNumber(0, 1, 3) },
+                  { throttles: randomNumber(0, 100) },
+                  { concurrent_executions: randomNumber(1, 1000) },
+                  { cold_starts_percent: randomNumber(0.1, 10, 1) + "%" },
+                ],
+                cost: [
+                  { monthly_estimate: randomNumber(10, 5000) },
+                  { currency: "USD" },
+                  { compute_cost: randomNumber(5, 3000) },
+                  { request_cost: randomNumber(5, 2000) },
+                ],
+                configuration: [
+                  { vpc_enabled: randomElement([true, false]) },
+                  { layers: randomNumber(0, 5) },
+                  {
+                    reserved_concurrency: randomElement([
+                      null,
+                      randomNumber(10, 1000),
+                    ]),
+                  },
+                  {
+                    provisioned_concurrency: randomElement([
+                      null,
+                      randomNumber(1, 100),
+                    ]),
+                  },
+                  { architecture: randomElement(["x86_64", "arm64"]) },
+                  { code_size_mb: randomNumber(1, 250) },
+                ],
+                external_links: generateExternalLinks("resource", lambdaId),
+              };
+            } else {
+              // Generic resource
+              const genericId = nodeName.split(":")[0].trim();
+              return {
+                id: genericId,
+                type: "generic",
+                status: randomElement([
+                  "operational",
+                  "degraded",
+                  "maintenance",
+                ]),
+                created_at: randomDateInRange(2020, 2024),
+                last_accessed: randomRecentDate(),
+                region: randomElement([
+                  "us-east-1",
+                  "us-west-2",
+                  "eu-central-1",
+                  "eu-west-1",
+                  "ap-southeast-1",
+                  "ap-northeast-1",
+                ]),
+                metrics: [
+                  { availability: randomNumber(99.9, 100, 3) + "%" },
+                  { response_time_ms: randomNumber(5, 100) },
+                  { throughput: randomNumber(100, 10000) + " req/s" },
+                  { error_rate: randomNumber(0, 0.5, 3) + "%" },
+                  { utilization: randomNumber(10, 90) + "%" },
+                ],
+                cost: [
+                  { monthly_estimate: randomNumber(100, 10000) },
+                  { currency: "USD" },
+                  { year_over_year_change: randomNumber(-20, 30, 1) + "%" },
+                ],
+                security: [
+                  {
+                    compliance: randomElement([
+                      "SOC2",
+                      "PCI-DSS",
+                      "HIPAA",
+                      "GDPR",
+                      "ISO27001",
+                    ]),
+                  },
+                  { encryption: randomElement(["enabled", "disabled"]) },
+                  { access_control: randomElement(["IAM", "RBAC", "ACL"]) },
+                ],
+                external_links: generateExternalLinks("resource", genericId),
+              };
+            }
+
+          case "other":
+            const otherId = `other-${randomNumber(1000, 9999)}`;
+            return {
+              id: otherId,
+              name: nodeName,
+              description: `Enterprise resource: ${nodeName}`,
+              created_at: randomDateInRange(2020, 2024),
+              last_updated: randomRecentDate(),
+              status: randomElement([
+                "active",
+                "inactive",
+                "pending",
+                "maintenance",
+                "deprecated",
+              ]),
+              owner: randomElement([
+                "Platform Team",
+                "SRE Team",
+                "DevOps",
+                "Infrastructure",
+                "Security",
+              ]),
+              priority: randomElement(["critical", "high", "medium", "low"]),
+              environment: randomElement([
+                "production",
+                "staging",
+                "development",
+                "shared",
+              ]),
+              tags: [
+                randomElement(["prod", "dev", "stage", "test", "shared"]),
+                randomElement([
+                  "app",
+                  "data",
+                  "infra",
+                  "security",
+                  "monitoring",
+                ]),
+                randomElement([
+                  "team-a",
+                  "team-b",
+                  "team-c",
+                  "platform",
+                  "core",
+                ]),
+                randomElement(["v1", "v2", "legacy", "next-gen", "beta"]),
+              ].slice(0, randomNumber(2, 4)),
+              metadata: [
+                {
+                  cost_center: randomElement([
+                    "IT-" + randomNumber(1000, 9999),
+                    "INFRA-" + randomNumber(1000, 9999),
+                    "PROD-" + randomNumber(1000, 9999),
+                  ]),
+                },
+                {
+                  business_unit: randomElement([
+                    "Retail",
+                    "Finance",
+                    "Marketing",
+                    "Engineering",
+                    "Operations",
+                  ]),
+                },
+                {
+                  data_classification: randomElement([
+                    "public",
+                    "internal",
+                    "confidential",
+                    "restricted",
+                  ]),
+                },
+                {
+                  sla: randomElement(["99.9%", "99.95%", "99.99%", "99.999%"]),
+                },
+              ],
+              external_links: generateExternalLinks("other", otherId),
+            };
+
+          default:
+            return null;
+        }
+      };
+
+      // Helper function to format snake_case keys
+      const formatMetadataKey = (key) => {
+        if (key.toLowerCase() === "id") return "ID"; // Special case for ID
+        // Handle specific acronyms or known terms
+        const acronyms = {
+          cpu: "CPU",
+          db: "DB",
+          pci_dss: "PCI DSS",
+          gdpr: "GDPR",
+          hipaa: "HIPAA",
+          sox: "SOX",
+          nist_800_53: "NIST 800-53",
+          fedramp: "FedRAMP",
+          iso_27001: "ISO 27001",
+          ms: "ms", // Keep milliseconds lowercase
+          us: "µs", // Microseconds
+          gb: "GB",
+          mb: "MB",
+          kb: "KB",
+          tb: "TB",
+          gi: "Gi", // Gibibytes
+          sla: "SLA",
+          oom: "OOM",
+          gc: "GC",
+          iops: "IOPS",
+          mbps: "Mbps",
+          p50: "p50",
+          p95: "p95",
+          p99: "p99",
+          avg: "Avg",
+          rdb: "RDB",
+          aof: "AOF",
+          az: "AZ",
+          vpc: "VPC",
+          tls: "TLS",
+          "sasl/scram": "SASL/SCRAM",
+          "sasl/iam": "SASL/IAM",
+          mtls: "mTLS",
+          acls: "ACLs",
+          iam: "IAM",
+          rbac: "RBAC",
+          soc2: "SOC2",
+          url: "URL",
+        };
+        if (acronyms[key.toLowerCase()]) {
+          return acronyms[key.toLowerCase()];
+        }
+        // General formatting
+        return key
+          .split("_")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ");
+      };
+
+      // Helper function to format string values
+      const formatMetadataValue = (value) => {
+        if (typeof value !== "string") return value; // Only format strings
+
+        // Handle specific known values first
+        const specificValues = {
+          "in-progress": "In Progress",
+          "not-applicable": "Not Applicable",
+          "under budget": "Under Budget",
+          "on track": "On Track",
+          "over budget": "Over Budget",
+          noeviction: "No Eviction",
+          "allkeys-lru": "All Keys LRU",
+          "volatile-lru": "Volatile LRU",
+          "allkeys-random": "All Keys Random",
+          "not configured": "Not Configured",
+          "private subnet": "Private Subnet",
+          emptyDir: "emptyDir", // Keep as is
+          hostPath: "hostPath", // Keep as is
+        };
+        if (specificValues[value.toLowerCase()]) {
+          return specificValues[value.toLowerCase()];
+        }
+
+        // General capitalization for simple lowercase words (avoiding IDs, technical terms)
+        if (
+          value === value.toLowerCase() &&
+          !value.includes(" ") &&
+          !value.includes("-") &&
+          !value.includes("_") &&
+          !/^[a-z0-9.-]+$/.test(value) && // Avoid things like 'us-east-1', '1.2.3'
+          !["true", "false", "null"].includes(value) && // Avoid boolean/null strings
+          isNaN(value) // Avoid pure numbers
+        ) {
+          return value.charAt(0).toUpperCase() + value.slice(1);
+        }
+
+        // Return original value if no specific formatting applies
+        return value;
+      };
+
+      // Function to populate a cloned template with metadata
+      const populateTemplate = (templateClone, metadata) => {
+        if (!metadata) return; // Exit if no metadata
+
+        // Populate simple key-value pairs
+        Object.keys(metadata).forEach((key) => {
+          const value = metadata[key];
+          if (typeof value !== "object" || value === null) {
+            const element = templateClone.querySelector(
+              `[data-metadata-key="${key}"]`
+            );
+            if (element) {
+              // Format the value before displaying
+              element.textContent = formatMetadataValue(value);
+            }
+          }
+        });
+
+        // Populate arrays
+        templateClone
+          .querySelectorAll("[data-metadata-array]")
+          .forEach((arrayContainer) => {
+            const arrayKey = arrayContainer.getAttribute("data-metadata-array");
+            const arrayData = metadata[arrayKey];
+            const itemTemplate = arrayContainer.querySelector(
+              "template[data-array-item-template]"
+            );
+
+            if (Array.isArray(arrayData) && itemTemplate) {
+              arrayData.forEach((item) => {
+                const itemClone = itemTemplate.content.cloneNode(true);
+
+                if (typeof item === "object" && item !== null) {
+                  // Handle arrays of objects (like compliance, links, etc.)
+                  Object.keys(item).forEach((itemKey) => {
+                    const element = itemClone.querySelector(
+                      `[data-metadata-key="${itemKey}"]`
+                    );
+                    if (element) {
+                      if (itemKey === "url" && element.tagName === "A") {
+                        element.href = item[itemKey];
+                      } else if (
+                        itemKey === "last_check" &&
+                        typeof item[itemKey] === "string"
+                      ) {
+                        // Format date nicely
+                        try {
+                          element.textContent = new Date(
+                            item[itemKey]
+                          ).toLocaleDateString();
+                        } catch (e) {
+                          element.textContent = formatMetadataValue(
+                            item[itemKey]
+                          ); // Fallback
+                        }
+                      } else {
+                        // Format the value before displaying
+                        element.textContent = formatMetadataValue(
+                          item[itemKey]
+                        );
+                      }
+                    }
+                  });
+                  // Special case for simple key-value objects within arrays (like compliance)
+                  const keys = Object.keys(item);
+                  if (keys.length === 1) {
+                    const singleKey = keys[0];
+                    const singleValue = item[singleKey];
+                    const keyElement = itemClone.querySelector(
+                      `[data-metadata-key="key"]`
+                    );
+                    const valueElement = itemClone.querySelector(
+                      `[data-metadata-key="value"]`
+                    );
+                    // Format the key before displaying
+                    if (keyElement)
+                      keyElement.textContent = formatMetadataKey(singleKey);
+                    // Format the value before displaying
+                    if (valueElement)
+                      valueElement.textContent =
+                        formatMetadataValue(singleValue);
+                  }
+                } else if (typeof item !== "object") {
+                  // Handle arrays of primitives (like tags)
+                  // Format the value before displaying
+                  const element = itemClone.querySelector(
+                    `[data-metadata-key="value"]`
+                  );
+                  if (element) {
+                    element.textContent = formatMetadataValue(item);
+                  }
+                }
+                arrayContainer.appendChild(itemClone);
+              });
+            }
+          });
+
+        // Handle resource type specifics
+        if (metadata.type && templateClone.id === "template-resource") {
+          const resourceTypeDiv = templateClone.querySelector(
+            `[data-resource-type="${metadata.type}"]`
+          );
+          if (resourceTypeDiv) {
+            resourceTypeDiv.style.display = "block";
+            // Populate specific fields within the resource type div
+            Object.keys(metadata).forEach((key) => {
+              const value = metadata[key];
+              if (typeof value !== "object" || value === null) {
+                // Simple values first
+                const element = resourceTypeDiv.querySelector(
+                  `[data-metadata-key="${key}"]`
+                );
+                if (element) {
+                  element.textContent = value;
+                }
+              } else if (Array.isArray(value)) {
+                // Arrays within the specific type
+                const arrayContainer = resourceTypeDiv.querySelector(
+                  `[data-metadata-array="${key}"]`
+                );
+                const itemTemplate = arrayContainer?.querySelector(
+                  "template[data-array-item-template]"
+                );
+                if (arrayContainer && itemTemplate) {
+                  value.forEach((item) => {
+                    const itemClone = itemTemplate.content.cloneNode(true);
+                    if (typeof item === "object" && item !== null) {
+                      Object.keys(item).forEach((itemKey) => {
+                        const element = itemClone.querySelector(
+                          `[data-metadata-key="${itemKey}"]`
+                        );
+                        if (element) element.textContent = item[itemKey];
+                      });
+                      // Handle simple key-value objects within arrays
+                      const keys = Object.keys(item);
+                      if (keys.length === 1) {
+                        const singleKey = keys[0];
+                        const singleValue = item[singleKey];
+                        const keyElement = itemClone.querySelector(
+                          `[data-metadata-key="key"]`
+                        );
+                        const valueElement = itemClone.querySelector(
+                          `[data-metadata-key="value"]`
+                        );
+                        if (keyElement) keyElement.textContent = singleKey;
+                        if (valueElement)
+                          valueElement.textContent = singleValue;
+                      }
+                    }
+                    arrayContainer.appendChild(itemClone);
+                  });
+                }
+              }
+            });
+          } else {
+            // Show generic if specific type not found
+            const genericDiv = templateClone.querySelector(
+              `[data-resource-type="generic"]`
+            );
+            if (genericDiv) genericDiv.style.display = "block";
+          }
+        }
+      };
+
+      // Function to display node details using templates (adapted for graph node structure)
+      const openNodeDetails = (node) => {
+        // Get pre-generated metadata from the map using node.id
+        const metadata = nodeMetadataMap.get(node.id);
+        const metadataContainer = document.getElementById("node-details");
+        const nodeClass = node.class || "other"; // Default to 'other' if class is missing
+
+        metadataContainer.innerHTML = ""; // Clear previous metadata
+
+        // Add the node name/ID as a header with a close button
+        const headerContainer = document.createElement("div");
+        headerContainer.className = "flex items-center justify-between mb-4"; // Use flex to align items
+
+        const header = document.createElement("h1");
+        header.className = "text-3xl text-text-primary node-name"; // Removed mb-4
+        header.textContent = node.id;
+
+        const closeButton = document.createElement("span");
+        closeButton.innerHTML = "&#x2715;"; // 'X' symbol
+        closeButton.className =
+          "text-text-secondary text-xl cursor-pointer hover:text-text-primary ml-2"; // Added margin-left
+        closeButton.title = "Clear selection";
+        closeButton.onclick = resetHighlight; // Call resetHighlight on click
+
+        headerContainer.appendChild(header);
+        headerContainer.appendChild(closeButton);
+        metadataContainer.appendChild(headerContainer);
+
+        // Add the action button container
+        const actionsDiv = document.createElement("div");
+        actionsDiv.id = "node-actions";
+        actionsDiv.className = "pb-4"; // Margin top
+        actionsDiv.innerHTML = `
+            <button
+              id="toggle-nodes"
+              class="bg-background-button-primary text-text-primary border-none py-2 px-4 rounded cursor-pointer text-sm transition-colors hover:bg-interactive-subtle"
+            >
+              Hide Unconnected Nodes
+            </button>
+        `;
+        metadataContainer.appendChild(actionsDiv);
+
+        // Find the template
+        const templateId = `template-${nodeClass}`;
+        const templateElement = document.getElementById(templateId);
+
+        if (templateElement && metadata) {
+          // Clone the template
+          const templateClone = templateElement.cloneNode(true);
+          templateClone.removeAttribute("id"); // Avoid duplicate IDs
+
+          // Populate the cloned template
+          populateTemplate(templateClone, metadata);
+
+          // Append the populated template to the container
+          metadataContainer.appendChild(templateClone);
+        } else if (metadata) {
+          // Fallback or error handling if template not found but metadata exists
+          console.warn(`Metadata template not found for class: ${nodeClass}`);
+          // Optionally display raw JSON as fallback
+          const pre = document.createElement("pre");
+          pre.textContent = JSON.stringify(metadata, null, 2);
+          metadataContainer.appendChild(pre);
+        } else {
+          // Handle case where there's no metadata
+          const noDataDiv = document.createElement("div");
+          noDataDiv.innerHTML =
+            "<p class='text-text-secondary'>No metadata available for this node.</p>";
+          metadataContainer.appendChild(noDataDiv);
+        }
+
+        // Add the event listener for the newly created button
+        const toggleButton = metadataContainer.querySelector("#toggle-nodes");
+        if (toggleButton) {
+          // Initialize state based on whether nodes are currently hidden
+          toggleButton.textContent = nodesHidden
+            ? "Show All Nodes"
+            : "Hide Unconnected Nodes";
+
+          toggleButton.addEventListener("click", function () {
+            if (nodesHidden) {
+              nodesHidden = false; // Update the state before calling functions
+              this.textContent = "Hide Unconnected Nodes";
+              showAllNodes();
+            } else {
+              nodesHidden = true; // Update the state before calling functions
+              this.textContent = "Show All Nodes";
+              hideUnconnectedNodes();
+            }
+          });
+        }
+      };
+
+      // Generate metadata for all nodes on load
+      data.nodes.forEach((node) => {
+        const metadata = generateMetadata(node);
+        if (metadata) {
+          nodeMetadataMap.set(node.id, metadata);
+        }
+      });
+
+      // --- End Metadata Logic ---
+
+      // Function to get a specific CSS variable value - force refresh to get latest values
+      function getCssVariable(variableName) {
+        // Force a style recalculation to ensure we get the latest value
+        return getComputedStyle(document.documentElement)
+          .getPropertyValue(variableName)
+          .trim();
       }
 
-      // Get theme-aware color palette
+      // Get theme-aware color palette using CSS variables
       function getNodeColorPalette() {
-        const themeColors = getThemeColors();
-
-        // Use different color palettes based on theme
-        if (themeColors === darkTheme) {
-          return [
-            "#8B5CF6", // violet-500
-            "#EC4899", // pink-500
-            "#3B82F6", // blue-500
-            "#10B981", // emerald-500
-          ];
-        } else {
-          return [
-            "#fecaca", // red-200
-            "#fed7aa", // orange-200
-            "#bfdbfe", // blue-200
-            "#a7f3d0", // emerald-200
-          ];
-        }
+        // Ensure palette length matches domain length
+        return [
+          getCssVariable("--graph-node-org"),
+          getCssVariable("--graph-node-app"),
+          getCssVariable("--graph-node-env"),
+          getCssVariable("--graph-node-env_type"),
+          getCssVariable("--graph-node-other"), // Using 'other' color for 'env'
+          getCssVariable("--graph-node-workload"),
+          getCssVariable("--graph-node-resource"),
+          getCssVariable("--graph-node-other"),
+        ];
       }
 
-      // Create a color scale based on the class
+      // Create a color scale based on the class - added 'env' and 'other'
       let color = d3
         .scaleOrdinal()
-        .domain(["org", "app", "workload", "resource"])
-        .range(getNodeColorPalette()); // Use theme-aware colors
+        .domain([
+          "org",
+          "app",
+          "env",
+          "env_type",
+          "workload",
+          "resource",
+          "other",
+        ]) // Added 'env'
+        .range(getNodeColorPalette()) // Use theme-aware colors
+        .unknown(getCssVariable("--graph-node-other")); // Fallback color
 
       // Function to update visualization colors when theme changes
       function updateVisualizationColors() {
-        // Update color scale with new theme colors
-        color.range(getNodeColorPalette());
-        const themeColors = getThemeColors();
+        // Get fresh color palette based on current theme
+        const newPalette = getNodeColorPalette();
 
-        // Update node colors
-        node.selectAll("circle").style("fill", (d) => color(d.class));
-        node
-          .selectAll("rect.node-label-bg")
-          .style("fill", (d) => color(d.class));
+        // Update color scale with new theme colors
+        color.range(newPalette);
+
+        // Apply colors directly to each node element
+        node.each(function (d) {
+          const nodeGroup = d3.select(this);
+          const nodeClass = d.class || "other"; // Default to 'other'
+
+          // Get the color for this node class from the updated palette using the scale's domain
+          const domainIndex = color.domain().indexOf(nodeClass);
+          const nodeColor =
+            newPalette[domainIndex >= 0 ? domainIndex : newPalette.length - 1]; // Fallback to last color ('other')
+        });
 
         // Update text colors
-        node.selectAll("text").style("fill", themeColors.text);
-        linkText.style("fill", themeColors.text);
+        node.select("text").style("fill", getCssVariable("--text-primary"));
+        linkText.style("fill", getCssVariable("--text-primary"));
+
+        // Update node label background color
+        node
+          .select("rect.node-label-bg")
+          .style("fill", getCssVariable("--graph-node-label-background"));
 
         // Update link colors if not highlighted
         if (!currentSelectedNode) {
-          link.style("stroke", themeColors.buttonBG);
+          link.style("stroke", getCssVariable("--graph-link"));
+        } else {
+          // If there's a selected node, update the highlight colors
+          linkGroups.each(function (d) {
+            const sourceId =
+              typeof d.source === "object" ? d.source.id : d.source;
+            const targetId =
+              typeof d.target === "object" ? d.target.id : d.target;
+            const isConnected =
+              sourceId === currentSelectedNode.id ||
+              targetId === currentSelectedNode.id;
+
+            if (isConnected) {
+              d3.select(this)
+                .select("line")
+                .style("stroke", getCssVariable("--graph-link-highlight"));
+            }
+          });
         }
+
+        // Update background colors for link text
+        linkTextBg.style("fill", getCssVariable("--interactive-subtle"));
+
+        // Update arrowhead markers with new theme colors
+        svg
+          .selectAll("marker#arrowhead path")
+          .attr("fill", getCssVariable("--graph-link"));
+        svg
+          .selectAll("marker#arrowhead-highlight path")
+          .attr("fill", getCssVariable("--graph-link-highlight"));
 
         // If there's a selected node, reapply highlighting with new theme colors
         if (currentSelectedNode) {
@@ -351,37 +3212,30 @@
             })
         );
 
+      // Define arrowhead markers
+      svg
+        .append("defs")
+        .selectAll("marker")
+        .data(["arrowhead", "arrowhead-highlight"]) // Normal and highlighted
+        .enter()
+        .append("marker")
+        .attr("id", (d) => d)
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", 15) // Offset adjusted for 24x24 icon (radius 12 + arrowhead size)
+        .attr("refY", 0)
+        .attr("markerWidth", 6)
+        .attr("markerHeight", 6)
+        .attr("orient", "auto")
+        .append("path")
+        .attr("d", "M0,-5L10,0L0,5") // Arrowhead shape
+        .attr("fill", (d) =>
+          d === "arrowhead-highlight"
+            ? getCssVariable("--graph-link-highlight")
+            : getCssVariable("--graph-link")
+        ); // Color based on ID
+
       // Container for the graph
       const container = svg.append("g");
-
-      // Generate random connection words
-      const connectionWords = [
-        "Depends",
-        "Connects",
-        "Requires",
-        "Integrates",
-        "Exchanges",
-        "Provides",
-        "Consumes",
-        "Accesses",
-        "Supplies",
-        "Queries",
-        "Updates",
-        "Monitors",
-        "Controls",
-        "Validates",
-        "Secures",
-        "Logs",
-        "Extends",
-        "Processes",
-        "Authorizes",
-        "Invokes",
-      ];
-
-      // Assign a random explanation to each link
-      data.links.forEach((link) => {
-        link.explanation = link.explanation || connectionWords[Math.floor(Math.random() * connectionWords.length)];
-      });
 
       // Initialize the links as groups
       const linkGroups = container
@@ -395,16 +3249,16 @@
       // Add the line for each link
       const link = linkGroups
         .append("line")
-        .attr(
-          "class",
-          "stroke-buttonBG stroke-opacity-60 transition-all duration-300"
-        )
-        .style("stroke-width", 2);
+        .attr("class", "stroke-opacity-60 transition-all duration-300")
+        .style("stroke", getCssVariable("--graph-link")) // Use CSS variable
+        .style("stroke-width", 2)
+        .attr("marker-end", "url(#arrowhead)"); // Add the default arrowhead
 
       // Add background rectangles for the link text (initially hidden)
       const linkTextBg = linkGroups
         .append("rect")
-        .attr("class", "fill-tableRowBorder rounded-md opacity-0")
+        .attr("class", "rounded-md opacity-0")
+        .style("fill", getCssVariable("--interactive-subtle")) // Use CSS variable
         .attr("rx", 3)
         .attr("ry", 3)
         .attr("width", 0)
@@ -415,8 +3269,8 @@
       // Add the explanation text for each link (hidden by default)
       const linkText = linkGroups
         .append("text")
-        .attr("class", "text-xs font-bold pointer-events-none opacity-0")
-        .style("fill", () => getThemeColors().text) // Use theme text color
+        .attr("class", "text-xs pointer-events-none opacity-0")
+        .style("fill", getCssVariable("--text-primary")) // Use CSS variable
         .text((d) => d.explanation)
         .attr("text-anchor", "middle")
         .attr("dy", -5);
@@ -437,40 +3291,111 @@
             .on("end", dragended)
         );
 
-      // Add circles to the nodes
-      node
-        .append("circle")
-        .attr("r", (d) => {
-          // Set radius based on class
-          switch (d.class) {
-            case "org":
-              return 16; // Largest
-            case "app":
-              return 14;
-            case "workload":
-              return 12;
-            case "resource":
-              return 10; // Smallest
-            default:
-              return 12;
+      // Utility function to adjust color brightness (Keep for label backgrounds)
+      function adjustBrightness(color, amount) {
+        // Parse the hex color
+        let hex = color;
+        if (hex.startsWith("#")) {
+          hex = hex.slice(1);
+        }
+
+        // Handle shorthand hex
+        if (hex.length === 3) {
+          hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+        }
+
+        // Convert to RGB
+        let r = parseInt(hex.slice(0, 2), 16);
+        let g = parseInt(hex.slice(2, 4), 16);
+        let b = parseInt(hex.slice(4, 6), 16);
+
+        // Adjust brightness
+        r = Math.max(0, Math.min(255, r + amount));
+        g = Math.max(0, Math.min(255, g + amount));
+        b = Math.max(0, Math.min(255, b + amount));
+
+        // Convert back to hex
+        return `#${r.toString(16).padStart(2, "0")}${g
+          .toString(16)
+          .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+      }
+
+      // function getBorderColor(fillColor) { ... } // Removed as it's no longer needed for nodes
+
+      // Append SVG icons based on class
+      node.each(function (d) {
+        const nodeGroup = d3.select(this);
+        const className = d.class || "other";
+        const svgString = svgIconContent[className] || svgIconContent.other;
+
+        // Add class to the group for CSS targeting
+        nodeGroup.classed(`node-${className}`, true);
+
+        // Parse the SVG string
+        const parser = new DOMParser();
+        const svgDoc = parser.parseFromString(svgString, "image/svg+xml");
+        const svgElement = svgDoc.querySelector("svg");
+
+        if (svgElement) {
+          // Calculate scale factor to fit into 24x24
+          const originalWidth = parseFloat(
+            svgElement.getAttribute("width") || 24
+          );
+          const originalHeight = parseFloat(
+            svgElement.getAttribute("height") || 24
+          );
+          // Use viewBox for aspect ratio calculation if width/height are missing
+          const viewBox = svgElement.getAttribute("viewBox");
+          let vbWidth = originalWidth;
+          let vbHeight = originalHeight;
+          if (!vbWidth || !vbHeight) {
+            if (viewBox) {
+              const parts = viewBox.split(" ");
+              if (parts.length === 4) {
+                vbWidth = parseFloat(parts[2]);
+                vbHeight = parseFloat(parts[3]);
+              }
+            }
           }
-        })
-        .attr(
-          "class",
-          "stroke-white stroke-0.5 transition-opacity duration-300"
-        )
-        .style("fill", (d) => color(d.class));
+          vbWidth = vbWidth || 24; // Fallback if still missing
+          vbHeight = vbHeight || 24;
+
+          const scaleX = 24 / vbWidth;
+          const scaleY = 24 / vbHeight;
+          const scale = Math.min(scaleX, scaleY); // Preserve aspect ratio
+
+          // Calculate translation to center the scaled icon within the 24x24 area
+          const translateX = (24 - vbWidth * scale) / 2;
+          const translateY = (24 - vbHeight * scale) / 2;
+
+          // Create a group for the icon elements
+          const iconGroup = nodeGroup
+            .append("g")
+            .attr("class", "node-icon")
+            // Scale and center the icon group within the -12, -12 offset area
+            .attr(
+              "transform",
+              `translate(${-12 + translateX}, ${
+                -12 + translateY
+              }) scale(${scale})`
+            );
+
+          // Append children (paths, circles, etc.) from the parsed SVG
+          Array.from(svgElement.children).forEach((child) => {
+            // Add a class to the shapes for styling
+            d3.select(child).classed("node-icon-shape", true);
+            iconGroup.node().appendChild(child.cloneNode(true));
+          });
+        }
+      });
 
       // Add background rectangles for node labels
       const labelBgs = node
         .append("rect")
-        .attr(
-          "class",
-          "rounded transition-opacity duration-300 opacity-80 node-label-bg"
-        )
+        .attr("class", "rounded transition-opacity duration-300  node-label-bg")
         .attr("rx", 3)
         .attr("ry", 3)
-        .style("fill", (d) => color(d.class));
+        .style("fill", getCssVariable("--graph-node-label-background")); // Use subtle background for all labels
 
       // Add labels to the nodes
       const labels = node
@@ -480,7 +3405,7 @@
           "class",
           "text-xs pointer-events-none transition-opacity duration-300"
         )
-        .style("fill", () => getThemeColors().text) // Use theme text color
+        .style("fill", getCssVariable("--text-primary")) // Use CSS variable
         .attr("dx", 15)
         .attr("dy", 4);
 
@@ -489,8 +3414,8 @@
 
       // Variables to control force parameters
       // Reduce movement by lowering alphaTarget and increasing strength values
-      let linkDistance = 50;
-      let chargeStrength = -1000;
+      let linkDistance = 100; // Increased from 50 to 100
+      let chargeStrength = -1500;
       let nodeCollideRadius = (d) => 20;
 
       // Create the simulation with reduced movement
@@ -520,15 +3445,6 @@
         svg
           .attr("width", graphContainer.clientWidth)
           .attr("height", graphContainer.clientHeight);
-
-        // Update force center
-        simulation.force(
-          "center",
-          d3.forceCenter(
-            graphContainer.clientWidth / 2,
-            graphContainer.clientHeight / 2
-          )
-        );
       }
 
       // Listen for window resize
@@ -551,12 +3467,28 @@
 
       // Update positions during simulation
       simulation.on("tick", () => {
-        // Update link lines
-        link
-          .attr("x1", (d) => d.source.x)
-          .attr("y1", (d) => d.source.y)
-          .attr("x2", (d) => d.target.x)
-          .attr("y2", (d) => d.target.y);
+        // Update link lines, adjusting end point for arrowhead
+        link.each(function (d) {
+          const source = d.source;
+          const target = d.target;
+          const dx = target.x - source.x;
+          const dy = target.y - source.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          // Use fixed radius for 24x24 icons
+          const targetRadius = 12;
+          const offset = targetRadius + 3; // Node radius (12) + marker refX adjustment (15 - 12 = 3)
+
+          // Calculate the adjusted target coordinates
+          const targetX = target.x - (dx / dist) * offset;
+          const targetY = target.y - (dy / dist) * offset;
+
+          d3.select(this)
+            .attr("x1", source.x)
+            .attr("y1", source.y)
+            .attr("x2", dist > offset ? targetX : target.x) // Avoid overshooting if nodes are too close
+            .attr("y2", dist > offset ? targetY : target.y);
+        });
 
         // Update link explanation position (text and background)
         linkGroups.each(function (d) {
@@ -694,14 +3626,14 @@
         });
 
         // Reduce opacity for all nodes
-        node.select("circle").style("opacity", 0.2);
+        node.select(".node-icon").style("opacity", 0.2); // Target icon group
         node.select("text").style("opacity", 0.2);
         node.select("rect.node-label-bg").style("opacity", 0.2);
 
         // Highlight the selected node and its connections
         node
           .filter((d) => currentConnectedNodeIds.has(d.id))
-          .select("circle")
+          .select(".node-icon") // Target icon group
           .style("opacity", 1);
 
         node
@@ -713,6 +3645,23 @@
           .filter((d) => currentConnectedNodeIds.has(d.id))
           .select("rect.node-label-bg")
           .style("opacity", 0.8);
+
+        // Reset all links to default style first before applying highlights
+        linkGroups.each(function () {
+          const linkElement = d3.select(this).select("line");
+          const textElement = d3.select(this).select("text");
+          const bgElement = d3.select(this).select("rect");
+
+          linkElement
+            .style("opacity", null) // Remove explicit opacity if set
+            .style("stroke-opacity", 0.6) // Reset to default dim state
+            .style("stroke", getCssVariable("--graph-link")) // Reset color
+            .style("stroke-width", 2) // Reset width
+            .attr("marker-end", "url(#arrowhead)"); // Reset marker
+
+          textElement.style("opacity", 0); // Hide text
+          bgElement.style("opacity", 0); // Hide background
+        });
 
         // Highlight connected links
         linkGroups.each(function (d) {
@@ -728,47 +3677,27 @@
           const bgElement = d3.select(this).select("rect");
 
           if (isConnected) {
-            const themeColors = getThemeColors();
             linkElement
               .style("stroke-opacity", 1)
-              .style("stroke", themeColors.brand) // Use theme brand color
-              .style("stroke-width", 3);
+              .style("stroke", getCssVariable("--graph-link-highlight")) // Use CSS variable
+              .style("stroke-width", 3)
+              .attr("marker-end", "url(#arrowhead-highlight)"); // Switch marker
 
             // Show both the text and its background
             textElement.style("opacity", 1);
             bgElement.style("opacity", 1);
           } else {
-            linkElement.style("stroke-opacity", 0.1);
+            // Reduce opacity for the entire line element, affecting the marker
+            linkElement
+              .style("opacity", 0.1) // Changed from stroke-opacity to opacity
+              .attr("marker-end", "url(#arrowhead)"); // Revert marker
             textElement.style("opacity", 0);
             bgElement.style("opacity", 0);
           }
         });
 
-        // Display node details
-        const nodeDetailsDiv = document.getElementById("node-details");
-
-        // Get connected nodes
-        const neighbors = [...currentConnectedNodeIds].filter(
-          (id) => id !== selectedNode.id
-        );
-
-        nodeDetailsDiv.innerHTML = `
-          <h2 class="text-xl font-bold mb-2 text-text">${selectedNode.id}</h2>
-          <p class="mb-2 text-text"><span class="font-semibold">Class:</span> ${
-            selectedNode.class
-          }</p>
-          <p class="font-semibold mb-1 text-text">Connected to ${
-            neighbors.length
-          } nodes:</p>
-          <ul class="bg-primary bg-opacity-50 rounded p-2 max-h-80 overflow-y-auto scrollbar-transparent">
-            ${neighbors
-              .map(
-                (id) =>
-                  `<li class="mb-1 hover:bg-primary hover:bg-opacity-20 p-1 rounded text-text">${id}</li>`
-              )
-              .join("")}
-          </ul>
-        `;
+        // Display node details using the new function
+        openNodeDetails(selectedNode);
 
         // Show details container with split layout
         toggleLayout(true);
@@ -792,18 +3721,19 @@
         if (currentSearchTerm) {
           applySearchFilter(currentSearchTerm);
         } else {
-          node.select("circle").style("opacity", 1);
+          node.select(".node-icon").style("opacity", 1); // Target icon group
           node.select("text").style("opacity", 1);
           node.select("rect.node-label-bg").style("opacity", 0.8);
         }
 
         // Reset link styles
         linkGroups.style("display", "");
-        const themeColors = getThemeColors();
         link
-          .style("stroke-opacity", 0.6)
-          .style("stroke", themeColors.buttonBG) // Use theme buttonBG color
-          .style("stroke-width", 2);
+          .style("opacity", null) // Remove the inline opacity style
+          .style("stroke-opacity", 0.6) // Ensure default stroke-opacity is set
+          .style("stroke", getCssVariable("--graph-link")) // Use CSS variable
+          .style("stroke-width", 2)
+          .attr("marker-end", "url(#arrowhead)"); // Ensure default marker
 
         // Hide all link texts and backgrounds
         linkText.style("opacity", 0);
@@ -851,7 +3781,7 @@
 
         // Show all nodes but keep highlighting
         node.style("display", "");
-        link.style("display", "");
+        linkGroups.style("display", ""); // Show all link groups instead of just the lines
 
         // Reapply highlight effect
         highlightConnections(currentSelectedNode);
@@ -874,7 +3804,7 @@
       function applySearchFilter(searchTerm) {
         if (!searchTerm) {
           // If search is cleared, reset all nodes to full opacity
-          node.select("circle").style("opacity", 1);
+          node.select(".node-icon").style("opacity", 1); // Target icon group
           node.select("text").style("opacity", 1);
           node.select("rect.node-label-bg").style("opacity", 0.8);
 
@@ -899,7 +3829,7 @@
           }
 
           // Use Tailwind's opacity classes by setting style directly
-          nodeElement.select("circle").style("opacity", matches ? 1 : 0.1);
+          nodeElement.select(".node-icon").style("opacity", matches ? 1 : 0.1); // Target icon group
           nodeElement.select("text").style("opacity", matches ? 1 : 0.1);
           nodeElement
             .select("rect.node-label-bg")
@@ -920,6 +3850,8 @@
 
           // Set opacity accordingly
           linkElement.style("stroke-opacity", isRelevant ? 0.6 : 0.1);
+          // Keep default marker during search filtering
+          linkElement.attr("marker-end", "url(#arrowhead)");
         });
       }
 
@@ -957,20 +3889,8 @@
         applySearchFilter("");
       });
 
-      // Toggle nodes visibility state
+      // Toggle nodes visibility state (moved inside openNodeDetails)
       let nodesHidden = false;
-      d3.select("#toggle-nodes").on("click", function () {
-        if (nodesHidden) {
-          // Show all nodes
-          showAllNodes();
-          d3.select(this).text("Hide Unconnected Nodes");
-        } else {
-          // Hide unconnected nodes
-          hideUnconnectedNodes();
-          d3.select(this).text("Show All Nodes");
-        }
-        nodesHidden = !nodesHidden;
-      });
 
       // Drag functions
       function dragstarted(event, d) {
@@ -986,8 +3906,10 @@
 
       function dragended(event, d) {
         if (!event.active) simulation.alphaTarget(0.01);
-        // Keep the node fixed where it was dragged
-        // (don't reset d.fx and d.fy to null)
+        // Don't keep the node fixed where it was dragged
+        // Reset d.fx and d.fy to null so the node can continue participating in the simulation
+        d.fx = null;
+        d.fy = null;
       }
     </script>
   </body>
