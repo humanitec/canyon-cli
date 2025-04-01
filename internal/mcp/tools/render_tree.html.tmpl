@@ -9,6 +9,709 @@
       rel="stylesheet"
     />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      /**
+       * TreeJS is a JavaScript librarie for displaying TreeViews
+       * on the web.
+       *
+       * @author Matthias Thalmann
+       */
+
+      function TreeView(root, container, options) {
+        var self = this;
+
+        /*
+         * Konstruktor
+         */
+        if (typeof root === "undefined") {
+          throw new Error("Parameter 1 must be set (root)");
+        }
+
+        if (!(root instanceof TreeNode)) {
+          throw new Error("Parameter 1 must be of type TreeNode");
+        }
+
+        if (container) {
+          if (!TreeUtil.isDOM(container)) {
+            container = document.querySelector(container);
+
+            if (container instanceof Array) {
+              container = container[0];
+            }
+
+            if (!TreeUtil.isDOM(container)) {
+              throw new Error(
+                "Parameter 2 must be either DOM-Object or CSS-QuerySelector (#, .)"
+              );
+            }
+          }
+        } else {
+          container = null;
+        }
+
+        if (!options || typeof options !== "object") {
+          options = {};
+        }
+
+        /*
+         * Methods
+         */
+        this.setRoot = function (_root) {
+          if (root instanceof TreeNode) {
+            root = _root;
+          }
+        };
+
+        this.getRoot = function () {
+          return root;
+        };
+
+        this.expandAllNodes = function () {
+          root.setExpanded(true);
+
+          root.getChildren().forEach(function (child) {
+            TreeUtil.expandNode(child);
+          });
+        };
+
+        this.expandPath = function (path) {
+          if (!(path instanceof TreePath)) {
+            throw new Error("Parameter 1 must be of type TreePath");
+          }
+
+          path.getPath().forEach(function (node) {
+            node.setExpanded(true);
+          });
+        };
+
+        this.collapseAllNodes = function () {
+          root.setExpanded(false);
+
+          root.getChildren().forEach(function (child) {
+            TreeUtil.collapseNode(child);
+          });
+        };
+
+        this.setContainer = function (_container) {
+          if (TreeUtil.isDOM(_container)) {
+            container = _container;
+          } else {
+            _container = document.querySelector(_container);
+
+            if (_container instanceof Array) {
+              _container = _container[0];
+            }
+
+            if (!TreeUtil.isDOM(_container)) {
+              throw new Error(
+                "Parameter 1 must be either DOM-Object or CSS-QuerySelector (#, .)"
+              );
+            }
+          }
+        };
+
+        this.getContainer = function () {
+          return container;
+        };
+
+        this.setOptions = function (_options) {
+          if (typeof _options === "object") {
+            options = _options;
+          }
+        };
+
+        this.changeOption = function (option, value) {
+          options[option] = value;
+        };
+
+        this.getOptions = function () {
+          return options;
+        };
+
+        // TODO: set selected key: up down; expand right; collapse left; enter: open;
+        this.getSelectedNodes = function () {
+          return TreeUtil.getSelectedNodesForNode(root);
+        };
+
+        this.reload = function () {
+          if (container == null) {
+            console.warn("No container specified");
+            return;
+          }
+
+          container.classList.add("tj_container");
+
+          var cnt = document.createElement("ul");
+
+          if (TreeUtil.getProperty(options, "show_root", true)) {
+            cnt.appendChild(renderNode(root));
+          } else {
+            root.getChildren().forEach(function (child) {
+              cnt.appendChild(renderNode(child));
+            });
+          }
+
+          container.innerHTML = "";
+          container.appendChild(cnt);
+        };
+
+        function renderNode(node) {
+          var li_outer = document.createElement("li");
+          var span_desc = document.createElement("span");
+          span_desc.className = "tj_description";
+          span_desc.tj_node = node;
+
+          if (!node.isEnabled()) {
+            li_outer.setAttribute("disabled", "");
+            node.setExpanded(false);
+            node.setSelected(false);
+          }
+
+          if (node.isSelected()) {
+            span_desc.classList.add("selected");
+          }
+
+          span_desc.addEventListener("click", function (e) {
+            var cur_el = e.target;
+
+            while (
+              typeof cur_el.tj_node === "undefined" ||
+              cur_el.classList.contains("tj_container")
+            ) {
+              cur_el = cur_el.parentElement;
+            }
+
+            var node_cur = cur_el.tj_node;
+
+            if (typeof node_cur === "undefined") {
+              return;
+            }
+
+            if (node_cur.isEnabled()) {
+              if (e.ctrlKey == false) {
+                if (!node_cur.isLeaf()) {
+                  node_cur.toggleExpanded();
+                  self.reload();
+                } else {
+                  node_cur.open();
+                }
+
+                node_cur.on("click")(e, node_cur);
+              }
+
+              if (e.ctrlKey == true) {
+                node_cur.toggleSelected();
+                self.reload();
+              } else {
+                var rt = node_cur.getRoot();
+
+                if (rt instanceof TreeNode) {
+                  TreeUtil.getSelectedNodesForNode(rt).forEach(function (_nd) {
+                    _nd.setSelected(false);
+                  });
+                }
+                node_cur.setSelected(true);
+
+                self.reload();
+              }
+            }
+          });
+
+          span_desc.addEventListener("contextmenu", function (e) {
+            var cur_el = e.target;
+
+            while (
+              typeof cur_el.tj_node === "undefined" ||
+              cur_el.classList.contains("tj_container")
+            ) {
+              cur_el = cur_el.parentElement;
+            }
+
+            var node_cur = cur_el.tj_node;
+
+            if (typeof node_cur === "undefined") {
+              return;
+            }
+
+            if (typeof node_cur.getListener("contextmenu") !== "undefined") {
+              node_cur.on("contextmenu")(e, node_cur);
+              e.preventDefault();
+            } else if (typeof TreeConfig.context_menu === "function") {
+              TreeConfig.context_menu(e, node_cur);
+              e.preventDefault();
+            }
+          });
+
+          if (
+            node.isLeaf() &&
+            !TreeUtil.getProperty(node.getOptions(), "forceParent", false)
+          ) {
+            var ret = "";
+            // var icon = TreeUtil.getProperty(node.getOptions(), "icon", "");
+            // if(icon != ""){
+            // 	ret += '<span class="tj_icon">' + icon + '</span>';
+            // }else if((icon = TreeUtil.getProperty(options, "leaf_icon", "")) != ""){
+            // 	ret += '<span class="tj_icon">' + icon + '</span>';
+            // }else{
+            // 	ret += '<span class="tj_icon">' + TreeConfig.leaf_icon + '</span>';
+            // }
+
+            span_desc.innerHTML = ret + node.toString() + "</span>";
+            span_desc.classList.add("tj_leaf");
+            span_desc.setAttribute("title", node.toString());
+
+            li_outer.appendChild(span_desc);
+          } else {
+            var ret = "";
+            if (node.isExpanded()) {
+              ret +=
+                '<span class="tj_mod_icon">' + TreeConfig.open_icon + "</span>";
+            } else {
+              ret +=
+                '<span class="tj_mod_icon">' +
+                TreeConfig.close_icon +
+                "</span>";
+            }
+
+            // var icon = TreeUtil.getProperty(node.getOptions(), "icon", "");
+            // if(icon != ""){
+            // 	ret += '<span class="tj_icon">' + icon + '</span>';
+            // }else if((icon = TreeUtil.getProperty(options, "parent_icon", "")) != ""){
+            // 	ret += '<span class="tj_icon">' + icon + '</span>';
+            // }else{
+            // 	ret += '<span class="tj_icon">' + TreeConfig.parent_icon + '</span>';
+            // }
+
+            span_desc.innerHTML = ret + node.toString() + "</span>";
+            span_desc.setAttribute("title", node.toString());
+
+            li_outer.appendChild(span_desc);
+
+            if (node.isExpanded()) {
+              var ul_container = document.createElement("ul");
+
+              node.getChildren().forEach(function (child) {
+                ul_container.appendChild(renderNode(child));
+              });
+
+              li_outer.appendChild(ul_container);
+            }
+          }
+
+          return li_outer;
+        }
+
+        if (typeof container !== "undefined") this.reload();
+      }
+
+      function TreeNode(userObject, options) {
+        var children = new Array();
+        var self = this;
+        var events = new Array();
+
+        var expanded = true;
+        var enabled = true;
+        var selected = false;
+
+        /*
+         * Konstruktor
+         */
+        if (userObject) {
+          if (
+            typeof userObject !== "string" &&
+            typeof userObject.toString !== "function"
+          ) {
+            throw new Error(
+              "Parameter 1 must be of type String or Object, where it must have the function toString()"
+            );
+          }
+        } else {
+          userObject = "";
+        }
+
+        if (!options || typeof options !== "object") {
+          options = {};
+        } else {
+          expanded = TreeUtil.getProperty(options, "expanded", true);
+          enabled = TreeUtil.getProperty(options, "enabled", true);
+          selected = TreeUtil.getProperty(options, "selected", false);
+        }
+
+        /*
+         * Methods
+         */
+        this.addChild = function (node) {
+          if (!TreeUtil.getProperty(options, "allowsChildren", true)) {
+            console.warn(
+              "Option allowsChildren is set to false, no child added"
+            );
+            return;
+          }
+
+          if (node instanceof TreeNode) {
+            children.push(node);
+
+            //Konstante hinzufügen (workaround)
+            Object.defineProperty(node, "parent", {
+              value: this,
+              writable: false,
+              enumerable: true,
+              configurable: true,
+            });
+          } else {
+            throw new Error("Parameter 1 must be of type TreeNode");
+          }
+        };
+
+        this.removeChildPos = function (pos) {
+          if (typeof children[pos] !== "undefined") {
+            if (typeof children[pos] !== "undefined") {
+              children.splice(pos, 1);
+            }
+          }
+        };
+
+        this.removeChild = function (node) {
+          if (!(node instanceof TreeNode)) {
+            throw new Error("Parameter 1 must be of type TreeNode");
+          }
+
+          this.removeChildPos(this.getIndexOfChild(node));
+        };
+
+        this.getChildren = function () {
+          return children;
+        };
+
+        this.getChildCount = function () {
+          return children.length;
+        };
+
+        this.getIndexOfChild = function (node) {
+          for (var i = 0; i < children.length; i++) {
+            if (children[i].equals(node)) {
+              return i;
+            }
+          }
+
+          return -1;
+        };
+
+        this.getRoot = function () {
+          var node = this;
+
+          while (typeof node.parent !== "undefined") {
+            node = node.parent;
+          }
+
+          return node;
+        };
+
+        this.setUserObject = function (_userObject) {
+          if (
+            !(typeof _userObject === "string") ||
+            typeof _userObject.toString !== "function"
+          ) {
+            throw new Error(
+              "Parameter 1 must be of type String or Object, where it must have the function toString()"
+            );
+          } else {
+            userObject = _userObject;
+          }
+        };
+
+        this.getUserObject = function () {
+          return userObject;
+        };
+
+        this.setOptions = function (_options) {
+          if (typeof _options === "object") {
+            options = _options;
+          }
+        };
+
+        this.changeOption = function (option, value) {
+          options[option] = value;
+        };
+
+        this.getOptions = function () {
+          return options;
+        };
+
+        this.isLeaf = function () {
+          return children.length == 0;
+        };
+
+        this.setExpanded = function (_expanded) {
+          if (this.isLeaf()) {
+            return;
+          }
+
+          if (typeof _expanded === "boolean") {
+            if (expanded == _expanded) {
+              return;
+            }
+
+            expanded = _expanded;
+
+            if (_expanded) {
+              this.on("expand")(this);
+            } else {
+              this.on("collapse")(this);
+            }
+
+            this.on("toggle_expanded")(this);
+          }
+        };
+
+        this.toggleExpanded = function () {
+          if (expanded) {
+            this.setExpanded(false);
+          } else {
+            this.setExpanded(true);
+          }
+        };
+
+        this.isExpanded = function () {
+          if (this.isLeaf()) {
+            return true;
+          } else {
+            return expanded;
+          }
+        };
+
+        this.setEnabled = function (_enabled) {
+          if (typeof _enabled === "boolean") {
+            if (enabled == _enabled) {
+              return;
+            }
+
+            enabled = _enabled;
+
+            if (_enabled) {
+              this.on("enable")(this);
+            } else {
+              this.on("disable")(this);
+            }
+
+            this.on("toggle_enabled")(this);
+          }
+        };
+
+        this.toggleEnabled = function () {
+          if (enabled) {
+            this.setEnabled(false);
+          } else {
+            this.setEnabled(true);
+          }
+        };
+
+        this.isEnabled = function () {
+          return enabled;
+        };
+
+        this.setSelected = function (_selected) {
+          if (typeof _selected !== "boolean") {
+            return;
+          }
+
+          if (selected == _selected) {
+            return;
+          }
+
+          selected = _selected;
+
+          if (_selected) {
+            this.on("select")(this);
+          } else {
+            this.on("deselect")(this);
+          }
+
+          this.on("toggle_selected")(this);
+        };
+
+        this.toggleSelected = function () {
+          if (selected) {
+            this.setSelected(false);
+          } else {
+            this.setSelected(true);
+          }
+        };
+
+        this.isSelected = function () {
+          return selected;
+        };
+
+        this.open = function () {
+          if (!this.isLeaf()) {
+            this.on("open")(this);
+          }
+        };
+
+        this.on = function (ev, callback) {
+          if (typeof callback === "undefined") {
+            if (typeof events[ev] !== "function") {
+              return function () {};
+            } else {
+              return events[ev];
+            }
+          }
+
+          if (typeof callback !== "function") {
+            throw new Error("Argument 2 must be of type function");
+          }
+
+          events[ev] = callback;
+        };
+
+        this.getListener = function (ev) {
+          return events[ev];
+        };
+
+        this.equals = function (node) {
+          if (node instanceof TreeNode) {
+            if (node.getUserObject() == userObject) {
+              return true;
+            }
+          }
+
+          return false;
+        };
+
+        this.toString = function () {
+          if (typeof userObject === "string") {
+            return userObject;
+          } else {
+            return userObject.name;
+          }
+        };
+      }
+
+      function TreePath(root, node) {
+        var nodes = new Array();
+
+        this.setPath = function (root, node) {
+          nodes = new Array();
+
+          while (typeof node !== "undefined" && !node.equals(root)) {
+            nodes.push(node);
+            node = node.parent;
+          }
+
+          if (node.equals(root)) {
+            nodes.push(root);
+          } else {
+            nodes = new Array();
+            throw new Error("Node is not contained in the tree of root");
+          }
+
+          nodes = nodes.reverse();
+
+          return nodes;
+        };
+
+        this.getPath = function () {
+          return nodes;
+        };
+
+        this.toString = function () {
+          return nodes.join(" - ");
+        };
+
+        if (root instanceof TreeNode && node instanceof TreeNode) {
+          this.setPath(root, node);
+        }
+      }
+
+      /*
+       * Util-Methods
+       */
+      const TreeUtil = {
+        default_leaf_icon: "<span>&#9642;</span>",
+        default_parent_icon: "<span>&#128449;</span>",
+        default_open_icon: "<span>&#9207;</span>",
+        default_close_icon: "<span>&#9205;</span>",
+
+        isDOM: function (obj) {
+          try {
+            return obj instanceof HTMLElement;
+          } catch (e) {
+            return (
+              typeof obj === "object" &&
+              obj.nodeType === 1 &&
+              typeof obj.style === "object" &&
+              typeof obj.ownerDocument === "object"
+            );
+          }
+        },
+
+        getProperty: function (options, opt, def) {
+          if (typeof options[opt] === "undefined") {
+            return def;
+          }
+
+          return options[opt];
+        },
+
+        expandNode: function (node) {
+          node.setExpanded(true);
+
+          if (!node.isLeaf()) {
+            node.getChildren().forEach(function (child) {
+              TreeUtil.expandNode(child);
+            });
+          }
+        },
+
+        collapseNode: function (node) {
+          node.setExpanded(false);
+
+          if (!node.isLeaf()) {
+            node.getChildren().forEach(function (child) {
+              TreeUtil.collapseNode(child);
+            });
+          }
+        },
+
+        getSelectedNodesForNode: function (node) {
+          if (!(node instanceof TreeNode)) {
+            throw new Error("Parameter 1 must be of type TreeNode");
+          }
+
+          var ret = new Array();
+
+          if (node.isSelected()) {
+            ret.push(node);
+          }
+
+          node.getChildren().forEach(function (child) {
+            if (child.isSelected()) {
+              if (ret.indexOf(child) == -1) {
+                ret.push(child);
+              }
+            }
+
+            if (!child.isLeaf()) {
+              TreeUtil.getSelectedNodesForNode(child).forEach(function (_node) {
+                if (ret.indexOf(_node) == -1) {
+                  ret.push(_node);
+                }
+              });
+            }
+          });
+
+          return ret;
+        },
+      };
+
+      var TreeConfig = {
+        leaf_icon: TreeUtil.default_leaf_icon,
+        parent_icon: TreeUtil.default_parent_icon,
+        open_icon: TreeUtil.default_open_icon,
+        close_icon: TreeUtil.default_close_icon,
+        context_menu: undefined,
+      };
+    </script>
     <style>
       * {
         font-family: "Archivo", sans-serif;
@@ -172,7 +875,145 @@
         --color-crevice-950: #24100a;
       }
 
-      /* Define theme variables directly based on data-theme */
+      /* Tree specific styles - Keep these */
+      .tj_container * {
+        position: relative;
+        box-sizing: border-box;
+      }
+
+      /* GitHub-style tree view */
+      .tj_container ul {
+        padding-left: 20px;
+        list-style-type: none;
+        margin: 0;
+      }
+
+      .tj_container > ul:first-of-type {
+        padding: 0;
+      }
+
+      /* Add vertical lines to show parent-child relationships */
+      .tj_container ul li {
+        position: relative;
+      }
+
+      /* Vertical lines for parent-child relationships */
+      .tj_container ul li:before {
+        content: "";
+        position: absolute;
+        left: -12px;
+        top: 0;
+        width: 1px;
+        height: 100%;
+        background-color: var(--tree-connector-color); /* Use new variable */
+        /* Opacity removed as color is adjusted directly */
+      }
+
+      /* Hide the vertical line for the first level */
+      .tj_container > ul:first-of-type > li:before {
+        display: none;
+      }
+
+      /* Horizontal connector lines */
+      .tj_container ul li:after {
+        content: "";
+        position: absolute;
+        left: -12px;
+        top: 10px;
+        width: 12px;
+        height: 1px;
+        background-color: var(--tree-connector-color); /* Use new variable */
+        /* Opacity removed as color is adjusted directly */
+      }
+
+      /* Hide horizontal connector for first level */
+      .tj_container > ul:first-of-type > li:after {
+        display: none;
+      }
+
+      .tj_container li span.tj_description {
+        cursor: pointer;
+        padding: 2px 5px 2px 8px;
+        display: block;
+        color: var(--text-primary); /* Use theme variable */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+        font-size: 10pt;
+        border-left: solid 4px transparent; /* Always reserve space for the indicator */
+
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+
+        text-align: left;
+      }
+
+      /* Full width hover effect */
+      .tj_container li span.tj_description:hover {
+        background-color: var(
+          --tree-item-background-hover
+        ); /* Use new variable */
+        width: 100%;
+      }
+
+      .tj_container li span.tj_mod_icon,
+      .tj_container li span.tj_icon {
+        display: inline-block;
+      }
+
+      .tj_container li span.tj_mod_icon,
+      .tj_container li span.tj_mod_icon * {
+        width: 1em;
+        height: 1em;
+      }
+
+      .tj_mod_icon > span {
+        font-size: 12pt;
+      }
+      .tj_icon > span {
+        font-size: 8pt;
+      }
+
+      .tj_container li span.tj_description.tj_leaf {
+        padding-left: 1.5em;
+        font-size: 10pt;
+      }
+
+      .tj_container li[disabled=""]:hover span.tj_description {
+        cursor: default;
+        background-color: var(
+          --tree-item-background-disabled
+        ); /* Use new variable */
+        border-left-color: var(
+          --tree-item-border-disabled
+        ); /* Use new variable */
+      }
+
+      /* Selection indicator on the far left */
+      .tj_container span.tj_description.selected {
+        background-color: var(
+          --tree-item-background-selected
+        ); /* Use new variable */
+        border-left-color: var(
+          --tree-item-border-selected
+        ); /* Use new variable */
+      }
+
+      .tj_container span.tj_description.selected:hover {
+        background-color: var(
+          --tree-item-background-selected
+        ); /* Use new variable */
+        border-left-color: var(
+          --tree-item-border-selected
+        ); /* Use new variable */
+      }
+
+      /* Define theme variables directly based on data-theme - These will be applied by the script */
       [data-theme="light"] {
         --text-primary: var(--color-black-900);
         --text-secondary: var(--color-black-700);
@@ -190,17 +1031,13 @@
         --background-highlight-secondary: var(--color-tan-200);
         --background-highlight-tertiary: var(--color-tan-100);
 
-        /* Graph specific semantic variables - Light */
-        --graph-node-org: var(--color-red-600);
-        --graph-node-app: var(--color-teal-800);
-        --graph-node-env: var(--color-violetta-500);
-        --graph-node-workload: var(--color-orange-400);
-        --graph-node-resource: var(--color-red-600);
-        --graph-node-env_type: var(--color-red-800);
-        --graph-node-other: var(--color-crevice-600);
-        --graph-link: var(--color-red-300);
-        --graph-link-highlight: var(--color-orange-500);
-        --graph-node-label-background: var(--color-black-100);
+        /* Tree specific semantic variables */
+        --tree-connector-color: var(--color-black-200);
+        --tree-item-background-hover: var(--color-tan-100);
+        --tree-item-background-selected: var(--color-crevice-500);
+        --tree-item-border-selected: var(--color-pipe-500);
+        --tree-item-background-disabled: var(--color-tan-100);
+        --tree-item-border-disabled: var(--color-black-300);
 
         /* Metadata specific semantic variables */
         --metadata-key-color: var(--color-black-700);
@@ -227,17 +1064,14 @@
         --background-highlight-primary: var(--color-black-800);
         --background-highlight-secondary: var(--color-brown-800);
         --background-highlight-tertiary: var(--color-brown-900);
-        /* Graph specific semantic variables - Dark */
-        --graph-node-org: var(--color-red-400);
-        --graph-node-app: var(--color-teal-400);
-        --graph-node-env: var(--color-violetta-300);
-        --graph-node-workload: var(--color-orange-100);
-        --graph-node-resource: var(--color-red-200);
-        --graph-node-env_type: var(--color-red-200);
-        --graph-node-other: var(--color-brown-100);
-        --graph-link: var(--color-purple-300);
-        --graph-link-highlight: var(--color-orange-600);
-        --graph-node-label-background: var(--color-black-400);
+
+        /* Tree specific semantic variables */
+        --tree-connector-color: var(--color-purple-500);
+        --tree-item-background-hover: var(--color-purple-700);
+        --tree-item-background-selected: var(--color-purple-600);
+        --tree-item-border-selected: var(--color-purple-200);
+        --tree-item-background-disabled: var(--color-purple-800);
+        --tree-item-border-disabled: var(--color-purple-600);
 
         /* Metadata specific semantic variables */
         --metadata-key-color: var(--color-purple-200);
@@ -275,41 +1109,6 @@
       .logo-dark {
         height: 1em;
         vertical-align: middle; /* Adjust vertical alignment */
-      }
-
-      /* Styling for embedded SVG icons */
-      .node-icon-shape {
-        /* Inherit fill color from parent group by default */
-        fill: currentColor;
-        stroke: currentColor; /* Also style stroke if needed */
-        stroke-width: 0.5; /* Adjust stroke width if needed */
-      }
-      .node-org {
-        color: var(--graph-node-org);
-      }
-      .node-app {
-        color: var(--graph-node-app);
-      }
-      .node-env {
-        color: var(--graph-node-env);
-      }
-      .node-env_type {
-        color: var(--graph-node-env_type);
-      }
-      .node-workload {
-        color: var(--graph-node-workload);
-      }
-      .node-resource {
-        color: var(--graph-node-resource);
-      }
-      .node-other {
-        color: var(--graph-node-other);
-      }
-
-      /* Adjust opacity rules to target the new structure */
-      .node-icon {
-        opacity: 1; /* Default opacity */
-        transition: opacity 0.3s ease-in-out;
       }
     </style>
     <script>
@@ -361,15 +1160,12 @@
           "metadata-array-background",
           "metadata-array-header-color",
           "metadata-object-background",
-          "graph-node-org",
-          "graph-node-app",
-          "graph-node-env",
-          "graph-node-env_type",
-          "graph-node-workload",
-          "graph-node-resource",
-          "graph-node-other",
-          "graph-link",
-          "graph-link-highlight",
+          "tree-connector-color",
+          "tree-item-background-hover",
+          "tree-item-background-selected",
+          "tree-item-border-selected",
+          "tree-item-background-disabled",
+          "tree-item-border-disabled",
         ];
 
         // Create an object with all the computed values
@@ -431,7 +1227,7 @@
           <option value="dark">🌚</option>
         </select>
         <div
-          class="text-text-link underline text-md cursor-not-allowed"
+          class="text-text-link text-md cursor-not-allowed"
           title="We're still working on our docs."
         >
           Documentation
@@ -440,8 +1236,7 @@
     </div>
 
     <div
-      class="flex flex-col flex-1 transition-all h-full duration-500 overflow-hidden"
-      id="main-container"
+      class="flex flex-col flex-1 transition-all duration-500 overflow-hidden p-4"
     >
       <script>
         // Theme switching functionality
@@ -457,9 +1252,6 @@
             document.documentElement.setAttribute("data-theme", selectedTheme);
             localStorage.setItem("theme", selectedTheme);
             applyThemeColors();
-
-            // Update D3 visualization colors
-            updateVisualizationColors();
 
             // Force redraw of the page to apply new theme
             document.body.style.display = "none";
@@ -481,9 +1273,6 @@
                   themeSelector.value = newTheme;
                   applyThemeColors();
 
-                  // Update D3 visualization colors
-                  updateVisualizationColors();
-
                   // Force redraw
                   document.body.style.display = "none";
                   setTimeout(() => {
@@ -494,1014 +1283,1108 @@
           }
         });
       </script>
-      <div id="button-bar" class="flex gap-2.5 px-4 pt-4 items-center">
-        <div class="relative">
-          <input
-            type="text"
-            id="search-nodes"
-            placeholder="Search nodes..."
-            class="border border-border-strong rounded py-2 px-3 text-sm bg-background-primary text-text-primary focus:outline-none focus:ring-1 focus:ring-accent-brand"
-          />
-          <button
-            id="clear-search"
-            class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-text-primary opacity-80 hover:opacity-100"
-            style="display: none"
-          >
-            ✕
-          </button>
-        </div>
-      </div>
       <div
-        class="flex flex-1 p-4 pt-2.5 h-full transition-all duration-500"
-        id="combined-container"
+        id="resizable-grid"
+        class="grid gap-1 h-full"
+        style="grid-template-columns: 1fr 8px 4fr"
       >
         <div
-          class="flex-1 transition-all h-full overflow-hidden duration-500 border rounded-md border-border-strong"
-          id="graph-container"
+          id="tree-column"
+          class="h-full overflow-hidden border rounded-md border-border-strong"
         >
-          <div id="graph" class="w-full h-full"></div>
+          <div
+            id="tree-container"
+            class="p-4 w-full h-full overflow-scroll scrollbar-transparent"
+          ></div>
         </div>
         <div
-          class="hidden overflow-scroll scrollbar-transparent transition-all border border-border-strong rounded-md p-4 duration-500 ml-3"
-          id="details-container"
-        >
-          <div id="node-details" class=""></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Hidden Metadata Templates -->
-    <div id="metadata-templates" style="display: none">
-      <!-- Template for 'org' -->
-      <div id="template-org">
-        <div class="space-y-2">
-          <!-- Changed from grid to space-y -->
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">ID:</div>
-            <div class="text-metadata-value-color" data-metadata-key="id"></div>
-          </div>
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">
-              Created At:
-            </div>
-            <div
-              class="text-metadata-value-color"
-              data-metadata-key="created_at"
-            ></div>
-          </div>
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">
-              Members:
-            </div>
-            <div
-              class="text-metadata-value-color"
-              data-metadata-key="members"
-            ></div>
-          </div>
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">
-              Teams:
-            </div>
-            <div
-              class="text-metadata-value-color"
-              data-metadata-key="teams"
-            ></div>
-          </div>
-        </div>
-        <div class="mt-4">
-          <h3 class="text-metadata-key-color mb-2">Compliance</h3>
-          <div data-metadata-array="compliance" class="flex flex-wrap gap-2">
-            <!-- Compliance items will be added here -->
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div, added padding/margin -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <!-- Key above -->
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
-                <!-- Value below -->
-              </div>
-            </template>
-          </div>
-        </div>
-        <div class="mt-4 mb-4">
-          <h3 class="text-metadata-key-color mb-2">External Links</h3>
-          <div data-metadata-array="external_links" class="space-y-1">
-            <template data-array-item-template>
-              <div>
-                <a
-                  data-metadata-key="service"
-                  href="#"
-                  target="_blank"
-                  class="text-text-link underline underline"
-                ></a>
-                (<span class="text-xs text-text-secondary"
-                  >Checked:
-                  <span
-                    class="text-text-secondary"
-                    data-metadata-key="last_check"
-                  ></span></span
-                >)
-              </div>
-            </template>
-          </div>
-        </div>
-      </div>
-
-      <!-- Template for 'app' -->
-      <div id="template-app">
-        <div class="space-y-2">
-          <!-- Changed from grid to space-y -->
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">ID:</div>
-            <div class="text-metadata-value-color" data-metadata-key="id"></div>
-          </div>
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">
-              Uptime:
-            </div>
-            <div
-              class="text-metadata-value-color"
-              data-metadata-key="uptime"
-            ></div>
-          </div>
-        </div>
-        <div class="mt-4">
-          <h3 class="text-metadata-key-color mb-2">Deployments</h3>
-          <div data-metadata-array="deployments" class="flex flex-wrap gap-2">
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
-              </div>
-            </template>
-          </div>
-        </div>
-        <div class="mt-4">
-          <h3 class="text-metadata-key-color mb-2">Performance</h3>
-          <div data-metadata-array="performance" class="flex flex-wrap gap-2">
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
-              </div>
-            </template>
-          </div>
-        </div>
-        <div class="mt-4 mb-4">
-          <h3 class="text-metadata-key-color mb-2">External Links</h3>
-          <div data-metadata-array="external_links" class="space-y-1">
-            <template data-array-item-template>
-              <div>
-                <a
-                  data-metadata-key="service"
-                  href="#"
-                  target="_blank"
-                  class="text-text-link underline"
-                ></a>
-                (<span class="text-xs text-text-secondary"
-                  >Checked:
-                  <span
-                    class="text-text-secondary"
-                    data-metadata-key="last_check"
-                  ></span></span
-                >)
-              </div>
-            </template>
-          </div>
-        </div>
-      </div>
-
-      <!-- Template for 'env_type' -->
-      <div id="template-env_type">
-        <div class="space-y-2">
-          <!-- Changed from grid to space-y -->
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">ID:</div>
-            <div class="text-metadata-value-color" data-metadata-key="id"></div>
-          </div>
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">
-              Description:
-            </div>
-            <div
-              class="text-metadata-value-color"
-              data-metadata-key="description"
-            ></div>
-          </div>
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">
-              Auto Scaling:
-            </div>
-            <div
-              class="text-metadata-value-color"
-              data-metadata-key="auto_scaling"
-            ></div>
-          </div>
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">
-              High Availability:
-            </div>
-            <div
-              class="text-metadata-value-color"
-              data-metadata-key="high_availability"
-            ></div>
-          </div>
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">
-              Backup Enabled:
-            </div>
-            <div
-              class="text-metadata-value-color"
-              data-metadata-key="backup_enabled"
-            ></div>
-          </div>
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">
-              Compliance Level:
-            </div>
-            <div
-              class="text-metadata-value-color"
-              data-metadata-key="compliance_level"
-            ></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Template for 'env' -->
-      <div id="template-env" class="max-h-1">
-        <div class="space-y-2">
-          <!-- Changed from grid to space-y -->
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">ID:</div>
-            <div class="text-metadata-value-color" data-metadata-key="id"></div>
-          </div>
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">
-              Status:
-            </div>
-            <div
-              class="text-metadata-value-color"
-              data-metadata-key="status"
-            ></div>
-          </div>
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">
-              Region:
-            </div>
-            <div
-              class="text-metadata-value-color"
-              data-metadata-key="region"
-            ></div>
-          </div>
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">
-              Created At:
-            </div>
-            <div
-              class="text-metadata-value-color"
-              data-metadata-key="created_at"
-            ></div>
-          </div>
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">
-              Last Updated:
-            </div>
-            <div
-              class="text-metadata-value-color"
-              data-metadata-key="last_updated"
-            ></div>
-          </div>
-        </div>
-        <div class="mt-4">
-          <h3 class="text-metadata-key-color mb-2">Compliance</h3>
-          <div data-metadata-array="compliance" class="flex flex-wrap gap-2">
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
-              </div>
-            </template>
-          </div>
-        </div>
-        <div class="mt-4">
-          <h3 class="text-metadata-key-color mb-2">Security</h3>
-          <div data-metadata-array="security" class="flex flex-wrap gap-2">
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
-              </div>
-            </template>
-          </div>
-        </div>
-        <div class="mt-4">
-          <h3 class="text-metadata-key-color mb-2">Cost</h3>
-          <div data-metadata-array="cost" class="flex flex-wrap gap-2">
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
-              </div>
-            </template>
-          </div>
-        </div>
-        <div class="mt-4">
-          <h3 class="text-metadata-key-color mb-2">Costs By Resource</h3>
+          id="resize-handle"
+          class="w-2 h-full cursor-col-resize bg-border-strong rounded-md opacity-10 hover:opacity-100 transition-opacity duration-200 ease-in-out z-10"
+        ></div>
+        <div id="details-column" class="h-full overflow-hidden">
           <div
-            data-metadata-array="costs_by_resource"
-            class="flex flex-wrap gap-2"
+            class="overflow-scroll scrollbar-transparent h-full border rounded-md border-border-strong p-4"
           >
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
-              </div>
-            </template>
-          </div>
-        </div>
-        <div class="mt-4 mb-4">
-          <h3 class="text-metadata-key-color mb-2">External Links</h3>
-          <div data-metadata-array="external_links" class="space-y-1">
-            <template data-array-item-template>
-              <div>
-                <a
-                  data-metadata-key="service"
-                  href="#"
-                  target="_blank"
-                  class="text-text-link underline"
-                ></a>
-                (<span class="text-xs text-text-secondary"
-                  >Checked:
-                  <span
-                    class="text-text-secondary"
-                    data-metadata-key="last_check"
-                  ></span></span
-                >)
-              </div>
-            </template>
-          </div>
-        </div>
-      </div>
+            <h1 class="text-3xl text-text-primary mb-4 node-name"></h1>
+            <div id="node-metadata" class=""></div>
 
-      <!-- Template for 'workload' -->
-      <div id="template-workload">
-        <div class="space-y-2">
-          <!-- Changed from grid to space-y -->
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">ID:</div>
-            <div class="text-metadata-value-color" data-metadata-key="id"></div>
-          </div>
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">Type:</div>
-            <div
-              class="text-metadata-value-color"
-              data-metadata-key="type"
-            ></div>
-          </div>
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">
-              Status:
-            </div>
-            <div
-              class="text-metadata-value-color"
-              data-metadata-key="status"
-            ></div>
-          </div>
-        </div>
-        <div class="mt-4">
-          <h3 class="text-metadata-key-color mb-2">Replicas</h3>
-          <div data-metadata-array="replicas" class="flex flex-wrap gap-2">
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
+            <!-- Hidden Metadata Templates -->
+            <div id="metadata-templates" style="display: none">
+              <!-- Template for 'org' -->
+              <div id="template-org">
+                <div class="space-y-2">
+                  <!-- Changed from grid to space-y -->
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      ID:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="id"
+                    ></div>
+                  </div>
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      Created At:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="created_at"
+                    ></div>
+                  </div>
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      Members:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="members"
+                    ></div>
+                  </div>
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      Teams:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="teams"
+                    ></div>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <h3 class="text-metadata-key-color mb-2">Compliance</h3>
+                  <div
+                    data-metadata-array="compliance"
+                    class="flex flex-wrap gap-2"
+                  >
+                    <!-- Compliance items will be added here -->
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div, added padding/margin -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <!-- Key above -->
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                        <!-- Value below -->
+                      </div>
+                    </template>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <h3 class="text-metadata-key-color mb-2">External Links</h3>
+                  <div data-metadata-array="external_links" class="space-y-1">
+                    <template data-array-item-template>
+                      <div>
+                        <a
+                          data-metadata-key="service"
+                          href="#"
+                          target="_blank"
+                          class="text-text-link underline"
+                        ></a>
+                        (<span class="text-xs text-text-secondary"
+                          >Checked:
+                          <span
+                            class="text-text-secondary"
+                            data-metadata-key="last_check"
+                          ></span></span
+                        >)
+                      </div>
+                    </template>
+                  </div>
+                </div>
               </div>
-            </template>
-          </div>
-        </div>
-        <div class="mt-4">
-          <h3 class="text-metadata-key-color mb-2">CPU</h3>
-          <div data-metadata-array="cpu" class="flex flex-wrap gap-2">
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
-              </div>
-            </template>
-          </div>
-        </div>
-        <div class="mt-4">
-          <h3 class="text-metadata-key-color mb-2">Memory</h3>
-          <div data-metadata-array="memory" class="flex flex-wrap gap-2">
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
-              </div>
-            </template>
-          </div>
-        </div>
-        <div class="mt-4">
-          <h3 class="text-metadata-key-color mb-2">Metrics</h3>
-          <div data-metadata-array="metrics" class="flex flex-wrap gap-2">
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
-              </div>
-            </template>
-          </div>
-        </div>
-        <div class="mt-4">
-          <h3 class="text-metadata-key-color mb-2">Health Checks</h3>
-          <div data-metadata-array="health_checks" class="flex flex-wrap gap-2">
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
-              </div>
-            </template>
-          </div>
-        </div>
-        <div class="mt-4 mb-4">
-          <h3 class="text-metadata-key-color mb-2">External Links</h3>
-          <div data-metadata-array="external_links" class="space-y-1">
-            <template data-array-item-template>
-              <div>
-                <a
-                  data-metadata-key="service"
-                  href="#"
-                  target="_blank"
-                  class="text-text-link underline"
-                ></a>
-                (<span class="text-xs text-text-secondary"
-                  >Checked:
-                  <span
-                    class="text-text-secondary"
-                    data-metadata-key="last_check"
-                  ></span></span
-                >)
-              </div>
-            </template>
-          </div>
-        </div>
-      </div>
 
-      <!-- Template for 'resource' -->
-      <div id="template-resource">
-        <!-- Generic resource fields -->
-        <div class="space-y-2 mb-4">
-          <!-- Changed from grid to space-y -->
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">ID:</div>
-            <div class="text-metadata-value-color" data-metadata-key="id"></div>
-          </div>
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">Type:</div>
-            <div
-              class="text-metadata-value-color"
-              data-metadata-key="type"
-            ></div>
-          </div>
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">
-              Status:
-            </div>
-            <div
-              class="text-metadata-value-color"
-              data-metadata-key="status"
-            ></div>
-          </div>
-        </div>
-        <!-- Specific fields will be added dynamically based on resource type if needed, or use sub-templates -->
-        <!-- Example: S3 specific -->
-        <div data-resource-type="s3" style="display: none">
-          <h3 class="text-metadata-key-color mb-2">S3 Metrics</h3>
-          <div data-metadata-array="metrics" class="flex flex-wrap gap-2">
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
+              <!-- Template for 'app' -->
+              <div id="template-app">
+                <div class="space-y-2">
+                  <!-- Changed from grid to space-y -->
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      ID:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="id"
+                    ></div>
+                  </div>
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      Uptime:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="uptime"
+                    ></div>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <h3 class="text-metadata-key-color mb-2">Deployments</h3>
+                  <div
+                    data-metadata-array="deployments"
+                    class="flex flex-wrap gap-2"
+                  >
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <h3 class="text-metadata-key-color mb-2">Performance</h3>
+                  <div
+                    data-metadata-array="performance"
+                    class="flex flex-wrap gap-2"
+                  >
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <h3 class="text-metadata-key-color mb-2">External Links</h3>
+                  <div data-metadata-array="external_links" class="space-y-1">
+                    <template data-array-item-template>
+                      <div>
+                        <a
+                          data-metadata-key="service"
+                          href="#"
+                          target="_blank"
+                          class="text-text-link underline"
+                        ></a>
+                        (<span class="text-xs text-text-secondary"
+                          >Checked:
+                          <span
+                            class="text-text-secondary"
+                            data-metadata-key="last_check"
+                          ></span></span
+                        >)
+                      </div>
+                    </template>
+                  </div>
+                </div>
               </div>
-            </template>
-          </div>
-          <h3 class="text-metadata-key-color mt-4 mb-2">S3 Performance</h3>
-          <div data-metadata-array="performance" class="flex flex-wrap gap-2">
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
-              </div>
-            </template>
-          </div>
-          <h3 class="text-metadata-key-color mt-4 mb-2">S3 Cost</h3>
-          <div data-metadata-array="cost" class="flex flex-wrap gap-2">
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
-              </div>
-            </template>
-          </div>
-          <h3 class="text-metadata-key-color mt-4 mb-2">S3 Compliance</h3>
-          <div data-metadata-array="compliance" class="flex flex-wrap gap-2">
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
-              </div>
-            </template>
-          </div>
-        </div>
-        <!-- Example: DB specific -->
-        <div data-resource-type="db" style="display: none">
-          <div class="space-y-2 mb-4">
-            <!-- Changed from grid to space-y -->
-            <div>
-              <div class="text-metadata-key-color text-xs font-medium">
-                Version:
-              </div>
-              <div
-                class="text-metadata-value-color"
-                data-metadata-key="version"
-              ></div>
-            </div>
-            <div>
-              <div class="text-metadata-key-color text-xs font-medium">
-                Size:
-              </div>
-              <div
-                class="text-metadata-value-color"
-                data-metadata-key="size"
-              ></div>
-            </div>
-          </div>
-          <h3 class="text-metadata-key-color mb-2">DB Connections</h3>
-          <div data-metadata-array="connections" class="flex flex-wrap gap-2">
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
-              </div>
-            </template>
-          </div>
-          <h3 class="text-metadata-key-color mt-4 mb-2">DB Performance</h3>
-          <div data-metadata-array="performance" class="flex flex-wrap gap-2">
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
-              </div>
-            </template>
-          </div>
-          <h3 class="text-metadata-key-color mt-4 mb-2">DB Storage</h3>
-          <div data-metadata-array="storage" class="flex flex-wrap gap-2">
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
-              </div>
-            </template>
-          </div>
-          <h3 class="text-metadata-key-color mt-4 mb-2">DB Backups</h3>
-          <div data-metadata-array="backups" class="flex flex-wrap gap-2">
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
-              </div>
-            </template>
-          </div>
-        </div>
-        <!-- Example: Redis specific -->
-        <div data-resource-type="redis" style="display: none">
-          <div class="space-y-2 mb-4">
-            <!-- Added space-y -->
-            <div>
-              <div class="text-metadata-key-color text-xs font-medium">
-                Version:
-              </div>
-              <div
-                class="text-metadata-value-color"
-                data-metadata-key="version"
-              ></div>
-            </div>
-          </div>
-          <h3 class="text-metadata-key-color mt-4 mb-2">Redis Connections</h3>
-          <div data-metadata-array="connections" class="flex flex-wrap gap-2">
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
-              </div>
-            </template>
-          </div>
-          <h3 class="text-metadata-key-color mt-4 mb-2">Redis Performance</h3>
-          <div data-metadata-array="performance" class="flex flex-wrap gap-2">
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
-              </div>
-            </template>
-          </div>
-          <h3 class="text-metadata-key-color mt-4 mb-2">Redis Memory</h3>
-          <div data-metadata-array="memory" class="flex flex-wrap gap-2">
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
-              </div>
-            </template>
-          </div>
-        </div>
-        <!-- Generic Resource Fields -->
-        <div data-resource-type="generic" style="display: none">
-          <div class="space-y-2 mb-4">
-            <!-- Changed from grid to space-y -->
-            <div>
-              <div class="text-metadata-key-color text-xs font-medium">
-                Created At:
-              </div>
-              <div
-                class="text-metadata-value-color"
-                data-metadata-key="created_at"
-              ></div>
-            </div>
-            <div>
-              <div class="text-metadata-key-color text-xs font-medium">
-                Last Accessed:
-              </div>
-              <div
-                class="text-metadata-value-color"
-                data-metadata-key="last_accessed"
-              ></div>
-            </div>
-          </div>
-          <h3 class="text-metadata-key-color mb-2">Generic Metrics</h3>
-          <div data-metadata-array="metrics" class="flex flex-wrap gap-2">
-            <template data-array-item-template>
-              <div
-                class="bg-metadata-array-background p-2 rounded text-sm mb-1"
-              >
-                <!-- Changed span to div -->
-                <div
-                  class="text-metadata-key-color text-xs font-medium"
-                  data-metadata-key="key"
-                ></div>
-                <div
-                  class="text-metadata-value-color"
-                  data-metadata-key="value"
-                ></div>
-              </div>
-            </template>
-          </div>
-        </div>
-        <!-- Common External Links -->
-        <div class="mt-4 mb-4">
-          <h3 class="text-metadata-key-color mb-2">External Links</h3>
-          <div data-metadata-array="external_links" class="space-y-1">
-            <template data-array-item-template>
-              <div>
-                <a
-                  data-metadata-key="service"
-                  href="#"
-                  target="_blank"
-                  class="text-text-link underline"
-                ></a>
-                (<span class="text-xs text-text-secondary"
-                  >Checked:
-                  <span
-                    class="text-text-secondary"
-                    data-metadata-key="last_check"
-                  ></span></span
-                >)
-              </div>
-            </template>
-          </div>
-        </div>
-      </div>
 
-      <!-- Template for 'other' -->
-      <div id="template-other">
-        <div class="space-y-2">
-          <!-- Changed from grid to space-y -->
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">ID:</div>
-            <div class="text-metadata-value-color" data-metadata-key="id"></div>
-          </div>
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">Name:</div>
-            <div
-              class="text-metadata-value-color"
-              data-metadata-key="name"
-            ></div>
-          </div>
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">
-              Description:
-            </div>
-            <div
-              class="text-metadata-value-color"
-              data-metadata-key="description"
-            ></div>
-          </div>
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">
-              Created At:
-            </div>
-            <div
-              class="text-metadata-value-color"
-              data-metadata-key="created_at"
-            ></div>
-          </div>
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">
-              Last Updated:
-            </div>
-            <div
-              class="text-metadata-value-color"
-              data-metadata-key="last_updated"
-            ></div>
-          </div>
-          <div>
-            <div class="text-metadata-key-color text-xs font-medium">
-              Status:
-            </div>
-            <div
-              class="text-metadata-value-color"
-              data-metadata-key="status"
-            ></div>
-          </div>
-        </div>
-        <div class="mt-4">
-          <h3 class="text-metadata-key-color mb-2">Tags</h3>
-          <div data-metadata-array="tags" class="flex flex-wrap gap-2">
-            <template data-array-item-template>
-              <span
-                class="bg-metadata-array-background p-1 rounded text-sm text-metadata-value-color"
-                data-metadata-key="value"
-              ></span>
-            </template>
-          </div>
-        </div>
-        <div class="mt-4 mb-4">
-          <h3 class="text-metadata-key-color mb-2">External Links</h3>
-          <div data-metadata-array="external_links" class="space-y-1">
-            <template data-array-item-template>
-              <div>
-                <a
-                  data-metadata-key="service"
-                  href="#"
-                  target="_blank"
-                  class="text-text-link underline"
-                ></a>
-                (<span class="text-xs text-text-secondary"
-                  >Checked:
-                  <span
-                    class="text-text-secondary"
-                    data-metadata-key="last_check"
-                  ></span></span
-                >)
+              <!-- Template for 'env_type' -->
+              <div id="template-env_type">
+                <div class="space-y-2">
+                  <!-- Changed from grid to space-y -->
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      ID:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="id"
+                    ></div>
+                  </div>
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      Description:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="description"
+                    ></div>
+                  </div>
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      Auto Scaling:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="auto_scaling"
+                    ></div>
+                  </div>
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      High Availability:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="high_availability"
+                    ></div>
+                  </div>
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      Backup Enabled:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="backup_enabled"
+                    ></div>
+                  </div>
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      Compliance Level:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="compliance_level"
+                    ></div>
+                  </div>
+                </div>
               </div>
-            </template>
+
+              <!-- Template for 'env' -->
+              <div id="template-env">
+                <div class="space-y-2">
+                  <!-- Changed from grid to space-y -->
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      ID:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="id"
+                    ></div>
+                  </div>
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      Status:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="status"
+                    ></div>
+                  </div>
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      Region:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="region"
+                    ></div>
+                  </div>
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      Created At:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="created_at"
+                    ></div>
+                  </div>
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      Last Updated:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="last_updated"
+                    ></div>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <h3 class="text-metadata-key-color mb-2">Compliance</h3>
+                  <div
+                    data-metadata-array="compliance"
+                    class="flex flex-wrap gap-2"
+                  >
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <h3 class="text-metadata-key-color mb-2">Security</h3>
+                  <div
+                    data-metadata-array="security"
+                    class="flex flex-wrap gap-2"
+                  >
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <h3 class="text-metadata-key-color mb-2">Cost</h3>
+                  <div data-metadata-array="cost" class="flex flex-wrap gap-2">
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <h3 class="text-metadata-key-color mb-2">
+                    Costs By Resource
+                  </h3>
+                  <div
+                    data-metadata-array="costs_by_resource"
+                    class="flex flex-wrap gap-2"
+                  >
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <h3 class="text-metadata-key-color mb-2">External Links</h3>
+                  <div data-metadata-array="external_links" class="space-y-1">
+                    <template data-array-item-template>
+                      <div>
+                        <a
+                          data-metadata-key="service"
+                          href="#"
+                          target="_blank"
+                          class="text-text-link underline"
+                        ></a>
+                        (<span class="text-xs text-text-secondary"
+                          >Checked:
+                          <span
+                            class="text-text-secondary"
+                            data-metadata-key="last_check"
+                          ></span></span
+                        >)
+                      </div>
+                    </template>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Template for 'workload' -->
+              <div id="template-workload">
+                <div class="space-y-2">
+                  <!-- Changed from grid to space-y -->
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      ID:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="id"
+                    ></div>
+                  </div>
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      Type:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="type"
+                    ></div>
+                  </div>
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      Status:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="status"
+                    ></div>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <h3 class="text-metadata-key-color mb-2">Replicas</h3>
+                  <div
+                    data-metadata-array="replicas"
+                    class="flex flex-wrap gap-2"
+                  >
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <h3 class="text-metadata-key-color mb-2">CPU</h3>
+                  <div data-metadata-array="cpu" class="flex flex-wrap gap-2">
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <h3 class="text-metadata-key-color mb-2">Memory</h3>
+                  <div
+                    data-metadata-array="memory"
+                    class="flex flex-wrap gap-2"
+                  >
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <h3 class="text-metadata-key-color mb-2">Metrics</h3>
+                  <div
+                    data-metadata-array="metrics"
+                    class="flex flex-wrap gap-2"
+                  >
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <h3 class="text-metadata-key-color mb-2">Health Checks</h3>
+                  <div
+                    data-metadata-array="health_checks"
+                    class="flex flex-wrap gap-2"
+                  >
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <h3 class="text-metadata-key-color mb-2">External Links</h3>
+                  <div data-metadata-array="external_links" class="space-y-1">
+                    <template data-array-item-template>
+                      <div>
+                        <a
+                          data-metadata-key="service"
+                          href="#"
+                          target="_blank"
+                          class="text-text-link underline"
+                        ></a>
+                        (<span class="text-xs text-text-secondary"
+                          >Checked:
+                          <span
+                            class="text-text-secondary"
+                            data-metadata-key="last_check"
+                          ></span></span
+                        >)
+                      </div>
+                    </template>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Template for 'resource' -->
+              <div id="template-resource">
+                <!-- Generic resource fields -->
+                <div class="space-y-2 mb-4">
+                  <!-- Changed from grid to space-y -->
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      ID:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="id"
+                    ></div>
+                  </div>
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      Type:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="type"
+                    ></div>
+                  </div>
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      Status:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="status"
+                    ></div>
+                  </div>
+                </div>
+                <!-- Specific fields will be added dynamically based on resource type if needed, or use sub-templates -->
+                <!-- Example: S3 specific -->
+                <div data-resource-type="s3" style="display: none">
+                  <h3 class="text-metadata-key-color mb-2">S3 Metrics</h3>
+                  <div
+                    data-metadata-array="metrics"
+                    class="flex flex-wrap gap-2"
+                  >
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+                  <h3 class="text-metadata-key-color mt-4 mb-2">
+                    S3 Performance
+                  </h3>
+                  <div
+                    data-metadata-array="performance"
+                    class="flex flex-wrap gap-2"
+                  >
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+                  <h3 class="text-metadata-key-color mt-4 mb-2">S3 Cost</h3>
+                  <div data-metadata-array="cost" class="flex flex-wrap gap-2">
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+                  <h3 class="text-metadata-key-color mt-4 mb-2">
+                    S3 Compliance
+                  </h3>
+                  <div
+                    data-metadata-array="compliance"
+                    class="flex flex-wrap gap-2"
+                  >
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+                <!-- Example: DB specific -->
+                <div data-resource-type="db" style="display: none">
+                  <div class="space-y-2 mb-4">
+                    <!-- Changed from grid to space-y -->
+                    <div>
+                      <div class="text-metadata-key-color text-xs font-medium">
+                        Version:
+                      </div>
+                      <div
+                        class="text-metadata-value-color"
+                        data-metadata-key="version"
+                      ></div>
+                    </div>
+                    <div>
+                      <div class="text-metadata-key-color text-xs font-medium">
+                        Size:
+                      </div>
+                      <div
+                        class="text-metadata-value-color"
+                        data-metadata-key="size"
+                      ></div>
+                    </div>
+                  </div>
+                  <h3 class="text-metadata-key-color mb-2">DB Connections</h3>
+                  <div
+                    data-metadata-array="connections"
+                    class="flex flex-wrap gap-2"
+                  >
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+                  <h3 class="text-metadata-key-color mt-4 mb-2">
+                    DB Performance
+                  </h3>
+                  <div
+                    data-metadata-array="performance"
+                    class="flex flex-wrap gap-2"
+                  >
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+                  <h3 class="text-metadata-key-color mt-4 mb-2">DB Storage</h3>
+                  <div
+                    data-metadata-array="storage"
+                    class="flex flex-wrap gap-2"
+                  >
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+                  <h3 class="text-metadata-key-color mt-4 mb-2">DB Backups</h3>
+                  <div
+                    data-metadata-array="backups"
+                    class="flex flex-wrap gap-2"
+                  >
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+                <!-- Example: Redis specific -->
+                <div data-resource-type="redis" style="display: none">
+                  <div class="space-y-2 mb-4">
+                    <!-- Added space-y -->
+                    <div>
+                      <div class="text-metadata-key-color text-xs font-medium">
+                        Version:
+                      </div>
+                      <div
+                        class="text-metadata-value-color"
+                        data-metadata-key="version"
+                      ></div>
+                    </div>
+                  </div>
+                  <h3 class="text-metadata-key-color mt-4 mb-2">
+                    Redis Connections
+                  </h3>
+                  <div
+                    data-metadata-array="connections"
+                    class="flex flex-wrap gap-2"
+                  >
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+                  <h3 class="text-metadata-key-color mt-4 mb-2">
+                    Redis Performance
+                  </h3>
+                  <div
+                    data-metadata-array="performance"
+                    class="flex flex-wrap gap-2"
+                  >
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+                  <h3 class="text-metadata-key-color mt-4 mb-2">
+                    Redis Memory
+                  </h3>
+                  <div
+                    data-metadata-array="memory"
+                    class="flex flex-wrap gap-2"
+                  >
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+                <!-- Generic Resource Fields -->
+                <div data-resource-type="generic" style="display: none">
+                  <div class="space-y-2 mb-4">
+                    <!-- Changed from grid to space-y -->
+                    <div>
+                      <div class="text-metadata-key-color text-xs font-medium">
+                        Created At:
+                      </div>
+                      <div
+                        class="text-metadata-value-color"
+                        data-metadata-key="created_at"
+                      ></div>
+                    </div>
+                    <div>
+                      <div class="text-metadata-key-color text-xs font-medium">
+                        Last Accessed:
+                      </div>
+                      <div
+                        class="text-metadata-value-color"
+                        data-metadata-key="last_accessed"
+                      ></div>
+                    </div>
+                  </div>
+                  <h3 class="text-metadata-key-color mb-2">Generic Metrics</h3>
+                  <div
+                    data-metadata-array="metrics"
+                    class="flex flex-wrap gap-2"
+                  >
+                    <template data-array-item-template>
+                      <div
+                        class="bg-metadata-array-background p-2 rounded text-sm mb-1"
+                      >
+                        <!-- Changed span to div -->
+                        <div
+                          class="text-metadata-key-color text-xs font-medium"
+                          data-metadata-key="key"
+                        ></div>
+                        <div
+                          class="text-metadata-value-color"
+                          data-metadata-key="value"
+                        ></div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+                <!-- Common External Links -->
+                <div class="mt-4">
+                  <h3 class="text-metadata-key-color mb-2">External Links</h3>
+                  <div data-metadata-array="external_links" class="space-y-1">
+                    <template data-array-item-template>
+                      <div>
+                        <a
+                          data-metadata-key="service"
+                          href="#"
+                          target="_blank"
+                          class="text-text-link underline"
+                        ></a>
+                        (<span class="text-xs text-text-secondary"
+                          >Checked:
+                          <span
+                            class="text-text-secondary"
+                            data-metadata-key="last_check"
+                          ></span></span
+                        >)
+                      </div>
+                    </template>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Template for 'other' -->
+              <div id="template-other">
+                <div class="space-y-2">
+                  <!-- Changed from grid to space-y -->
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      ID:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="id"
+                    ></div>
+                  </div>
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      Name:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="name"
+                    ></div>
+                  </div>
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      Description:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="description"
+                    ></div>
+                  </div>
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      Created At:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="created_at"
+                    ></div>
+                  </div>
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      Last Updated:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="last_updated"
+                    ></div>
+                  </div>
+                  <div>
+                    <div class="text-metadata-key-color text-xs font-medium">
+                      Status:
+                    </div>
+                    <div
+                      class="text-metadata-value-color"
+                      data-metadata-key="status"
+                    ></div>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <h3 class="text-metadata-key-color mb-2">Tags</h3>
+                  <div data-metadata-array="tags" class="flex flex-wrap gap-2">
+                    <template data-array-item-template>
+                      <span
+                        class="bg-metadata-array-background p-1 rounded text-sm text-metadata-value-color"
+                        data-metadata-key="value"
+                      ></span>
+                    </template>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <h3 class="text-metadata-key-color mb-2">External Links</h3>
+                  <div data-metadata-array="external_links" class="space-y-1">
+                    <template data-array-item-template>
+                      <div>
+                        <a
+                          data-metadata-key="service"
+                          href="#"
+                          target="_blank"
+                          class="text-text-link underline"
+                        ></a>
+                        (<span class="text-xs text-text-secondary"
+                          >Checked:
+                          <span
+                            class="text-text-secondary"
+                            data-metadata-key="last_check"
+                          ></span></span
+                        >)
+                      </div>
+                    </template>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- End Hidden Metadata Templates -->
           </div>
         </div>
       </div>
     </div>
-    <!-- End Hidden Metadata Templates -->
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <script>
       // Data
       const data = {{ toRawJsonJs . }};
 
-      // Store SVG content for icons
-      const svgIconContent = {
-        org: `<svg width="33" height="36" viewBox="0 0 33 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.7937 1.19121C15.8219 0.612007 17.0781 0.612008 18.1063 1.19121L30.4845 8.16344C31.5463 8.76149 32.2032 9.88545 32.2032 11.104V24.896C32.2032 26.1146 31.5463 27.2385 30.4845 27.8366L18.1063 34.8088C17.0781 35.388 15.8219 35.388 14.7937 34.8088L2.41548 27.8366C1.35373 27.2385 0.696831 26.1146 0.696831 24.896V11.104C0.696831 9.88545 1.35374 8.76149 2.41548 8.16344L14.7937 1.19121Z" fill="currentColor" stroke="currentColor" stroke-width="0.45"/></svg>`,
-        app: `<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M35.4728 6.67279C35.8104 7.01036 36 7.46819 36 7.94558V18L18 0H28.0544C28.5318 0 28.9896 0.189642 29.3272 0.527207L35.4728 6.67279Z" fill="currentColor"/><path d="M18 36L36 18V28.0544C36 28.5318 35.8104 28.9896 35.4728 29.3272L29.3272 35.4728C28.9896 35.8104 28.5318 36 28.0544 36H18Z" fill="currentColor"/><path d="M0 18L18 36H7.94558C7.46819 36 7.01036 35.8104 6.67279 35.4728L0.527207 29.3272C0.189642 28.9896 0 28.5318 0 28.0544V18Z" fill="currentColor"/><path d="M0 18V7.94558C0 7.46819 0.189642 7.01036 0.527207 6.67279L6.67279 0.527208C7.01036 0.189642 7.46819 0 7.94558 0H18L0 18Z" fill="currentColor"/><path d="M10.2728 19.2728C9.56985 18.5698 9.56985 17.4302 10.2728 16.7272L16.7272 10.2728C17.4302 9.56985 18.5698 9.56985 19.2728 10.2728L25.7272 16.7272C26.4302 17.4302 26.4302 18.5698 25.7272 19.2728L19.2728 25.7272C18.5698 26.4302 17.4302 26.4302 16.7272 25.7272L10.2728 19.2728Z" fill="currentColor"/></svg>`,
-        env: `<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="18" cy="18" r="18" fill="currentColor"/></svg>`,
-        workload: `<svg width="37" height="36" viewBox="0 0 37 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M36.4 10.8L29.2 18V7.2H18.4L25.6 0H36.4V10.8Z" fill="currentColor"/><path d="M7.60002 18L18.4 7.2L29.2 18L18.4 28.8L7.60002 18Z" fill="currentColor"/><path d="M7.60002 18L0.400024 25.2V36H11.2L18.4 28.8L25.6 36H36.4V25.2L29.2 18V28.8H18.4H7.60002V18Z" fill="currentColor"/><path d="M7.60002 18L0.400024 10.8V0H11.2L18.4 7.2H7.60002V18Z" fill="currentColor"/></svg>`,
-        resource: `<svg width="37" height="36" viewBox="0 0 37 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21.4715 0C23.365 0 24.9 1.53502 24.9 3.42857V12L12.9 0H21.4715Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M36.9 24V15.4286C36.9 13.535 35.365 12 33.4715 12H24.9H16.3286C14.435 12 12.9 13.535 12.9 15.4286V24L0.900024 12L12.9 0H4.3286C2.43505 0 0.900024 1.53502 0.900024 3.42857V12V20.5714C0.900024 22.465 2.43505 24 4.3286 24H12.9V32.5714C12.9 34.465 14.435 36 16.3286 36H24.9H33.4715C35.365 36 36.9 34.465 36.9 32.5714V24ZM36.9 24L24.9 36L12.9 24H21.4715C23.365 24 24.9 22.465 24.9 20.5714V12L36.9 24Z" fill="currentColor"/></svg>`,
-        env_type: `<svg width="36" height="35" viewBox="0 0 36 35" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18.0966 0.105279C18.2745 -0.0350929 18.5255 -0.035093 18.7034 0.105279L20.6672 1.65463C20.8011 1.76028 20.9803 1.78867 21.1403 1.72957L23.4867 0.86288C23.6993 0.784358 23.938 0.861914 24.0638 1.0504L25.4527 3.13075C25.5474 3.27261 25.7091 3.35499 25.8795 3.34822L28.3789 3.24904C28.6054 3.24005 28.8084 3.38757 28.8698 3.60571L29.5479 6.01343C29.5941 6.17761 29.7224 6.30592 29.8866 6.35215L32.2943 7.03018C32.5125 7.09161 32.66 7.29465 32.651 7.5211L32.5518 10.0205C32.545 10.1909 32.6274 10.3526 32.7693 10.4473L34.8496 11.8362C35.0381 11.962 35.1157 12.2007 35.0371 12.4133L34.1705 14.7597C34.1114 14.9197 34.1397 15.0989 34.2454 15.2328L35.7947 17.1966C35.9351 17.3745 35.9351 17.6255 35.7947 17.8034L34.2454 19.7672C34.1397 19.9011 34.1114 20.0803 34.1705 20.2403L35.0371 22.5867C35.1157 22.7993 35.0381 23.038 34.8496 23.1638L32.7693 24.5527C32.6274 24.6474 32.545 24.8091 32.5518 24.9795L32.651 27.4789C32.66 27.7053 32.5125 27.9084 32.2943 27.9698L29.8866 28.6478C29.7224 28.6941 29.5941 28.8224 29.5479 28.9866L28.8698 31.3943C28.8084 31.6124 28.6054 31.7599 28.3789 31.751L25.8795 31.6518C25.7091 31.645 25.5474 31.7274 25.4527 31.8692L24.0638 33.9496C23.938 34.1381 23.6993 34.2156 23.4867 34.1371L21.1403 33.2704C20.9803 33.2113 20.8011 33.2397 20.6672 33.3454L18.7034 34.8947C18.5255 35.0351 18.2745 35.0351 18.0966 34.8947L16.1329 33.3454C15.999 33.2397 15.8197 33.2113 15.6597 33.2704L13.3133 34.1371C13.1007 34.2156 12.862 34.1381 12.7362 33.9496L11.3473 31.8692C11.2526 31.7274 11.091 31.645 10.9205 31.6518L8.42112 31.751C8.19468 31.7599 7.99163 31.6124 7.9302 31.3943L7.25218 28.9866C7.20594 28.8224 7.07764 28.6941 6.91346 28.6478L4.50574 27.9698C4.2876 27.9084 4.14008 27.7053 4.14906 27.4789L4.24825 24.9795C4.25501 24.8091 4.17263 24.6474 4.03078 24.5527L1.95042 23.1638C1.76194 23.038 1.68438 22.7993 1.7629 22.5867L2.62959 20.2403C2.68869 20.0803 2.6603 19.9011 2.55466 19.7672L1.0053 17.8034C0.864932 17.6255 0.864931 17.3745 1.0053 17.1966L2.55466 15.2328C2.6603 15.0989 2.68869 14.9197 2.62959 14.7597L1.7629 12.4133C1.68438 12.2007 1.76194 11.962 1.95042 11.8362L4.03078 10.4473C4.17263 10.3526 4.25501 10.1909 4.24825 10.0205L4.14906 7.5211C4.14008 7.29465 4.2876 7.09161 4.50574 7.03018L6.91346 6.35215C7.07764 6.30592 7.20594 6.17761 7.25218 6.01343L7.9302 3.60571C7.99163 3.38757 8.19468 3.24005 8.42112 3.24904L10.9205 3.34822C11.091 3.35499 11.2526 3.27261 11.3473 3.13075L12.7362 1.0504C12.862 0.861914 13.1007 0.784358 13.3133 0.86288L15.6597 1.72957C15.8197 1.78867 15.999 1.76028 16.1329 1.65463L18.0966 0.105279Z" fill="currentColor"/></svg>`,
-        other: `<svg width="36" height="35" viewBox="0 0 36 35" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18.0966 0.105279C18.2745 -0.0350929 18.5255 -0.035093 18.7034 0.105279L20.6672 1.65463C20.8011 1.76028 20.9803 1.78867 21.1403 1.72957L23.4867 0.86288C23.6993 0.784358 23.938 0.861914 24.0638 1.0504L25.4527 3.13075C25.5474 3.27261 25.7091 3.35499 25.8795 3.34822L28.3789 3.24904C28.6054 3.24005 28.8084 3.38757 28.8698 3.60571L29.5479 6.01343C29.5941 6.17761 29.7224 6.30592 29.8866 6.35215L32.2943 7.03018C32.5125 7.09161 32.66 7.29465 32.651 7.5211L32.5518 10.0205C32.545 10.1909 32.6274 10.3526 32.7693 10.4473L34.8496 11.8362C35.0381 11.962 35.1157 12.2007 35.0371 12.4133L34.1705 14.7597C34.1114 14.9197 34.1397 15.0989 34.2454 15.2328L35.7947 17.1966C35.9351 17.3745 35.9351 17.6255 35.7947 17.8034L34.2454 19.7672C34.1397 19.9011 34.1114 20.0803 34.1705 20.2403L35.0371 22.5867C35.1157 22.7993 35.0381 23.038 34.8496 23.1638L32.7693 24.5527C32.6274 24.6474 32.545 24.8091 32.5518 24.9795L32.651 27.4789C32.66 27.7053 32.5125 27.9084 32.2943 27.9698L29.8866 28.6478C29.7224 28.6941 29.5941 28.8224 29.5479 28.9866L28.8698 31.3943C28.8084 31.6124 28.6054 31.7599 28.3789 31.751L25.8795 31.6518C25.7091 31.645 25.5474 31.7274 25.4527 31.8692L24.0638 33.9496C23.938 34.1381 23.6993 34.2156 23.4867 34.1371L21.1403 33.2704C20.9803 33.2113 20.8011 33.2397 20.6672 33.3454L18.7034 34.8947C18.5255 35.0351 18.2745 35.0351 18.0966 34.8947L16.1329 33.3454C15.999 33.2397 15.8197 33.2113 15.6597 33.2704L13.3133 34.1371C13.1007 34.2156 12.862 34.1381 12.7362 33.9496L11.3473 31.8692C11.2526 31.7274 11.091 31.645 10.9205 31.6518L8.42112 31.751C8.19468 31.7599 7.99163 31.6124 7.9302 31.3943L7.25218 28.9866C7.20594 28.8224 7.07764 28.6941 6.91346 28.6478L4.50574 27.9698C4.2876 27.9084 4.14008 27.7053 4.14906 27.4789L4.24825 24.9795C4.25501 24.8091 4.17263 24.6474 4.03078 24.5527L1.95042 23.1638C1.76194 23.038 1.68438 22.7993 1.7629 22.5867L2.62959 20.2403C2.68869 20.0803 2.6603 19.9011 2.55466 19.7672L1.0053 17.8034C0.864932 17.6255 0.864931 17.3745 1.0053 17.1966L2.55466 15.2328C2.6603 15.0989 2.68869 14.9197 2.62959 14.7597L1.7629 12.4133C1.68438 12.2007 1.76194 11.962 1.95042 11.8362L4.03078 10.4473C4.17263 10.3526 4.25501 10.1909 4.24825 10.0205L4.14906 7.5211C4.14008 7.29465 4.2876 7.09161 4.50574 7.03018L6.91346 6.35215C7.07764 6.30592 7.20594 6.17761 7.25218 6.01343L7.9302 3.60571C7.99163 3.38757 8.19468 3.24005 8.42112 3.24904L10.9205 3.34822C11.091 3.35499 11.2526 3.27261 11.3473 3.13075L12.7362 1.0504C12.862 0.861914 13.1007 0.784358 13.3133 0.86288L15.6597 1.72957C15.8197 1.78867 15.999 1.76028 16.1329 1.65463L18.0966 0.105279Z" fill="currentColor"/></svg>`,
-      };
-
-      // --- Metadata Generation and Display Logic (from tree.html) ---
-
       // Store pre-generated metadata for each node
       const nodeMetadataMap = new Map();
 
-      // Function to generate random metadata based on object class (adapted for graph node structure)
+      // Function to generate random metadata based on object class
       const generateMetadata = (node) => {
-        const nodeClass = node.class;
-        const nodeName = node.id; // Use node.id as name for graph nodes
+        const userObject = node.getUserObject();
+        const nodeClass = userObject.class;
+        const nodeName = userObject.name;
 
         if (!nodeClass) {
           return null; // No metadata for objects without a class
@@ -2722,6 +3605,24 @@
         }
       };
 
+      // Function to generate metadata for a node and all its children recursively
+      const generateMetadataForTree = (node) => {
+        // Generate metadata for this node and store it in the map
+        // Use the node's toString() as a unique identifier
+        const nodeId = node.toString();
+        const metadata = generateMetadata(node);
+        if (metadata) {
+          nodeMetadataMap.set(nodeId, metadata);
+        }
+
+        // Process children recursively
+        if (!node.isLeaf()) {
+          node.getChildren().forEach((child) => {
+            generateMetadataForTree(child);
+          });
+        }
+      };
+
       // Helper function to format snake_case keys
       const formatMetadataKey = (key) => {
         if (key.toLowerCase() === "id") return "ID"; // Special case for ID
@@ -2981,47 +3882,20 @@
         }
       };
 
-      // Function to display node details using templates (adapted for graph node structure)
       const openNodeDetails = (node) => {
-        // Get pre-generated metadata from the map using node.id
-        const metadata = nodeMetadataMap.get(node.id);
-        const metadataContainer = document.getElementById("node-details");
-        const nodeClass = node.class || "other"; // Default to 'other' if class is missing
+        const elements = document.querySelectorAll(".node-name");
+        elements.forEach((element) => {
+          element.innerHTML = node.getUserObject().name;
+        });
+
+        // Get pre-generated metadata from the map
+        const nodeId = node.toString(); // Using toString() as the key like before
+        const metadata = nodeMetadataMap.get(nodeId);
+        const metadataContainer = document.getElementById("node-metadata");
+        const userObject = node.getUserObject();
+        const nodeClass = userObject.class || "other"; // Default to 'other' if class is missing
 
         metadataContainer.innerHTML = ""; // Clear previous metadata
-
-        // Add the node name/ID as a header with a close button
-        const headerContainer = document.createElement("div");
-        headerContainer.className = "flex items-center justify-between mb-4"; // Use flex to align items
-
-        const header = document.createElement("h1");
-        header.className = "text-3xl text-text-primary node-name"; // Removed mb-4
-        header.textContent = node.id;
-
-        const closeButton = document.createElement("span");
-        closeButton.innerHTML = "&#x2715;"; // 'X' symbol
-        closeButton.className =
-          "text-text-secondary text-xl cursor-pointer hover:text-text-primary ml-2"; // Added margin-left
-        closeButton.title = "Clear selection";
-        closeButton.onclick = resetHighlight; // Call resetHighlight on click
-
-        headerContainer.appendChild(header);
-        headerContainer.appendChild(closeButton);
-        metadataContainer.appendChild(headerContainer);
-
-        // Add the action button container
-        const actionsDiv = document.createElement("div");
-        actionsDiv.id = "node-actions";
-        actionsDiv.className = "pb-4"; // Margin top
-        actionsDiv.innerHTML = `
-            <button
-              id="toggle-nodes"
-              class="bg-background-button-primary text-text-primary border-none py-2 px-4 rounded cursor-pointer text-sm transition-colors hover:bg-interactive-subtle"
-            >
-              Hide Unconnected Nodes
-            </button>
-        `;
-        metadataContainer.appendChild(actionsDiv);
 
         // Find the template
         const templateId = `template-${nodeClass}`;
@@ -3046,871 +3920,188 @@
           metadataContainer.appendChild(pre);
         } else {
           // Handle case where there's no metadata
-          const noDataDiv = document.createElement("div");
-          noDataDiv.innerHTML =
+          metadataContainer.innerHTML =
             "<p class='text-text-secondary'>No metadata available for this node.</p>";
-          metadataContainer.appendChild(noDataDiv);
-        }
-
-        // Add the event listener for the newly created button
-        const toggleButton = metadataContainer.querySelector("#toggle-nodes");
-        if (toggleButton) {
-          // Initialize state based on whether nodes are currently hidden
-          toggleButton.textContent = nodesHidden
-            ? "Show All Nodes"
-            : "Hide Unconnected Nodes";
-
-          toggleButton.addEventListener("click", function () {
-            if (nodesHidden) {
-              nodesHidden = false; // Update the state before calling functions
-              this.textContent = "Hide Unconnected Nodes";
-              showAllNodes();
-            } else {
-              nodesHidden = true; // Update the state before calling functions
-              this.textContent = "Show All Nodes";
-              hideUnconnectedNodes();
-            }
-          });
         }
       };
 
-      // Generate metadata for all nodes on load
-      data.nodes.forEach((node) => {
-        const metadata = generateMetadata(node);
-        if (metadata) {
-          nodeMetadataMap.set(node.id, metadata);
-        }
-      });
-
-      // --- End Metadata Logic ---
-
-      // Function to get a specific CSS variable value - force refresh to get latest values
-      function getCssVariable(variableName) {
-        // Force a style recalculation to ensure we get the latest value
-        return getComputedStyle(document.documentElement)
-          .getPropertyValue(variableName)
-          .trim();
-      }
-
-      // Get theme-aware color palette using CSS variables
-      function getNodeColorPalette() {
-        // Ensure palette length matches domain length
-        return [
-          getCssVariable("--graph-node-org"),
-          getCssVariable("--graph-node-app"),
-          getCssVariable("--graph-node-env"),
-          getCssVariable("--graph-node-env_type"),
-          getCssVariable("--graph-node-other"), // Using 'other' color for 'env'
-          getCssVariable("--graph-node-workload"),
-          getCssVariable("--graph-node-resource"),
-          getCssVariable("--graph-node-other"),
-        ];
-      }
-
-      // Create a color scale based on the class - added 'env' and 'other'
-      let color = d3
-        .scaleOrdinal()
-        .domain([
-          "org",
-          "app",
-          "env",
-          "env_type",
-          "workload",
-          "resource",
-          "other",
-        ]) // Added 'env'
-        .range(getNodeColorPalette()) // Use theme-aware colors
-        .unknown(getCssVariable("--graph-node-other")); // Fallback color
-
-      // Function to update visualization colors when theme changes
-      function updateVisualizationColors() {
-        // Get fresh color palette based on current theme
-        const newPalette = getNodeColorPalette();
-
-        // Update color scale with new theme colors
-        color.range(newPalette);
-
-        // Apply colors directly to each node element
-        node.each(function (d) {
-          const nodeGroup = d3.select(this);
-          const nodeClass = d.class || "other"; // Default to 'other'
-
-          // Get the color for this node class from the updated palette using the scale's domain
-          const domainIndex = color.domain().indexOf(nodeClass);
-          const nodeColor =
-            newPalette[domainIndex >= 0 ? domainIndex : newPalette.length - 1]; // Fallback to last color ('other')
-        });
-
-        // Update text colors
-        node.select("text").style("fill", getCssVariable("--text-primary"));
-        linkText.style("fill", getCssVariable("--text-primary"));
-
-        // Update node label background color
-        node
-          .select("rect.node-label-bg")
-          .style("fill", getCssVariable("--graph-node-label-background"));
-
-        // Update link colors if not highlighted
-        if (!currentSelectedNode) {
-          link.style("stroke", getCssVariable("--graph-link"));
-        } else {
-          // If there's a selected node, update the highlight colors
-          linkGroups.each(function (d) {
-            const sourceId =
-              typeof d.source === "object" ? d.source.id : d.source;
-            const targetId =
-              typeof d.target === "object" ? d.target.id : d.target;
-            const isConnected =
-              sourceId === currentSelectedNode.id ||
-              targetId === currentSelectedNode.id;
-
-            if (isConnected) {
-              d3.select(this)
-                .select("line")
-                .style("stroke", getCssVariable("--graph-link-highlight"));
-            }
+      const addChildren = (node, children) => {
+        for (child of children) {
+          childNode = new TreeNode(child);
+          childNode.on("select", (node) => {
+            openNodeDetails(node);
           });
-        }
-
-        // Update background colors for link text
-        linkTextBg.style("fill", getCssVariable("--interactive-subtle"));
-
-        // Update arrowhead markers with new theme colors
-        svg
-          .selectAll("marker#arrowhead path")
-          .attr("fill", getCssVariable("--graph-link"));
-        svg
-          .selectAll("marker#arrowhead-highlight path")
-          .attr("fill", getCssVariable("--graph-link-highlight"));
-
-        // If there's a selected node, reapply highlighting with new theme colors
-        if (currentSelectedNode) {
-          highlightConnections(currentSelectedNode);
-        }
-      }
-
-      // Get the graph container dimensions
-      const graphContainer = document.getElementById("graph-container");
-      const width = graphContainer.clientWidth;
-      const height = graphContainer.clientHeight; // Use the full height of the container
-
-      // Create SVG element
-      const svg = d3
-        .select("#graph")
-        .append("svg")
-        .attr("width", width)
-        .attr("height", height)
-        .call(
-          d3
-            .zoom()
-            .filter((event) => {
-              // Prevent double-click zoom but allow other zoom events
-              return !event.type.includes("dblclick");
-            })
-            .on("zoom", function (event) {
-              container.attr("transform", event.transform);
-            })
-        );
-
-      // Define arrowhead markers
-      svg
-        .append("defs")
-        .selectAll("marker")
-        .data(["arrowhead", "arrowhead-highlight"]) // Normal and highlighted
-        .enter()
-        .append("marker")
-        .attr("id", (d) => d)
-        .attr("viewBox", "0 -5 10 10")
-        .attr("refX", 15) // Offset adjusted for 24x24 icon (radius 12 + arrowhead size)
-        .attr("refY", 0)
-        .attr("markerWidth", 6)
-        .attr("markerHeight", 6)
-        .attr("orient", "auto")
-        .append("path")
-        .attr("d", "M0,-5L10,0L0,5") // Arrowhead shape
-        .attr("fill", (d) =>
-          d === "arrowhead-highlight"
-            ? getCssVariable("--graph-link-highlight")
-            : getCssVariable("--graph-link")
-        ); // Color based on ID
-
-      // Container for the graph
-      const container = svg.append("g");
-
-      // Initialize the links as groups
-      const linkGroups = container
-        .append("g")
-        .selectAll(".link-group")
-        .data(data.links)
-        .enter()
-        .append("g")
-        .attr("class", "link-group");
-
-      // Add the line for each link
-      const link = linkGroups
-        .append("line")
-        .attr("class", "stroke-opacity-60 transition-all duration-300")
-        .style("stroke", getCssVariable("--graph-link")) // Use CSS variable
-        .style("stroke-width", 2)
-        .attr("marker-end", "url(#arrowhead)"); // Add the default arrowhead
-
-      // Add background rectangles for the link text (initially hidden)
-      const linkTextBg = linkGroups
-        .append("rect")
-        .attr("class", "rounded-md opacity-0")
-        .style("fill", getCssVariable("--interactive-subtle")) // Use CSS variable
-        .attr("rx", 3)
-        .attr("ry", 3)
-        .attr("width", 0)
-        .attr("height", 0)
-        .attr("x", 0)
-        .attr("y", 0);
-
-      // Add the explanation text for each link (hidden by default)
-      const linkText = linkGroups
-        .append("text")
-        .attr("class", "text-xs pointer-events-none opacity-0")
-        .style("fill", getCssVariable("--text-primary")) // Use CSS variable
-        .text((d) => d.explanation)
-        .attr("text-anchor", "middle")
-        .attr("dy", -5);
-
-      // Initialize the nodes with drag functionality
-      const node = container
-        .append("g")
-        .selectAll(".node")
-        .data(data.nodes)
-        .enter()
-        .append("g")
-        .attr("class", "cursor-pointer")
-        .call(
-          d3
-            .drag()
-            .on("start", dragstarted)
-            .on("drag", dragged)
-            .on("end", dragended)
-        );
-
-      // Utility function to adjust color brightness (Keep for label backgrounds)
-      function adjustBrightness(color, amount) {
-        // Parse the hex color
-        let hex = color;
-        if (hex.startsWith("#")) {
-          hex = hex.slice(1);
-        }
-
-        // Handle shorthand hex
-        if (hex.length === 3) {
-          hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
-        }
-
-        // Convert to RGB
-        let r = parseInt(hex.slice(0, 2), 16);
-        let g = parseInt(hex.slice(2, 4), 16);
-        let b = parseInt(hex.slice(4, 6), 16);
-
-        // Adjust brightness
-        r = Math.max(0, Math.min(255, r + amount));
-        g = Math.max(0, Math.min(255, g + amount));
-        b = Math.max(0, Math.min(255, b + amount));
-
-        // Convert back to hex
-        return `#${r.toString(16).padStart(2, "0")}${g
-          .toString(16)
-          .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
-      }
-
-      // function getBorderColor(fillColor) { ... } // Removed as it's no longer needed for nodes
-
-      // Append SVG icons based on class
-      node.each(function (d) {
-        const nodeGroup = d3.select(this);
-        const className = d.class || "other";
-        const svgString = svgIconContent[className] || svgIconContent.other;
-
-        // Add class to the group for CSS targeting
-        nodeGroup.classed(`node-${className}`, true);
-
-        // Parse the SVG string
-        const parser = new DOMParser();
-        const svgDoc = parser.parseFromString(svgString, "image/svg+xml");
-        const svgElement = svgDoc.querySelector("svg");
-
-        if (svgElement) {
-          // Calculate scale factor to fit into 24x24
-          const originalWidth = parseFloat(
-            svgElement.getAttribute("width") || 24
-          );
-          const originalHeight = parseFloat(
-            svgElement.getAttribute("height") || 24
-          );
-          // Use viewBox for aspect ratio calculation if width/height are missing
-          const viewBox = svgElement.getAttribute("viewBox");
-          let vbWidth = originalWidth;
-          let vbHeight = originalHeight;
-          if (!vbWidth || !vbHeight) {
-            if (viewBox) {
-              const parts = viewBox.split(" ");
-              if (parts.length === 4) {
-                vbWidth = parseFloat(parts[2]);
-                vbHeight = parseFloat(parts[3]);
-              }
-            }
+          node.addChild(childNode);
+          if (child.children) {
+            addChildren(childNode, child.children);
           }
-          vbWidth = vbWidth || 24; // Fallback if still missing
-          vbHeight = vbHeight || 24;
-
-          const scaleX = 24 / vbWidth;
-          const scaleY = 24 / vbHeight;
-          const scale = Math.min(scaleX, scaleY); // Preserve aspect ratio
-
-          // Calculate translation to center the scaled icon within the 24x24 area
-          const translateX = (24 - vbWidth * scale) / 2;
-          const translateY = (24 - vbHeight * scale) / 2;
-
-          // Create a group for the icon elements
-          const iconGroup = nodeGroup
-            .append("g")
-            .attr("class", "node-icon")
-            // Scale and center the icon group within the -12, -12 offset area
-            .attr(
-              "transform",
-              `translate(${-12 + translateX}, ${
-                -12 + translateY
-              }) scale(${scale})`
-            );
-
-          // Append children (paths, circles, etc.) from the parsed SVG
-          Array.from(svgElement.children).forEach((child) => {
-            // Add a class to the shapes for styling
-            d3.select(child).classed("node-icon-shape", true);
-            iconGroup.node().appendChild(child.cloneNode(true));
-          });
         }
-      });
-
-      // Add background rectangles for node labels
-      const labelBgs = node
-        .append("rect")
-        .attr("class", "rounded transition-opacity duration-300  node-label-bg")
-        .attr("rx", 3)
-        .attr("ry", 3)
-        .style("fill", getCssVariable("--graph-node-label-background")); // Use subtle background for all labels
-
-      // Add labels to the nodes
-      const labels = node
-        .append("text")
-        .text((d) => d.id)
-        .attr(
-          "class",
-          "text-xs pointer-events-none transition-opacity duration-300"
-        )
-        .style("fill", getCssVariable("--text-primary")) // Use CSS variable
-        .attr("dx", 15)
-        .attr("dy", 4);
-
-      // Store initial positions for nodes
-      let initialPositions = [];
-
-      // Variables to control force parameters
-      // Reduce movement by lowering alphaTarget and increasing strength values
-      let linkDistance = 100; // Increased from 50 to 100
-      let chargeStrength = -1500;
-      let nodeCollideRadius = (d) => 20;
-
-      // Create the simulation with reduced movement
-      const simulation = d3
-        .forceSimulation(data.nodes)
-        .force(
-          "link",
-          d3
-            .forceLink(data.links)
-            .id((d) => d.id)
-            .distance(() => linkDistance)
-        )
-        .force(
-          "charge",
-          d3.forceManyBody().strength(() => chargeStrength)
-        )
-        .force("center", d3.forceCenter(width / 2, height / 2))
-        .force(
-          "collide",
-          d3.forceCollide().radius(nodeCollideRadius).iterations(2)
-        );
-
-      // Function to handle window resize
-      function handleResize() {
-        const graphContainer = document.getElementById("graph-container");
-
-        svg
-          .attr("width", graphContainer.clientWidth)
-          .attr("height", graphContainer.clientHeight);
-      }
-
-      // Listen for window resize
-      window.addEventListener("resize", handleResize);
-
-      // Initial layout (full screen)
-      toggleLayout(false);
-
-      // Save initial positions after the simulation has settled
-      simulation.on("end", () => {
-        // Store initial positions for all nodes
-        data.nodes.forEach((node) => {
-          initialPositions.push({
-            id: node.id,
-            x: node.x,
-            y: node.y,
-          });
+      };
+      window.onload = () => {
+        const rootNode = new TreeNode(data.root);
+        rootNode.on("select", (node) => {
+          openNodeDetails(node);
         });
-      });
+        if (data.root.children) {
+          addChildren(rootNode, data.root.children);
+        }
 
-      // Update positions during simulation
-      simulation.on("tick", () => {
-        // Update link lines, adjusting end point for arrowhead
-        link.each(function (d) {
-          const source = d.source;
-          const target = d.target;
-          const dx = target.x - source.x;
-          const dy = target.y - source.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+        // Generate metadata for the entire tree when it's loaded
+        generateMetadataForTree(rootNode);
 
-          // Use fixed radius for 24x24 icons
-          const targetRadius = 12;
-          const offset = targetRadius + 3; // Node radius (12) + marker refX adjustment (15 - 12 = 3)
+        // Display details for the root node initially
+        openNodeDetails(rootNode);
 
-          // Calculate the adjusted target coordinates
-          const targetX = target.x - (dx / dist) * offset;
-          const targetY = target.y - (dy / dist) * offset;
+        const tree = new TreeView(rootNode, "#tree-container");
+        tree.reload();
 
-          d3.select(this)
-            .attr("x1", source.x)
-            .attr("y1", source.y)
-            .attr("x2", dist > offset ? targetX : target.x) // Avoid overshooting if nodes are too close
-            .attr("y2", dist > offset ? targetY : target.y);
-        });
-
-        // Update link explanation position (text and background)
-        linkGroups.each(function (d) {
-          const linkGroup = d3.select(this);
-          const textElement = linkGroup.select("text");
-          const bgElement = linkGroup.select("rect");
-
-          // Calculate the center point of the link
-          const x = (d.source.x + d.target.x) / 2;
-          const y = (d.source.y + d.target.y) / 2;
-
-          // Position the text at the center
-          textElement.attr("x", x).attr("y", y - 5);
-
-          // Get the bounding box of the text to size the background correctly
-          if (textElement.node()) {
-            const bbox = textElement.node().getBBox();
-
-            // Position the background rectangle to encompass the text
-            bgElement
-              .attr("x", bbox.x - 4)
-              .attr("y", bbox.y - 2)
-              .attr("width", bbox.width + 8)
-              .attr("height", bbox.height + 4);
-          }
-        });
-
-        // Update nodes
-        node.attr("transform", (d) => `translate(${d.x}, ${d.y})`);
-
-        // Update node label backgrounds based on text size
-        node.each(function () {
-          const nodeGroup = d3.select(this);
-          const textElement = nodeGroup.select("text");
-          const bgElement = nodeGroup.select("rect.node-label-bg");
-
-          if (textElement.node()) {
-            const bbox = textElement.node().getBBox();
-
-            // Position the background rectangle to encompass the text
-            bgElement
-              .attr("x", bbox.x - 2)
-              .attr("y", bbox.y - 1)
-              .attr("width", bbox.width + 4)
-              .attr("height", bbox.height + 2);
-          }
-        });
-      });
-
-      // Store current selected node globally
-      let currentSelectedNode = null;
-      let currentConnectedNodeIds = new Set();
-
-      // Function to move a node to the left third of the screen quickly
-      function moveNodeToLeftThird(d) {
-        const graphContainer = document.getElementById("graph-container");
-        const leftThirdX = graphContainer.clientWidth / 3;
-        const centerY = graphContainer.clientHeight / 2;
-
-        // Apply direct positioning to the selected node
-        d.fx = leftThirdX; // Fix the x position
-        d.fy = centerY; // Fix the y position
-
-        // Apply immediate transition
-        d.x = leftThirdX;
-        d.y = centerY;
-
-        // Temporarily boost simulation to better position connected nodes
-        simulation.alpha(0.3).restart();
-
-        // Release fixed position after a delay to allow for later interactions
+        // Custom behavior to override the default tree.js behavior
+        // We need to wait a bit for the tree to be fully rendered
         setTimeout(() => {
-          if (currentSelectedNode === d) {
-            // Keep it fixed while selected
-            d.fx = leftThirdX;
-            d.fy = centerY;
-          }
+          // Override the default click behavior
+          const treeContainer = document.getElementById("tree-container");
+
+          // Prevent the default click behavior on the description spans
+          treeContainer.addEventListener(
+            "click",
+            function (e) {
+              // If the click is on the description span but not on the arrow icon
+              if (
+                e.target.closest(".tj_description") &&
+                !e.target.closest(".tj_mod_icon")
+              ) {
+                e.stopPropagation(); // Stop event propagation
+
+                // Find the node associated with this description
+                let element = e.target;
+                while (element && !element.tj_node) {
+                  element = element.parentElement;
+                }
+
+                if (element && element.tj_node) {
+                  const node = element.tj_node;
+
+                  // Select the node and show details without toggling expansion
+                  const root = node.getRoot();
+                  if (root instanceof TreeNode) {
+                    TreeUtil.getSelectedNodesForNode(root).forEach(function (
+                      n
+                    ) {
+                      n.setSelected(false);
+                    });
+                  }
+
+                  node.setSelected(true);
+                  openNodeDetails(node);
+                  tree.reload();
+                }
+              }
+            },
+            true
+          ); // Use capture phase to intercept events before they reach the default handlers
+
+          // Add click handlers to the arrow icons
+          treeContainer.addEventListener(
+            "click",
+            function (e) {
+              // If the click is on the arrow icon
+              if (e.target.closest(".tj_mod_icon")) {
+                e.stopPropagation(); // Stop event propagation
+
+                // Find the node associated with this arrow
+                let element = e.target.closest(".tj_description");
+                if (element && element.tj_node) {
+                  const node = element.tj_node;
+
+                  // Toggle expansion only
+                  if (!node.isLeaf()) {
+                    node.toggleExpanded();
+                    tree.reload();
+
+                    // Re-apply our custom event handlers after reload
+                    setTimeout(() => {
+                      applyCustomBehavior();
+                    }, 0);
+                  }
+                }
+              }
+            },
+            true
+          ); // Use capture phase
         }, 100);
-      }
 
-      // Toggle layout function
-      function toggleLayout(showDetails) {
-        const combinedContainer = document.getElementById("combined-container");
-        const graphContainer = document.getElementById("graph-container");
-        const detailsContainer = document.getElementById("details-container");
-
-        if (showDetails) {
-          // Switch to split view
-          combinedContainer.style.flexDirection = "row";
-          graphContainer.style.width = "66.6%";
-          detailsContainer.style.display = "block";
-          detailsContainer.style.width = "33.3%";
-
-          // Trigger resize to update the graph
-          setTimeout(handleResize, 10);
-        } else {
-          // Switch to full screen graph
-          combinedContainer.style.flexDirection = "row";
-          graphContainer.style.width = "100%";
-          detailsContainer.style.display = "none";
-
-          // Trigger resize to update the graph
-          setTimeout(handleResize, 10);
-        }
-      }
-
-      // Function to highlight connections
-      function highlightConnections(selectedNode) {
-        // Store current selection
-        currentSelectedNode = selectedNode;
-        currentConnectedNodeIds = new Set();
-
-        // Find connected nodes and links
-        const connectedLinks = [];
-
-        data.links.forEach((link) => {
-          if (
-            link.source.id === selectedNode.id ||
-            link.target.id === selectedNode.id
-          ) {
-            currentConnectedNodeIds.add(
-              typeof link.source === "object" ? link.source.id : link.source
-            );
-            currentConnectedNodeIds.add(
-              typeof link.target === "object" ? link.target.id : link.target
-            );
-            connectedLinks.push(link);
-          }
-        });
-
-        // Fix positions of all nodes to prevent movement when highlighting
-        data.nodes.forEach((node) => {
-          node.fx = node.x;
-          node.fy = node.y;
-        });
-
-        // Reduce opacity for all nodes
-        node.select(".node-icon").style("opacity", 0.2); // Target icon group
-        node.select("text").style("opacity", 0.2);
-        node.select("rect.node-label-bg").style("opacity", 0.2);
-
-        // Highlight the selected node and its connections
-        node
-          .filter((d) => currentConnectedNodeIds.has(d.id))
-          .select(".node-icon") // Target icon group
-          .style("opacity", 1);
-
-        node
-          .filter((d) => currentConnectedNodeIds.has(d.id))
-          .select("text")
-          .style("opacity", 1);
-
-        node
-          .filter((d) => currentConnectedNodeIds.has(d.id))
-          .select("rect.node-label-bg")
-          .style("opacity", 0.8);
-
-        // Reset all links to default style first before applying highlights
-        linkGroups.each(function () {
-          const linkElement = d3.select(this).select("line");
-          const textElement = d3.select(this).select("text");
-          const bgElement = d3.select(this).select("rect");
-
-          linkElement
-            .style("opacity", null) // Remove explicit opacity if set
-            .style("stroke-opacity", 0.6) // Reset to default dim state
-            .style("stroke", getCssVariable("--graph-link")) // Reset color
-            .style("stroke-width", 2) // Reset width
-            .attr("marker-end", "url(#arrowhead)"); // Reset marker
-
-          textElement.style("opacity", 0); // Hide text
-          bgElement.style("opacity", 0); // Hide background
-        });
-
-        // Highlight connected links
-        linkGroups.each(function (d) {
-          const sourceId =
-            typeof d.source === "object" ? d.source.id : d.source;
-          const targetId =
-            typeof d.target === "object" ? d.target.id : d.target;
-          const isConnected =
-            sourceId === selectedNode.id || targetId === selectedNode.id;
-
-          const linkElement = d3.select(this).select("line");
-          const textElement = d3.select(this).select("text");
-          const bgElement = d3.select(this).select("rect");
-
-          if (isConnected) {
-            linkElement
-              .style("stroke-opacity", 1)
-              .style("stroke", getCssVariable("--graph-link-highlight")) // Use CSS variable
-              .style("stroke-width", 3)
-              .attr("marker-end", "url(#arrowhead-highlight)"); // Switch marker
-
-            // Show both the text and its background
-            textElement.style("opacity", 1);
-            bgElement.style("opacity", 1);
-          } else {
-            // Reduce opacity for the entire line element, affecting the marker
-            linkElement
-              .style("opacity", 0.1) // Changed from stroke-opacity to opacity
-              .attr("marker-end", "url(#arrowhead)"); // Revert marker
-            textElement.style("opacity", 0);
-            bgElement.style("opacity", 0);
-          }
-        });
-
-        // Display node details using the new function
-        openNodeDetails(selectedNode);
-
-        // Show details container with split layout
-        toggleLayout(true);
-      }
-
-      // Store search state
-      let currentSearchTerm = "";
-
-      // Reset highlight function
-      function resetHighlight() {
-        // Release fixed positions for all nodes
-        data.nodes.forEach((node) => {
-          node.fx = null;
-          node.fy = null;
-        });
-
-        // Show all nodes again
-        node.style("display", "");
-
-        // Reset opacities and styles, but respect search filter if active
-        if (currentSearchTerm) {
-          applySearchFilter(currentSearchTerm);
-        } else {
-          node.select(".node-icon").style("opacity", 1); // Target icon group
-          node.select("text").style("opacity", 1);
-          node.select("rect.node-label-bg").style("opacity", 0.8);
+        // Function to apply custom behavior after tree reloads
+        function applyCustomBehavior() {
+          // Make arrow icons more visually distinct as clickable elements
+          document.querySelectorAll(".tj_mod_icon").forEach((icon) => {
+            icon.style.cursor = "pointer";
+          });
         }
 
-        // Reset link styles
-        linkGroups.style("display", "");
-        link
-          .style("opacity", null) // Remove the inline opacity style
-          .style("stroke-opacity", 0.6) // Ensure default stroke-opacity is set
-          .style("stroke", getCssVariable("--graph-link")) // Use CSS variable
-          .style("stroke-width", 2)
-          .attr("marker-end", "url(#arrowhead)"); // Ensure default marker
+        // Initial application of custom behavior
+        applyCustomBehavior();
 
-        // Hide all link texts and backgrounds
-        linkText.style("opacity", 0);
-        linkTextBg.style("opacity", 0);
+        // --- Resizing Logic ---
+        const resizeHandle = document.getElementById("resize-handle");
+        const resizableGrid = document.getElementById("resizable-grid");
+        const treeColumn = document.getElementById("tree-column");
+        const detailsColumn = document.getElementById("details-column");
+        let isResizing = false;
+        let startX, initialTreeWidth, initialDetailsWidth, gridWidth;
 
-        // Reset layout to full screen
-        toggleLayout(false);
+        resizeHandle.addEventListener("mousedown", (e) => {
+          isResizing = true;
+          startX = e.clientX;
+          gridWidth = resizableGrid.offsetWidth;
+          initialTreeWidth = treeColumn.offsetWidth;
+          // No need for initialDetailsWidth as we'll use fractions
 
-        // Clear current selection
-        currentSelectedNode = null;
-        currentConnectedNodeIds = new Set();
+          // Prevent text selection during drag
+          document.body.style.userSelect = "none";
+          document.body.style.cursor = "col-resize"; // Optional: change cursor globally
 
-        // Restart with minimal movement
-        simulation.alpha(0.1).restart();
-      }
-
-      // Function to hide unconnected nodes
-      function hideUnconnectedNodes() {
-        if (!currentSelectedNode) return;
-
-        // Hide unconnected nodes
-        node
-          .filter((d) => !currentConnectedNodeIds.has(d.id))
-          .style("display", "none");
-
-        // Hide links that don't connect to our selected node
-        linkGroups.each(function (d) {
-          const sourceId =
-            typeof d.source === "object" ? d.source.id : d.source;
-          const targetId =
-            typeof d.target === "object" ? d.target.id : d.target;
-          const isConnected =
-            sourceId === currentSelectedNode.id ||
-            targetId === currentSelectedNode.id;
-
-          if (!isConnected) {
-            d3.select(this).style("display", "none");
-          }
+          document.addEventListener("mousemove", handleMouseMove);
+          document.addEventListener("mouseup", handleMouseUp);
         });
-      }
 
-      // Function to show all nodes
-      function showAllNodes() {
-        if (!currentSelectedNode) return;
+        function handleMouseMove(e) {
+          if (!isResizing) return;
 
-        // Show all nodes but keep highlighting
-        node.style("display", "");
-        linkGroups.style("display", ""); // Show all link groups instead of just the lines
+          const currentX = e.clientX;
+          const deltaX = currentX - startX;
+          let newTreeWidth = initialTreeWidth + deltaX;
 
-        // Reapply highlight effect
-        highlightConnections(currentSelectedNode);
-      }
+          // Constraints (e.g., min width 100px)
+          const minWidth = 100;
+          const handleWidth = resizeHandle.offsetWidth;
+          const maxWidth = gridWidth - minWidth - handleWidth;
 
-      // Add click handling for nodes
-      node.on("click", (event, d) => {
-        event.stopPropagation(); // Prevent event bubbling
-        highlightConnections(d);
-      });
+          newTreeWidth = Math.max(minWidth, Math.min(newTreeWidth, maxWidth));
 
-      // Click on background to reset
-      svg.on("click", (event) => {
-        if (event.target.tagName === "svg" || event.target.tagName === "rect") {
-          resetHighlight();
-        }
-      });
+          const newTreeFraction = newTreeWidth / gridWidth;
+          const newDetailsFraction =
+            1 - newTreeFraction - handleWidth / gridWidth;
 
-      // Function to apply search filter
-      function applySearchFilter(searchTerm) {
-        if (!searchTerm) {
-          // If search is cleared, reset all nodes to full opacity
-          node.select(".node-icon").style("opacity", 1); // Target icon group
-          node.select("text").style("opacity", 1);
-          node.select("rect.node-label-bg").style("opacity", 0.8);
-
-          // Reset all links to default opacity
-          link.style("stroke-opacity", 0.6);
-          return;
+          // Update grid-template-columns using fractions (fr units)
+          // Ensure fractions are positive
+          if (newTreeFraction > 0 && newDetailsFraction > 0) {
+            resizableGrid.style.gridTemplateColumns = `${newTreeFraction}fr ${handleWidth}px ${newDetailsFraction}fr`;
+          }
         }
 
-        // Convert to lowercase for case-insensitive comparison
-        const term = searchTerm.toLowerCase();
+        function handleMouseUp() {
+          if (isResizing) {
+            isResizing = false;
+            document.removeEventListener("mousemove", handleMouseMove);
+            document.removeEventListener("mouseup", handleMouseUp);
 
-        // Track which nodes match the search
-        const matchingNodeIds = new Set();
-
-        // Apply opacity based on match
-        node.each(function (d) {
-          const nodeElement = d3.select(this);
-          const matches = d.id.toLowerCase().includes(term);
-
-          if (matches) {
-            matchingNodeIds.add(d.id);
+            // Restore text selection and cursor
+            document.body.style.userSelect = "";
+            document.body.style.cursor = "";
           }
-
-          // Use Tailwind's opacity classes by setting style directly
-          nodeElement.select(".node-icon").style("opacity", matches ? 1 : 0.1); // Target icon group
-          nodeElement.select("text").style("opacity", matches ? 1 : 0.1);
-          nodeElement
-            .select("rect.node-label-bg")
-            .style("opacity", matches ? 0.8 : 0.1);
-        });
-
-        // Update link opacity based on whether they connect matching nodes
-        linkGroups.each(function (d) {
-          const linkElement = d3.select(this).select("line");
-          const sourceId =
-            typeof d.source === "object" ? d.source.id : d.source;
-          const targetId =
-            typeof d.target === "object" ? d.target.id : d.target;
-
-          // If either source or target matches, keep link visible
-          const isRelevant =
-            matchingNodeIds.has(sourceId) || matchingNodeIds.has(targetId);
-
-          // Set opacity accordingly
-          linkElement.style("stroke-opacity", isRelevant ? 0.6 : 0.1);
-          // Keep default marker during search filtering
-          linkElement.attr("marker-end", "url(#arrowhead)");
-        });
-      }
-
-      // Button event handlers
-      d3.select("#reset-highlight").on("click", function () {
-        // Clear search when resetting view
-        const searchInput = document.getElementById("search-nodes");
-        searchInput.value = "";
-        currentSearchTerm = "";
-        document.getElementById("clear-search").style.display = "none";
-
-        resetHighlight();
-      });
-
-      // Search functionality
-      const searchInput = document.getElementById("search-nodes");
-      const clearButton = document.getElementById("clear-search");
-
-      searchInput.addEventListener("input", function () {
-        const searchTerm = this.value.trim();
-        currentSearchTerm = searchTerm;
-
-        // Show/hide clear button
-        clearButton.style.display = searchTerm ? "block" : "none";
-
-        // Apply search filter
-        applySearchFilter(searchTerm);
-      });
-
-      // Clear search button
-      clearButton.addEventListener("click", function () {
-        searchInput.value = "";
-        currentSearchTerm = "";
-        this.style.display = "none";
-        applySearchFilter("");
-      });
-
-      // Toggle nodes visibility state (moved inside openNodeDetails)
-      let nodesHidden = false;
-
-      // Drag functions
-      function dragstarted(event, d) {
-        if (!event.active) simulation.alphaTarget(0.3).restart();
-        d.fx = d.x;
-        d.fy = d.y;
-      }
-
-      function dragged(event, d) {
-        d.fx = event.x;
-        d.fy = event.y;
-      }
-
-      function dragended(event, d) {
-        if (!event.active) simulation.alphaTarget(0.01);
-        // Don't keep the node fixed where it was dragged
-        // Reset d.fx and d.fy to null so the node can continue participating in the simulation
-        d.fx = null;
-        d.fy = null;
-      }
+        }
+        // --- End Resizing Logic ---
+      };
     </script>
   </body>
 </html>
