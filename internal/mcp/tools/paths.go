@@ -17,7 +17,8 @@ func NewListPathsTool() mcp.Tool {
 		Name: "list-canyon-paths",
 		Description: `Returns a list of 'paths' supported by the canyon MCP server.
 Paths are remote functions which can be used to query or achieve a wide array of functionality.
-The list of available paths may change over time so consider listing the available paths when there is low confidence that an existing paths can be used to solve the user query`,
+The list of available paths may change over time so consider listing the available paths when there is low confidence that an existing paths can be used to solve the user query.
+Canyon paths are not tools themselves and must be called through the call-canyon-path tool.`,
 		InputSchema: map[string]interface{}{
 			"type":     "object",
 			"required": []interface{}{"org_id"},
@@ -74,7 +75,7 @@ func NewCallPathTool() mcp.Tool {
 			"org_id":          map[string]interface{}{"type": "string", "description": "The organization ID of the org in which the path is defined"},
 			"name":            map[string]interface{}{"type": "string", "description": "The name of the path to call"},
 			"arguments":       map[string]interface{}{"type": "object", "description": "The arguments of the path to call, these must match the input schema"},
-			"idempotency_key": map[string]interface{}{"type": "string", "description": "An idempotency key to use to continue the request if it times out, this should be a short globally unique alphanumeric string"},
+			"idempotency_key": map[string]interface{}{"type": "string", "description": "An idempotency key to use to continue the request if it times out, this will be created for you on the first attempt"},
 		}, "required": []interface{}{"org_id", "name", "arguments", "idempotency_key"}},
 		Callable: func(ctx context.Context, arguments map[string]interface{}) ([]mcp.CallToolResponseContent, error) {
 			name, _ := arguments["name"].(string)
