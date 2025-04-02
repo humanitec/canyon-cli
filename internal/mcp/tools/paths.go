@@ -4,10 +4,10 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
+	"github.com/humanitec/canyon-cli/internal"
 	"github.com/humanitec/canyon-cli/internal/clients/humanitec"
 	"github.com/humanitec/canyon-cli/internal/mcp"
 )
@@ -59,7 +59,7 @@ Canyon paths are not tools themselves and must be called through the call-canyon
 				}
 			}
 
-			raw, _ := json.Marshal(tools)
+			raw := internal.PrettyJson(tools)
 			return []mcp.CallToolResponseContent{
 				mcp.NewTextToolResponseContent("Here's an array of the current canyon tools in JSON: %s", string(raw)),
 			}, nil
@@ -111,7 +111,7 @@ func NewCallPathTool() mcp.Tool {
 				}
 				return nil, fmt.Errorf("unexpected response from humanitec, you can be able to continue the request with idempotency key '%s' to continue waiting: %s %s", idempotencyKey, r.HTTPResponse.Status, string(r.Body))
 			} else {
-				raw, _ := json.Marshal(r.JSON200)
+				raw := internal.PrettyJson(r.JSON200)
 				return []mcp.CallToolResponseContent{
 					mcp.NewTextToolResponseContent("The path returned the following result in JSON: %s", string(raw)),
 				}, nil

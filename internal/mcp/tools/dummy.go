@@ -2,8 +2,8 @@ package tools
 
 import (
 	"context"
-	"encoding/json"
 
+	"github.com/humanitec/canyon-cli/internal"
 	"github.com/humanitec/canyon-cli/internal/mcp"
 )
 
@@ -23,7 +23,7 @@ func NewDummyMetadataKeysTool() mcp.Tool {
 				Key         string `json:"key"`
 				Description string `json:"description"`
 			}
-			raw, _ := json.Marshal([]fake{
+			raw := internal.PrettyJson([]fake{
 				{Key: "Service-Owner", Description: "The project team who own this workload and are responsible for development and deployments"},
 				{Key: "Github-Repo-Url", Description: "The GitHub repository URL where the source code of a workload can be found"},
 				{Key: "Git-Tag", Description: "The Git tag that the container image of this workload comes from"},

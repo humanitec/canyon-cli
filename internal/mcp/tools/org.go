@@ -2,7 +2,6 @@ package tools
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -13,6 +12,7 @@ import (
 
 	"github.com/humanitec/humanitec-go-autogen/client"
 
+	"github.com/humanitec/canyon-cli/internal"
 	"github.com/humanitec/canyon-cli/internal/clients/humanitec"
 	"github.com/humanitec/canyon-cli/internal/mcp"
 )
@@ -47,7 +47,7 @@ This tool also returns the list of Organizations that the user has access to inc
 						}
 					}
 				}
-				rawOrgs, _ := json.Marshal(out)
+				rawOrgs := internal.PrettyJson(out)
 				return []mcp.CallToolResponseContent{mcp.NewTextToolResponseContent(`The user is currently logged in. The following JSON is map from Humanitec Organization to Role:
 %s
 'administrators' can take all actions in the Organization, 'managers' may create applications and manage users, 'members' only have access to an application level, 'org_viewers' have read access to the whole Organization.`,
@@ -171,7 +171,7 @@ An optional app_id regex argument can filter Application Ids, while the env_type
 					return nil, err
 				}
 
-				rawApps, _ := json.Marshal(out)
+				rawApps := internal.PrettyJson(out)
 				return []mcp.CallToolResponseContent{mcp.NewTextToolResponseContent("The user is has access to the following Humanitec Applications with Organization '%s' in JSON format: %s", orgId, string(rawApps))}, nil
 			}
 		},
@@ -201,7 +201,7 @@ The profile schema includes the set of properties supported in Workloads specs t
 			}).AndStatusCodeEq(http.StatusOK).RespAndError(); err != nil {
 				return nil, err
 			} else {
-				profileSchema, _ := json.Marshal(r.JSON200.SpecSchema)
+				profileSchema := internal.PrettyJson(r.JSON200.SpecSchema)
 				return []mcp.CallToolResponseContent{mcp.NewTextToolResponseContent(`The humanitec workload profile has the following JSON schema for the spec of a deployment set module: %s`, string(profileSchema))}, nil
 			}
 		},
