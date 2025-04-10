@@ -1,5 +1,7 @@
 # canyon-cli
 
+This CLI is publically available for reference use in ongoing demos and feedback initiatives.
+
 ## Installation
 
 1. Download the latest version of the canyon-cli MCP tool from https://github.com/humanitec/canyon-cli/releases/.
